@@ -1,0 +1,27 @@
+{
+  "name": "creative-delta/authentication",
+  "type": "library",
+  "description": "PHP Zend - Authentication",
+  "homepage": "https://github.com/GoPlan/authentication",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Duc-Anh Le",
+      "email": "ducanh.ke@gmail.com"
+    }
+  ],
+  "version": "0.0.1",
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/GoPlan/authentication"
+    }
+  ],
+  "require": {
+  },
+  "autoload": {
+    "psr-4": {
+      "CreativeDelta\\Authentication\\": "src/"
+    }
+  }
+}
