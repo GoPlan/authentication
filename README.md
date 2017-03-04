@@ -1,1 +1,1 @@
-PHP Zend - User Management 
+User Register Authentication - Email, Facebook, G+ for PHP Zend
