@@ -45,6 +45,15 @@ class UserFacebookService
         $this->redirectUri = $redirectUri;
     }
 
+    /**
+     * Use this method to receive URL for Facebook authentication, then redirect your page to the URL.
+     * Once user has logged-in, the user will then be redirected back to the URL set by $redirectUri.
+     * You should have an controller::action for this redirection url. Then in this action, you can
+     * retrieve authentication data {code, state} for next uses.
+     *
+     * @param $state
+     * @return string
+     */
     public function generateOAuthUrl($state)
     {
         $config = [
@@ -61,10 +70,16 @@ class UserFacebookService
         return $url;
     }
 
-    public function initializeToken($data)
+    /**
+     * Since service is only set to received [code] in the authentication response,
+     * an extra step must be made in order to receive an access_token for your application.
+     *
+     * Use this method and provide it with the code (received from authentication) to get a token.
+     *
+     * @param $code
+     */
+    public function initializeToken($code)
     {
-        $code = $data['code'];
-
         $config = [
             'client_id'     => $this->appId,
             'client_secret' => $this->appSecret,
@@ -81,6 +96,10 @@ class UserFacebookService
         $this->token = $dataArray['access_token'];
     }
 
+    /**
+     * @param string $fields // a comma separated string of profile fields to be retrieved
+     * @return mixed
+     */
     public function profile($fields)
     {
         $httpGraph = new Client(self::FACEBOOK_GRAPH_URL);
