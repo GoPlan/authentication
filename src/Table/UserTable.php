@@ -37,13 +37,15 @@ class UserTable
 
     public function has($username)
     {
-        return !($this->get($username) == null);
+        return $this->tableGateway->select(['username' => $username])->count() > 0;
     }
 
     public function create($username)
     {
         $user             = new RowGateway(self::ID_NAME, self::TABLE_NAME, $this->dbAdapter);
         $user['username'] = $username;
-        return $user->save();
+        $user->save();
+
+        return $user;
     }
 }

@@ -32,18 +32,17 @@ class UserFacebookTable
 
     public function has($facebookId)
     {
-        return $this->tableGateway->select(['facebook' => $facebookId])->count();
+        return $this->tableGateway->select(['facebookId' => $facebookId])->count() > 0;
     }
 
     public function create($username, $facebookId, $profile)
     {
-        $account               = new RowGateway(UserFacebookTable::TABLE_NAME, UserFacebookTable::ID_NAME, $this->dbAdapter);
-        $account['username']   = $username;
-        $account['facebookId'] = $facebookId;
-        $account['profile']    = $profile;
+        $account                = new RowGateway(UserFacebookTable::ID_NAME, UserFacebookTable::TABLE_NAME, $this->dbAdapter);
+        $account['username']    = $username;
+        $account['facebookId']  = $facebookId;
+        $account['profileJson'] = $profile;
+        $account->save();
 
-        $result = $account->save();
-
-        return $result;
+        return $account;
     }
 }

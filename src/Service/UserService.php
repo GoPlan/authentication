@@ -25,6 +25,7 @@ class UserService implements UserServiceInterface
     protected $userFacebookTable;
     protected $userEmailTable;
 
+
     protected $dbAdapter;
 
 
@@ -60,8 +61,12 @@ class UserService implements UserServiceInterface
 
         try {
 
-            $this->userTable->create($username) &&
-            $this->userFacebookTable->create($username, $facebookId, $profile);
+            $user     = $this->userTable->create($username);
+            $facebook = $this->userFacebookTable->create($username, $facebookId, $profile);
+
+            $user['primaryTable'] = UserFacebookTable::TABLE_NAME;
+            $user['primaryId']    = $facebook[UserFacebookTable::ID_NAME];
+            $user->save();
 
         } catch (\Exception $exception) {
             throw new UserException(UserException::CODE_DATABASE_INSERT_ERROR, $exception);

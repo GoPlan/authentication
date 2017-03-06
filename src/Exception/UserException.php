@@ -20,7 +20,7 @@ class UserException extends \Exception
     const CODE_DATABASE_INSERT_ERROR = 2;
 
     const codes = [
-        self::CODE_ACCOUNT_EXIST         => "Account already existed",
+        self::CODE_ACCOUNT_EXIST_ERROR   => "Account already existed",
         self::CODE_DATABASE_INSERT_ERROR => "Database insertion failed"
     ];
 
