@@ -2,7 +2,7 @@
 /**
  * Created by PhpStorm.
  *
- * combo-outfit (by Duc-Anh LE)
+ * Duc-Anh LE (ducanh.ke@gmail.com)
  *
  * User: ducanh-ki
  * Date: 3/6/17
@@ -54,15 +54,17 @@ class UserFacebookService
      * @param $state
      * @return string
      */
-    public function generateOAuthUrl($state)
+    public function generateOAuthUrl($state = null)
     {
         $config = [
             'response_type' => self::FACEBOOK_RESPONSE,
             'scope'         => $this->scope,
             'client_id'     => $this->appId,
             'redirect_uri'  => $this->redirectUri,
-            'state'         => $state
         ];
+
+        if ($state)
+            $config['state'] = $state;
 
         $query = http_build_query($config);
         $url   = self::FACEBOOK_OAUTH_URL . '?' . $query;
@@ -77,6 +79,7 @@ class UserFacebookService
      * Use this method and provide it with the code (received from authentication) to get a token.
      *
      * @param $code
+     * @return $this
      */
     public function initializeToken($code)
     {
@@ -94,6 +97,8 @@ class UserFacebookService
         $dataArray = json_decode($response->getBody(), true);
 
         $this->token = $dataArray['access_token'];
+
+        return $this;
     }
 
     /**

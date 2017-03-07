@@ -2,7 +2,7 @@
 /**
  * Created by PhpStorm.
  *
- * combo-outfit (by Duc-Anh LE)
+ * Duc-Anh LE (ducanh.ke@gmail.com)
  *
  * User: ducanh-ki
  * Date: 3/4/17

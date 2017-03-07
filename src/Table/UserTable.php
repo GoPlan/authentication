@@ -2,7 +2,7 @@
 /**
  * Created by PhpStorm.
  *
- * combo-outfit (by Duc-Anh LE)
+ * Duc-Anh LE (ducanh.ke@gmail.com)
  *
  * User: ducanh-ki
  * Date: 3/3/17
@@ -14,6 +14,7 @@ namespace CreativeDelta\User\Table;
 
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\RowGateway\RowGateway;
+use Zend\Db\TableGateway\Feature\RowGatewayFeature;
 use Zend\Db\TableGateway\TableGateway;
 
 class UserTable

@@ -2,7 +2,7 @@
 /**
  * Created by PhpStorm.
  *
- * combo-outfit (by Duc-Anh LE)
+ * Duc-Anh LE (ducanh.ke@gmail.com)
  *
  * User: ducanh-ki
  * Date: 3/3/17
@@ -16,7 +16,7 @@ interface UserServiceInterface
 {
     public function hasUsername($username);
 
-    public function hasFacebook($facebookId);
+    public function hasFacebookRecord($facebookId);
 
     public function registerFacebook($username, $facebookId, $profile);
 
