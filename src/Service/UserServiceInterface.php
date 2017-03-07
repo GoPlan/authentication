@@ -14,10 +14,10 @@ namespace CreativeDelta\User\Service;
 
 interface UserServiceInterface
 {
-    public function hasUsername($username);
+    public function hasIdentity($identity);
 
-    public function hasFacebookRecord($facebookId);
+    public function hasRecord($userId);
 
-    public function registerFacebook($username, $facebookId, $profile);
+    public function register($identity, $userId, $profile);
 
 }

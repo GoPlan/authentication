@@ -17,9 +17,9 @@ use Zend\Db\RowGateway\RowGateway;
 use Zend\Db\TableGateway\Feature\RowGatewayFeature;
 use Zend\Db\TableGateway\TableGateway;
 
-class UserTable
+class UserIdentityTable
 {
-    const TABLE_NAME = "User";
+    const TABLE_NAME = "UserIdentity";
     const ID_NAME    = "id";
 
     protected $tableGateway;
@@ -31,22 +31,21 @@ class UserTable
         $this->tableGateway = new TableGateway(self::TABLE_NAME, $dbAdapter);
     }
 
-    public function get($username)
+    public function get($identity)
     {
-        return $this->tableGateway->select(['username' => $username])->current();
+        return $this->tableGateway->select(['identity' => $identity])->current();
     }
 
-    public function has($username)
+    public function has($identity)
     {
-        return $this->tableGateway->select(['username' => $username])->count() > 0;
+        return $this->tableGateway->select(['identity' => $identity])->count() > 0;
     }
 
-    public function create($username)
+    public function create($identity)
     {
         $user             = new RowGateway(self::ID_NAME, self::TABLE_NAME, $this->dbAdapter);
-        $user['username'] = $username;
+        $user['identity'] = $identity;
         $user->save();
-
         return $user;
     }
 }

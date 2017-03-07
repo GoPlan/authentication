@@ -13,32 +13,28 @@ namespace CreativeDelta\User\Service;
 
 
 use CreativeDelta\User\Exception\UserException;
-use CreativeDelta\User\Model\User;
-use CreativeDelta\User\Table\UserEmailTable;
-use CreativeDelta\User\Table\UserFacebookTable;
+use CreativeDelta\User\Model\Identity;
 use CreativeDelta\User\Table\UserSignInLogTable;
-use CreativeDelta\User\Table\UserTable;
+use CreativeDelta\User\Table\UserIdentityTable;
 use Zend\Db\Adapter\AdapterInterface;
-use Zend\Db\RowGateway\RowGateway;
 use Zend\Stdlib\Hydrator\ClassMethods;
 
 class UserService implements UserServiceInterface
 {
-    protected $userTable;
-    protected $userFacebookTable;
-    protected $userEmailTable;
+    protected $userIdentityTable;
     protected $userSignInLogTable;
 
+    protected $strategy;
     protected $dbAdapter;
 
     // TODO To refactor UserService to use Strategy pattern for Email, Facebook, or G+ service.
 
-    function __construct(AdapterInterface $dbAdapter)
+    function __construct(AdapterInterface $dbAdapter, UserServiceStrategyInterface $strategy)
     {
-        $this->dbAdapter          = $dbAdapter;
-        $this->userTable          = new UserTable($dbAdapter);
-        $this->userEmailTable     = new UserEmailTable($dbAdapter);
-        $this->userFacebookTable  = new UserFacebookTable($dbAdapter);
+        $this->dbAdapter = $dbAdapter;
+        $this->strategy  = $strategy;
+
+        $this->userIdentityTable  = new UserIdentityTable($dbAdapter);
         $this->userSignInLogTable = new UserSignInLogTable($dbAdapter);
     }
 
@@ -63,69 +59,63 @@ class UserService implements UserServiceInterface
     }
 
     /**
-     * @param $username
+     * @param $identity
      * @return bool
      */
-    public function hasUsername($username)
+    public function hasIdentity($identity)
     {
-        return $this->userTable->has($username);
+        return $this->userIdentityTable->has($identity);
     }
 
     /**
-     * @param $facebookId
-     * @return User|RowGateway|null
+     * @param $userId
+     * @return Identity|null
      */
-    public function getUserByFacebookId($facebookId)
+    public function getIdentityByUserId($userId)
     {
-        $facebookRecord = $this->userFacebookTable->get($facebookId);
-        $userRecord     = $this->userTable->get($facebookRecord['username']);
+        $recordRow   = $this->getRecord($userId);
+        $identityRow = $this->userIdentityTable->get($recordRow['identity']);
 
-        /** @var User $user */
-        $user = $facebookRecord && $userRecord ?
-            (new ClassMethods())->hydrate($userRecord->getArrayCopy(), new User()) : null;
+        /** @var Identity $identity */
+        $identity = $identityRow ? (new ClassMethods())->hydrate($identityRow->getArrayCopy(), new Identity()) : null;
 
-        return $user;
+        return $identity;
     }
 
     /**
-     * @param $facebookId
+     * @param $userId
      * @return bool
      */
-    public function hasFacebookRecord($facebookId)
+    public function hasRecord($userId)
     {
-        return $this->userFacebookTable->has($facebookId);
+        return $this->strategy->has($userId);
     }
 
     /**
-     * @param $facebookId
+     * @param $userId
      * @return array|\ArrayObject|null
      */
-    public function getFacebookRecord($facebookId)
+    public function getRecord($userId)
     {
-        return $this->userFacebookTable->get($facebookId);
+        return $this->strategy->get($userId);
     }
 
     /**
-     * @param $username
-     * @param int $facebookId
-     * @param $profile
+     * @param string $identity
+     * @param int $userId
+     * @param array $profile
      * @throws UserException
      */
-    public function registerFacebook($username, $facebookId, $profile)
+    public function register($identity, $userId, $profile)
     {
-        if ($this->hasUsername($username) || $this->hasFacebookRecord($facebookId)) {
+        if ($this->hasIdentity($identity) || $this->hasRecord($userId)) {
             throw new UserException(UserException::CODE_ACCOUNT_EXIST_ERROR);
         }
 
         try {
 
-            $user     = $this->userTable->create($username);
-            $facebook = $this->userFacebookTable->create($username, $facebookId, $profile);
-
-            $user['primaryTable'] = UserFacebookTable::TABLE_NAME;
-            $user['primaryId']    = $facebook[UserFacebookTable::ID_NAME];
-            $user['state']        = User::STATE_ACTIVE;
-            $user->save();
+            $identity = $this->userIdentityTable->create($identity);
+            $this->strategy->register($identity, $userId, $profile);
 
         } catch (\Exception $exception) {
             throw new UserException(UserException::CODE_DATABASE_INSERT_ERROR, $exception);

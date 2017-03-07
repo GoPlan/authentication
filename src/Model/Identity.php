@@ -12,14 +12,14 @@
 namespace CreativeDelta\User\Model;
 
 
-class User
+class Identity
 {
     const STATE_NEW      = 0;
     const STATE_ACTIVE   = 1;
     const STATE_DISABLED = 2;
 
     protected $id;
-    protected $username;
+    protected $identity;
     protected $state;
 
     /**
@@ -41,17 +41,17 @@ class User
     /**
      * @return mixed
      */
-    public function getUsername()
+    public function getIdentity()
     {
-        return $this->username;
+        return $this->identity;
     }
 
     /**
-     * @param mixed $username
+     * @param mixed $identity
      */
-    public function setUsername($username)
+    public function setIdentity($identity)
     {
-        $this->username = $username;
+        $this->identity = $identity;
     }
 
     /**

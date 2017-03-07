@@ -12,23 +12,23 @@
 namespace CreativeDelta\User\Adapter;
 
 
-use CreativeDelta\User\Model\User;
+use CreativeDelta\User\Model\Identity;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 
 class FacebookAuthenticationAdapter implements AdapterInterface
 {
 
-    /** @var  User $user */
-    protected $user;
+    /** @var  Identity $identity */
+    protected $identity;
 
     /**
      * FacebookAuthenticationAdapter constructor.
-     * @param User|null $user
+     * @param Identity|null $identity
      */
-    public function __construct(User $user = null)
+    public function __construct(Identity $identity = null)
     {
-        $this->user = $user;
+        $this->identity = $identity;
     }
 
     /**
@@ -37,14 +37,14 @@ class FacebookAuthenticationAdapter implements AdapterInterface
     public function authenticate()
     {
 
-        if (!$this->user) {
+        if (!$this->identity) {
             return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null);
         }
 
-        if (!($this->user->getState() == User::STATE_ACTIVE)) {
+        if (!($this->identity->getState() == Identity::STATE_ACTIVE)) {
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, ['User is not active']);
         }
 
-        return new Result(Result::SUCCESS, $this->user->getUsername());
+        return new Result(Result::SUCCESS, $this->identity->getIdentity());
     }
 }

@@ -31,21 +31,21 @@ class UserFacebookTable
         $this->tableGateway = new TableGateway(self::TABLE_NAME, $dbAdapter);
     }
 
-    public function has($facebookId)
+    public function has($userId)
     {
-        return $this->tableGateway->select(['facebookId' => $facebookId])->count() > 0;
+        return $this->tableGateway->select(['userId' => $userId])->count() > 0;
     }
 
-    public function get($facebookId)
+    public function get($userId)
     {
-        return $this->tableGateway->select(['facebookId' => $facebookId])->current();
+        return $this->tableGateway->select(['userId' => $userId])->current();
     }
 
-    public function create($username, $facebookId, $profile)
+    public function create($identity, $userId, $profile)
     {
         $account                = new RowGateway(UserFacebookTable::ID_NAME, UserFacebookTable::TABLE_NAME, $this->dbAdapter);
-        $account['username']    = $username;
-        $account['facebookId']  = $facebookId;
+        $account['identity']    = $identity;
+        $account['userId']      = $userId;
         $account['profileJson'] = $profile;
         $account->save();
 

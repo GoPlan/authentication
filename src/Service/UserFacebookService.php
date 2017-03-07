@@ -12,9 +12,12 @@
 namespace CreativeDelta\User\Service;
 
 
+use CreativeDelta\User\Model\Identity;
+use CreativeDelta\User\Table\UserFacebookTable;
+use Zend\Db\RowGateway\RowGateway;
 use Zend\Http\Client;
 
-class UserFacebookService
+class UserFacebookService implements UserServiceStrategyInterface
 {
     const FACEBOOK_RESPONSE  = "code";
     const FACEBOOK_OAUTH_URL = "https://www.facebook.com/v2.8/dialog/oauth";
@@ -30,19 +33,26 @@ class UserFacebookService
     protected $state;
     protected $redirectUri;
 
+    protected $dbAdapter;
+    protected $userFacebookTable;
+
     /**
      * UserFacebookService constructor.
      * @param $appId
      * @param $appSecret
      * @param $scope
+     * @param $dbAdapter
      * @param $redirectUri
      */
-    public function __construct($appId, $appSecret, $scope, $redirectUri)
+    public function __construct($appId, $appSecret, $scope, $redirectUri, $dbAdapter)
     {
         $this->appId       = $appId;
         $this->appSecret   = $appSecret;
         $this->scope       = $scope;
         $this->redirectUri = $redirectUri;
+
+        $this->dbAdapter         = $dbAdapter;
+        $this->userFacebookTable = new UserFacebookTable($this->dbAdapter);
     }
 
     /**
@@ -119,4 +129,31 @@ class UserFacebookService
 
         return $profileArray;
     }
+
+    public function has($userId)
+    {
+        return $this->userFacebookTable->has($userId);
+    }
+
+    public function get($userId)
+    {
+        return $this->userFacebookTable->get($userId);
+    }
+
+    /**
+     * @param RowGateway $identity
+     * @param int $userId
+     * @param string $profileJson
+     */
+    public function register($identity, $userId, $profileJson)
+    {
+        $record = $this->userFacebookTable->create($identity['identity'], $userId, $profileJson);
+
+        $identity['primaryTable'] = UserFacebookTable::TABLE_NAME;
+        $identity['primaryId']    = $record[UserFacebookTable::ID_NAME];
+        $identity['state']        = Identity::STATE_ACTIVE;
+        $identity->save();
+    }
+
+
 }

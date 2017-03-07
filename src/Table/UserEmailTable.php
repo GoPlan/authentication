@@ -31,10 +31,10 @@ class UserEmailTable
 
     public function has($email)
     {
-        return !($this->getEmail($email) == null);
+        return !($this->get($email) == null);
     }
 
-    public function getEmail($email)
+    public function get($email)
     {
         return $this->tableGateway->select(['email' => $email])->current();
     }
