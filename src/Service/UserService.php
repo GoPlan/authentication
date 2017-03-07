@@ -16,6 +16,7 @@ use CreativeDelta\User\Exception\UserException;
 use CreativeDelta\User\Model\User;
 use CreativeDelta\User\Table\UserEmailTable;
 use CreativeDelta\User\Table\UserFacebookTable;
+use CreativeDelta\User\Table\UserSignInLogTable;
 use CreativeDelta\User\Table\UserTable;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\RowGateway\RowGateway;
@@ -23,19 +24,42 @@ use Zend\Stdlib\Hydrator\ClassMethods;
 
 class UserService implements UserServiceInterface
 {
-
     protected $userTable;
     protected $userFacebookTable;
     protected $userEmailTable;
+    protected $userSignInLogTable;
 
     protected $dbAdapter;
 
+    // TODO To refactor UserService to use Strategy pattern for Email, Facebook, or G+ service.
+
     function __construct(AdapterInterface $dbAdapter)
     {
-        $this->dbAdapter         = $dbAdapter;
-        $this->userTable         = new UserTable($dbAdapter);
-        $this->userEmailTable    = new UserEmailTable($dbAdapter);
-        $this->userFacebookTable = new UserFacebookTable($dbAdapter);
+        $this->dbAdapter          = $dbAdapter;
+        $this->userTable          = new UserTable($dbAdapter);
+        $this->userEmailTable     = new UserEmailTable($dbAdapter);
+        $this->userFacebookTable  = new UserFacebookTable($dbAdapter);
+        $this->userSignInLogTable = new UserSignInLogTable($dbAdapter);
+    }
+
+    /**
+     * @param $data
+     * @return string
+     */
+    public function createSignInLogHash($data)
+    {
+        $signInLog = $this->userSignInLogTable->createSignInLog($data);
+        $hash      = $signInLog['hash'];
+        return $hash;
+    }
+
+    /**
+     * @param $hash
+     * @return array|\ArrayObject|null
+     */
+    public function getSignInLog($hash)
+    {
+        return $this->userSignInLogTable->getByHash($hash);
     }
 
     /**
@@ -72,6 +96,10 @@ class UserService implements UserServiceInterface
         return $this->userFacebookTable->has($facebookId);
     }
 
+    /**
+     * @param $facebookId
+     * @return array|\ArrayObject|null
+     */
     public function getFacebookRecord($facebookId)
     {
         return $this->userFacebookTable->get($facebookId);
