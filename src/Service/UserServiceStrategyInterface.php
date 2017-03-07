@@ -18,5 +18,5 @@ interface UserServiceStrategyInterface
 
     public function get($userId);
 
-    public function register($identity, $userId, $profileJson);
+    public function register($identity, $userId, $dataJson);
 }

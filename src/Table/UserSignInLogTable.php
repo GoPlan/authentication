@@ -22,7 +22,8 @@ class UserSignInLogTable
     const TABLE_NAME = "UserSignInLog";
     const ID_NAME    = "id";
 
-    const SECURITY_STRING_LENGTH = 18;
+    const DATETIME_FORMAT   = 'Y-m-d H:i:s';
+    const RANDOM_STRING_LEN = 18;
 
     /** @var  TableGateway $tableGateway */
     protected $tableGateway;
@@ -69,7 +70,7 @@ class UserSignInLogTable
         $hash     = $this->bcrypt->create($sequence);
 
         $row             = new RowGateway(self::ID_NAME, self::TABLE_NAME, $this->dbAdapter);
-        $row['datetime'] = $datetime->format(\DateTime::RFC3339);
+        $row['datetime'] = $datetime->format(self::DATETIME_FORMAT);
         $row['random']   = $random;
         $row['salt']     = $salt;
         $row['hash']     = $hash;
@@ -85,6 +86,6 @@ class UserSignInLogTable
      */
     private function random()
     {
-        return bin2hex(openssl_random_pseudo_bytes(self::SECURITY_STRING_LENGTH));
+        return bin2hex(openssl_random_pseudo_bytes(self::RANDOM_STRING_LEN));
     }
 }

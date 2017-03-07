@@ -74,7 +74,7 @@ class UserService implements UserServiceInterface
     public function getIdentityByUserId($userId)
     {
         $recordRow   = $this->getRecord($userId);
-        $identityRow = $this->userIdentityTable->get($recordRow['identity']);
+        $identityRow = $this->userIdentityTable->getById($recordRow['id']);
 
         /** @var Identity $identity */
         $identity = $identityRow ? (new ClassMethods())->hydrate($identityRow->getArrayCopy(), new Identity()) : null;
@@ -103,10 +103,10 @@ class UserService implements UserServiceInterface
     /**
      * @param string $identity
      * @param int $userId
-     * @param array $profile
+     * @param array $dataJson
      * @throws UserException
      */
-    public function register($identity, $userId, $profile)
+    public function register($identity, $userId, $dataJson)
     {
         if ($this->hasIdentity($identity) || $this->hasRecord($userId)) {
             throw new UserException(UserException::CODE_ACCOUNT_EXIST_ERROR);
@@ -115,7 +115,7 @@ class UserService implements UserServiceInterface
         try {
 
             $identity = $this->userIdentityTable->create($identity);
-            $this->strategy->register($identity, $userId, $profile);
+            $this->strategy->register($identity, $userId, $dataJson);
 
         } catch (\Exception $exception) {
             throw new UserException(UserException::CODE_DATABASE_INSERT_ERROR, $exception);

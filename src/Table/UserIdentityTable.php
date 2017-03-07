@@ -31,7 +31,12 @@ class UserIdentityTable
         $this->tableGateway = new TableGateway(self::TABLE_NAME, $dbAdapter);
     }
 
-    public function get($identity)
+    public function getById($id)
+    {
+        return $this->tableGateway->select(['id' => $id])->current();
+    }
+
+    public function getByIdentity($identity)
     {
         return $this->tableGateway->select(['identity' => $identity])->current();
     }

@@ -14,7 +14,6 @@ namespace CreativeDelta\User\Table;
 
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\RowGateway\RowGateway;
-use Zend\Db\TableGateway\Feature\RowGatewayFeature;
 use Zend\Db\TableGateway\TableGateway;
 
 class UserFacebookTable
@@ -41,12 +40,12 @@ class UserFacebookTable
         return $this->tableGateway->select(['userId' => $userId])->current();
     }
 
-    public function create($identity, $userId, $profile)
+    public function create($identityId, $userId, $profile)
     {
-        $account                = new RowGateway(UserFacebookTable::ID_NAME, UserFacebookTable::TABLE_NAME, $this->dbAdapter);
-        $account['identity']    = $identity;
-        $account['userId']      = $userId;
-        $account['profileJson'] = $profile;
+        $account               = new RowGateway(UserFacebookTable::ID_NAME, UserFacebookTable::TABLE_NAME, $this->dbAdapter);
+        $account['identityId'] = $identityId;
+        $account['userId']     = $userId;
+        $account['dataJson']   = $profile;
         $account->save();
 
         return $account;

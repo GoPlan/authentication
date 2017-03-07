@@ -18,6 +18,6 @@ interface UserServiceInterface
 
     public function hasRecord($userId);
 
-    public function register($identity, $userId, $profile);
+    public function register($identity, $userId, $dataJson);
 
 }

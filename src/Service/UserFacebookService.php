@@ -143,11 +143,11 @@ class UserFacebookService implements UserServiceStrategyInterface
     /**
      * @param RowGateway $identity
      * @param int $userId
-     * @param string $profileJson
+     * @param string $dataJson
      */
-    public function register($identity, $userId, $profileJson)
+    public function register($identity, $userId, $dataJson)
     {
-        $record = $this->userFacebookTable->create($identity['identity'], $userId, $profileJson);
+        $record = $this->userFacebookTable->create($identity['id'], $userId, $dataJson);
 
         $identity['primaryTable'] = UserFacebookTable::TABLE_NAME;
         $identity['primaryId']    = $record[UserFacebookTable::ID_NAME];
