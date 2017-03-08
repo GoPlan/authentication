@@ -23,7 +23,7 @@ class UserSignInLogTable
     const ID_NAME    = "id";
 
     const DATETIME_FORMAT   = 'Y-m-d H:i:s';
-    const RANDOM_STRING_LEN = 18;
+    const RANDOM_STRING_LEN = 8;
 
     /** @var  TableGateway $tableGateway */
     protected $tableGateway;
