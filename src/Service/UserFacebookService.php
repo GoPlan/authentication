@@ -56,10 +56,9 @@ class UserFacebookService implements UserServiceStrategyInterface
     }
 
     /**
-     * Use this method to receive URL for Facebook authentication, then redirect your page to the URL.
-     * Once user has logged-in, the user will then be redirected back to the URL set by $redirectUri.
-     * You should have an controller::action for this redirection url. Then in this action, you can
-     * retrieve authentication data {code, state} for next uses.
+     * Use this method to receive URL for Facebook authentication. To initialize the sign-in sequence, redirect yourself to the URL.
+     * Once sign-in step is completed, the user will be redirected back to the URL provided previously in $redirectUri.
+     * You should have a controller::action catch this redirection. Then in this action, further activities can be arranged using returned the "code" and "state".
      *
      * @param $state
      * @return string
