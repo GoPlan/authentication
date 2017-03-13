@@ -9,17 +9,18 @@
  * Time: 8:36 AM
  */
 
-namespace CreativeDelta\User\Table;
+namespace CreativeDelta\User\Facebook;
 
 
 use Zend\Db\Adapter\AdapterInterface;
-use Zend\Db\RowGateway\RowGateway;
 use Zend\Db\TableGateway\TableGateway;
 
 class UserFacebookTable
 {
-    const TABLE_NAME = "UserFacebook";
-    const ID_NAME    = "id";
+    const TABLE_NAME           = "UserFacebook";
+    const ID_NAME              = "id";
+    const REF_USER_ID_NAME     = "userId";
+    const REF_IDENTITY_ID_NAME = "identityId";
 
     protected $tableGateway;
     protected $dbAdapter;
@@ -30,24 +31,21 @@ class UserFacebookTable
         $this->tableGateway = new TableGateway(self::TABLE_NAME, $dbAdapter);
     }
 
+    /**
+     * @param $userId
+     * @return bool
+     */
     public function has($userId)
     {
         return $this->tableGateway->select(['userId' => $userId])->count() > 0;
     }
 
+    /**
+     * @param $userId
+     * @return array|\ArrayObject|null
+     */
     public function get($userId)
     {
         return $this->tableGateway->select(['userId' => $userId])->current();
-    }
-
-    public function create($identityId, $userId, $profile)
-    {
-        $account               = new RowGateway(UserFacebookTable::ID_NAME, UserFacebookTable::TABLE_NAME, $this->dbAdapter);
-        $account['identityId'] = $identityId;
-        $account['userId']     = $userId;
-        $account['dataJson']   = $profile;
-        $account->save();
-
-        return $account;
     }
 }

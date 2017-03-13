@@ -9,7 +9,7 @@
  * Time: 9:25 AM
  */
 
-namespace CreativeDelta\User\Table;
+namespace CreativeDelta\User\Email;
 
 
 use Zend\Db\Adapter\AdapterInterface;

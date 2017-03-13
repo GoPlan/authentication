@@ -30,6 +30,9 @@
 
 ## Plugin-specific files:
 
+# MySQL Backup schema
+*.mwb.bak
+
 # IntelliJ
 /out/
 

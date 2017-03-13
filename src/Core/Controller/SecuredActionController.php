@@ -9,7 +9,7 @@
  * Time: 2:52 PM
  */
 
-namespace CreativeDelta\User\Controller;
+namespace CreativeDelta\User\Core\Controller;
 
 
 use Zend\Mvc\Controller\AbstractActionController;

@@ -17,21 +17,17 @@
  * back to your page, use the hash (stored in "state") to retrieve back your configuration variables (which were setup earlier).
  */
 
-namespace CreativeDelta\User\Table;
+namespace CreativeDelta\User\Core\Table;
 
 
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\AdapterInterface;
-use Zend\Db\RowGateway\RowGateway;
 use Zend\Db\TableGateway\TableGateway;
 
-class UserSignInLogTable
+class UserSessionLogTable
 {
-    const TABLE_NAME = "UserSignInLog";
+    const TABLE_NAME = "UserSessionLog";
     const ID_NAME    = "id";
-
-    const DATETIME_FORMAT   = 'Y-m-d H:i:s';
-    const RANDOM_STRING_LEN = 8;
 
     /** @var  TableGateway $tableGateway */
     protected $tableGateway;
@@ -60,40 +56,5 @@ class UserSignInLogTable
     public function getByHash($hash)
     {
         return $this->tableGateway->select(['hash' => $hash])->current();
-    }
-
-    /**
-     * @param array $data
-     * @return RowGateway
-     */
-    public function createSignInLog($data)
-    {
-        $datetime = new \DateTime();
-        $random   = $this->random();
-        $salt     = $this->random();
-
-        $this->bcrypt->setSalt($salt);
-
-        $sequence = $datetime->format(\DateTime::RFC3339) . '+' . $random;
-        $hash     = $this->bcrypt->create($sequence);
-
-        $row             = new RowGateway(self::ID_NAME, self::TABLE_NAME, $this->dbAdapter);
-        $row['datetime'] = $datetime->format(self::DATETIME_FORMAT);
-        $row['random']   = $random;
-        $row['salt']     = $salt;
-        $row['hash']     = $hash;
-        $row['dataJson'] = json_encode($data);
-
-        $row->save();
-
-        return $row;
-    }
-
-    /**
-     * @return string
-     */
-    private function random()
-    {
-        return bin2hex(openssl_random_pseudo_bytes(self::RANDOM_STRING_LEN));
     }
 }

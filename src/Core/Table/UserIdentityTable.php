@@ -9,12 +9,10 @@
  * Time: 3:32 PM
  */
 
-namespace CreativeDelta\User\Table;
+namespace CreativeDelta\User\Core\Table;
 
 
 use Zend\Db\Adapter\AdapterInterface;
-use Zend\Db\RowGateway\RowGateway;
-use Zend\Db\TableGateway\Feature\RowGatewayFeature;
 use Zend\Db\TableGateway\TableGateway;
 
 class UserIdentityTable
@@ -31,26 +29,32 @@ class UserIdentityTable
         $this->tableGateway = new TableGateway(self::TABLE_NAME, $dbAdapter);
     }
 
-    public function getById($id)
+    /**
+     * @param $id
+     * @return array|\ArrayObject|null
+     */
+    public function get($id)
     {
         return $this->tableGateway->select(['id' => $id])->current();
     }
 
+    /**
+     * @param $identity
+     * @return array|\ArrayObject|null
+     */
     public function getByIdentity($identity)
     {
-        return $this->tableGateway->select(['identity' => $identity])->current();
+        $result = $this->tableGateway->select(['identity' => $identity])->current();
+        return $result;
     }
 
-    public function has($identity)
+    /**
+     * @param $identity
+     * @return bool
+     */
+    public function hasIdentity($identity)
     {
         return $this->tableGateway->select(['identity' => $identity])->count() > 0;
     }
 
-    public function create($identity)
-    {
-        $user             = new RowGateway(self::ID_NAME, self::TABLE_NAME, $this->dbAdapter);
-        $user['identity'] = $identity;
-        $user->save();
-        return $user;
-    }
 }

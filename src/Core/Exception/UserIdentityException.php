@@ -9,12 +9,12 @@
  * Time: 9:49 AM
  */
 
-namespace CreativeDelta\User\Exception;
+namespace CreativeDelta\User\Core\Exception;
 
 
 use Exception;
 
-class UserException extends \Exception
+class UserIdentityException extends \Exception
 {
     const CODE_ACCOUNT_EXIST_ERROR   = 1;
     const CODE_DATABASE_INSERT_ERROR = 2;

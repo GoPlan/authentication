@@ -9,47 +9,47 @@
  * Time: 5:17 PM
  */
 
-namespace CreativeDelta\User\Service;
+namespace CreativeDelta\User\Facebook;
 
 
-use CreativeDelta\User\Model\Identity;
-use CreativeDelta\User\Table\UserFacebookTable;
+use CreativeDelta\User\Core\Service\UserAuthenticationMethodServiceInterface;
+use CreativeDelta\User\Core\Service\UserRegisterMethodAdapter;
 use Zend\Db\RowGateway\RowGateway;
 use Zend\Http\Client;
 
-class UserFacebookService implements UserServiceStrategyInterface
+class UserFacebookMethod implements UserRegisterMethodAdapter, UserAuthenticationMethodServiceInterface
 {
-    const FACEBOOK_RESPONSE  = "code";
-    const FACEBOOK_OAUTH_URL = "https://www.facebook.com/v2.8/dialog/oauth";
-    const FACEBOOK_TOKEN_URL = "https://graph.facebook.com/v2.8/oauth/access_token";
-    const FACEBOOK_GRAPH_URL = "https://graph.facebook.com/me";
-    const FACEBOOK_SCOPE     = "public_profile, email";
+    const METHOD_NAME              = "Facebook";
+    const METHOD_TABLE_NAME        = "UserFacebook";
+    const FACEBOOK_RESPONSE        = "code";
+    const FACEBOOK_OAUTH_URL       = "https://www.facebook.com/v2.8/dialog/oauth";
+    const FACEBOOK_TOKEN_URL       = "https://graph.facebook.com/v2.8/oauth/access_token";
+    const FACEBOOK_GRAPH_URL       = "https://graph.facebook.com/me";
+    const FACEBOOK_SCOPE           = "public_profile, email";
+    const FACEBOOK_PROFILE_FIELDS  = "id, first_name, last_name, email";
+    const FACEBOOK_PROFILE_ID_NAME = "id";
 
     protected $appId;
     protected $appSecret;
-
     protected $token;
     protected $scope;
     protected $state;
-    protected $redirectUri;
-
     protected $dbAdapter;
     protected $userFacebookTable;
 
     /**
      * UserFacebookService constructor.
+     * @param $dbAdapter
      * @param $appId
      * @param $appSecret
      * @param $scope
-     * @param $dbAdapter
-     * @param $redirectUri
+     * @internal param $redirectUri
      */
-    public function __construct($appId, $appSecret, $scope, $redirectUri, $dbAdapter)
+    public function __construct($dbAdapter, $appId, $appSecret, $scope)
     {
-        $this->appId       = $appId;
-        $this->appSecret   = $appSecret;
-        $this->scope       = $scope;
-        $this->redirectUri = $redirectUri;
+        $this->appId     = $appId;
+        $this->appSecret = $appSecret;
+        $this->scope     = $scope;
 
         $this->dbAdapter         = $dbAdapter;
         $this->userFacebookTable = new UserFacebookTable($this->dbAdapter);
@@ -60,16 +60,17 @@ class UserFacebookService implements UserServiceStrategyInterface
      * Once sign-in step is completed, the user will be redirected back to the URL provided previously in $redirectUri.
      * You should have a controller::action catch this redirection. Then in this action, further activities can be arranged using returned the "code" and "state".
      *
+     * @param null $redirectUri
      * @param $state
      * @return string
      */
-    public function generateOAuthUrl($state = null)
+    public function makeAuthenticationUrl($redirectUri, $state = null)
     {
         $config = [
             'response_type' => self::FACEBOOK_RESPONSE,
             'scope'         => $this->scope,
             'client_id'     => $this->appId,
-            'redirect_uri'  => $this->redirectUri,
+            'redirect_uri'  => $redirectUri
         ];
 
         if ($state)
@@ -87,15 +88,16 @@ class UserFacebookService implements UserServiceStrategyInterface
      *
      * Use this method and provide it with the code (received from authentication) to get a token.
      *
+     * @param $redirectUri
      * @param $code
      * @return $this
      */
-    public function initializeToken($code)
+    public function initAccessToken($redirectUri, $code)
     {
         $config = [
             'client_id'     => $this->appId,
             'client_secret' => $this->appSecret,
-            'redirect_uri'  => $this->redirectUri,
+            'redirect_uri'  => $redirectUri,
             'code'          => $code
         ];
 
@@ -112,10 +114,11 @@ class UserFacebookService implements UserServiceStrategyInterface
 
     /**
      * @param string $fields // a comma separated string of profile fields to be retrieved
-     * @return mixed
+     * @return array
      */
-    public function profile($fields)
+    public function getProfileData($fields = null)
     {
+        $fields    = $fields ? $fields : self::FACEBOOK_PROFILE_FIELDS;
         $httpGraph = new Client(self::FACEBOOK_GRAPH_URL);
         $httpGraph->setParameterGet([
             'access_token' => $this->token,
@@ -129,30 +132,50 @@ class UserFacebookService implements UserServiceStrategyInterface
         return $profileArray;
     }
 
+    /**
+     * @return null|FacebookProfile
+     */
+    public function getStoredProfile()
+    {
+        $profileData         = $this->getProfileData();
+        $storedProfileResult = $this->userFacebookTable->get($profileData[self::FACEBOOK_PROFILE_ID_NAME]);
+
+        if ($storedProfileResult) {
+            $facebookProfile = FacebookProfile::newFromArray($this->dbAdapter, $storedProfileResult->getArrayCopy(), true);
+            return $facebookProfile;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @param $userId
+     * @return bool
+     */
     public function has($userId)
     {
         return $this->userFacebookTable->has($userId);
     }
 
-    public function get($userId)
+    public function register($identityId, $userId, $dataJson)
     {
-        return $this->userFacebookTable->get($userId);
+        $row               = new RowGateway(UserFacebookTable::ID_NAME, UserFacebookTable::TABLE_NAME, $this->dbAdapter);
+        $row['identityId'] = $identityId;
+        $row['userId']     = $userId;
+        $row['dataJson']   = json_encode($dataJson);
+        $row->save();
+
+        return $row[UserFacebookTable::ID_NAME];
     }
 
-    /**
-     * @param RowGateway $identity
-     * @param int $userId
-     * @param string $dataJson
-     */
-    public function register($identity, $userId, $dataJson)
+    public function getName()
     {
-        $record = $this->userFacebookTable->create($identity['id'], $userId, $dataJson);
-
-        $identity['primaryTable'] = UserFacebookTable::TABLE_NAME;
-        $identity['primaryId']    = $record[UserFacebookTable::ID_NAME];
-        $identity['state']        = Identity::STATE_ACTIVE;
-        $identity->save();
+        return self::METHOD_NAME;
     }
 
+    public function getTableName()
+    {
+        return self::METHOD_TABLE_NAME;
+    }
 
 }

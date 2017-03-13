@@ -9,10 +9,10 @@
  * Time: 8:54 AM
  */
 
-namespace CreativeDelta\User\Adapter;
+namespace CreativeDelta\User\Facebook;
 
 
-use CreativeDelta\User\Model\Identity;
+use CreativeDelta\User\Core\Model\Identity;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 
@@ -45,6 +45,6 @@ class FacebookAuthenticationAdapter implements AdapterInterface
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, ['User is not active']);
         }
 
-        return new Result(Result::SUCCESS, $this->identity->getIdentity());
+        return new Result(Result::SUCCESS, $this->identity);
     }
 }
