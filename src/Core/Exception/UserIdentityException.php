@@ -16,12 +16,16 @@ use Exception;
 
 class UserIdentityException extends \Exception
 {
-    const CODE_ACCOUNT_EXIST_ERROR   = 1;
-    const CODE_DATABASE_INSERT_ERROR = 2;
+    const CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST       = 1;
+    const CODE_ERROR_INSERT_DATABASE_OPERATION_FAILED   = 2;
+    const CODE_ERROR_AUTHENTICATION_UNKNOWN_RESULT_CODE = 3;
+    const CODE_ERROR_AUTHENTICATION_USER_NOT_ACTIVE     = 4;
 
     const codes = [
-        self::CODE_ACCOUNT_EXIST_ERROR   => "Account already existed",
-        self::CODE_DATABASE_INSERT_ERROR => "Database insertion failed"
+        self::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST       => "INSERT_ACCOUNT_ALREADY_EXIST",
+        self::CODE_ERROR_INSERT_DATABASE_OPERATION_FAILED   => "INSERT_DATABASE_OPERATION_FAILED",
+        self::CODE_ERROR_AUTHENTICATION_UNKNOWN_RESULT_CODE => "AUTHENTICATION_UNKNOWN_RESULT_CODE",
+        self::CODE_ERROR_AUTHENTICATION_USER_NOT_ACTIVE     => "USER_NOT_ACTIVE"
     ];
 
     public function __construct($code = 0, Exception $previous = null)

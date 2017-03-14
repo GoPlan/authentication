@@ -15,7 +15,7 @@ namespace CreativeDelta\User\Facebook;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\TableGateway\TableGateway;
 
-class UserFacebookTable
+class FacebookTable
 {
     const TABLE_NAME           = "UserFacebook";
     const ID_NAME              = "id";

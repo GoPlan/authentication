@@ -144,7 +144,7 @@ class UserIdentityService implements UserIdentityServiceInterface
     public function register(UserRegisterMethodAdapter $adapter, $identity, $userId, $dataJson)
     {
         if ($this->hasIdentity($identity) || $adapter->has($userId)) {
-            throw new UserIdentityException(UserIdentityException::CODE_ACCOUNT_EXIST_ERROR);
+            throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST);
         }
 
         try {
@@ -164,7 +164,7 @@ class UserIdentityService implements UserIdentityServiceInterface
             return $identityObj[UserIdentityTable::ID_NAME];
 
         } catch (\Exception $exception) {
-            throw new UserIdentityException(UserIdentityException::CODE_DATABASE_INSERT_ERROR, $exception);
+            throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_DATABASE_OPERATION_FAILED, $exception);
         }
     }
 }

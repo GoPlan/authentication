@@ -16,8 +16,9 @@ use CreativeDelta\User\Core\Service\UserAuthenticationMethodServiceInterface;
 use CreativeDelta\User\Core\Service\UserRegisterMethodAdapter;
 use Zend\Db\RowGateway\RowGateway;
 use Zend\Http\Client;
+use Zend\Http\Response;
 
-class UserFacebookMethod implements UserRegisterMethodAdapter, UserAuthenticationMethodServiceInterface
+class FacebookMethod implements UserRegisterMethodAdapter, UserAuthenticationMethodServiceInterface
 {
     const METHOD_NAME              = "Facebook";
     const METHOD_TABLE_NAME        = "UserFacebook";
@@ -52,7 +53,7 @@ class UserFacebookMethod implements UserRegisterMethodAdapter, UserAuthenticatio
         $this->scope     = $scope;
 
         $this->dbAdapter         = $dbAdapter;
-        $this->userFacebookTable = new UserFacebookTable($this->dbAdapter);
+        $this->userFacebookTable = new FacebookTable($this->dbAdapter);
     }
 
     /**
@@ -91,6 +92,7 @@ class UserFacebookMethod implements UserRegisterMethodAdapter, UserAuthenticatio
      * @param $redirectUri
      * @param $code
      * @return $this
+     * @throws FacebookException|\Exception
      */
     public function initAccessToken($redirectUri, $code)
     {
@@ -101,13 +103,21 @@ class UserFacebookMethod implements UserRegisterMethodAdapter, UserAuthenticatio
             'code'          => $code
         ];
 
-        $httpToken = new Client(self::FACEBOOK_TOKEN_URL);
-        $httpToken->setParameterGet($config);
+        $client = new Client(self::FACEBOOK_TOKEN_URL);
+        $client->setParameterGet($config);
 
-        $response  = $httpToken->send();
+        $response  = $client->send();
         $dataArray = json_decode($response->getBody(), true);
 
-        $this->token = $dataArray['access_token'];
+        switch ($response->getStatusCode()) {
+            case Response::STATUS_CODE_200:
+                $this->token = $dataArray['access_token'];
+                break;
+            case Response::STATUS_CODE_400:
+                throw FacebookException::newFromArray($dataArray);
+            default:
+                break;
+        }
 
         return $this;
     }
@@ -115,21 +125,30 @@ class UserFacebookMethod implements UserRegisterMethodAdapter, UserAuthenticatio
     /**
      * @param string $fields // a comma separated string of profile fields to be retrieved
      * @return array
+     * @throws FacebookException|\Exception
      */
     public function getProfileData($fields = null)
     {
-        $fields    = $fields ? $fields : self::FACEBOOK_PROFILE_FIELDS;
-        $httpGraph = new Client(self::FACEBOOK_GRAPH_URL);
-        $httpGraph->setParameterGet([
+        $fields = $fields ? $fields : self::FACEBOOK_PROFILE_FIELDS;
+        $client = new Client(self::FACEBOOK_GRAPH_URL);
+        $client->setParameterGet([
             'access_token' => $this->token,
             'fields'       => $fields
         ]);
 
-        $response     = $httpGraph->send();
-        $profileJson  = $response->getBody();
-        $profileArray = json_decode($profileJson, true);
+        $response  = $client->send();
+        $dataArray = json_decode($$response->getBody(), true);
 
-        return $profileArray;
+        switch ($response->getStatusCode()) {
+            case Response::STATUS_CODE_200:
+                return $dataArray;
+            case Response::STATUS_CODE_400:
+                throw FacebookException::newFromArray($dataArray, null);
+            default:
+                break;
+        }
+
+        return $dataArray;
     }
 
     /**
@@ -159,13 +178,13 @@ class UserFacebookMethod implements UserRegisterMethodAdapter, UserAuthenticatio
 
     public function register($identityId, $userId, $dataJson)
     {
-        $row               = new RowGateway(UserFacebookTable::ID_NAME, UserFacebookTable::TABLE_NAME, $this->dbAdapter);
+        $row               = new RowGateway(FacebookTable::ID_NAME, FacebookTable::TABLE_NAME, $this->dbAdapter);
         $row['identityId'] = $identityId;
         $row['userId']     = $userId;
         $row['dataJson']   = json_encode($dataJson);
         $row->save();
 
-        return $row[UserFacebookTable::ID_NAME];
+        return $row[FacebookTable::ID_NAME];
     }
 
     public function getName()

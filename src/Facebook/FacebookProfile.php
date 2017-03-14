@@ -32,7 +32,7 @@ class FacebookProfile extends AbstractProfile implements RowGatewayInterface
     public function __construct(AdapterInterface $dbAdapter)
     {
         $this->dbAdapter  = $dbAdapter;
-        $this->rowGateway = new RowGateway(UserFacebookTable::ID_NAME, UserFacebookTable::TABLE_NAME, $dbAdapter);
+        $this->rowGateway = new RowGateway(FacebookTable::ID_NAME, FacebookTable::TABLE_NAME, $dbAdapter);
     }
 
     static function newFromArray(AdapterInterface $dbAdapter, $data, $exist = false)
@@ -64,17 +64,17 @@ class FacebookProfile extends AbstractProfile implements RowGatewayInterface
 
     function getId()
     {
-        return $this->rowGateway[UserFacebookTable::ID_NAME];
+        return $this->rowGateway[FacebookTable::ID_NAME];
     }
 
     function getUserId()
     {
-        return $this->rowGateway[UserFacebookTable::REF_USER_ID_NAME];
+        return $this->rowGateway[FacebookTable::REF_USER_ID_NAME];
     }
 
     function getIdentityId()
     {
-        return $this->rowGateway[UserFacebookTable::REF_IDENTITY_ID_NAME];
+        return $this->rowGateway[FacebookTable::REF_IDENTITY_ID_NAME];
     }
 
 }

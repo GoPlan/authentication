@@ -42,7 +42,7 @@ class FacebookAuthenticationAdapter implements AdapterInterface
         }
 
         if (!($this->identity->getState() == Identity::STATE_ACTIVE)) {
-            return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, ['User is not active']);
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, ['USER_NOT_ACTIVE']);
         }
 
         return new Result(Result::SUCCESS, $this->identity);
