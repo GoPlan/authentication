@@ -137,7 +137,7 @@ class FacebookMethod implements UserRegisterMethodAdapter, UserAuthenticationMet
         ]);
 
         $response  = $client->send();
-        $dataArray = json_decode($$response->getBody(), true);
+        $dataArray = json_decode($response->getBody(), true);
 
         switch ($response->getStatusCode()) {
             case Response::STATUS_CODE_200:

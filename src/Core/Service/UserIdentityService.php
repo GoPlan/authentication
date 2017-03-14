@@ -22,18 +22,16 @@ use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\RowGateway\RowGateway;
 use Zend\Stdlib\Hydrator\ClassMethods;
 
-class UserIdentityService implements UserIdentityServiceInterface
+class UserIdentityService implements UserIdentityServiceInterface, UserSessionServiceInterface
 {
     const QUERY_RETURN_URL_NAME = "return";
     const QUERY_SESSION_NAME    = "session";
-    const DATETIME_FORMAT       = 'Y-m-d H:i:s';
-    const SESSION_DATA_NAME     = "dataJson";
-    const RANDOM_STRING_LEN     = 8;
 
     protected $bcrypt;
     protected $dbAdapter;
     protected $userIdentityTable;
     protected $userSignInLogTable;
+    protected $userSessionService;
 
     function __construct(AdapterInterface $dbAdapter)
     {
@@ -41,6 +39,7 @@ class UserIdentityService implements UserIdentityServiceInterface
         $this->dbAdapter          = $dbAdapter;
         $this->userIdentityTable  = new UserIdentityTable($dbAdapter);
         $this->userSignInLogTable = new UserSessionLogTable($dbAdapter);
+        $this->userSessionService = new UserSessionService($this->dbAdapter);
     }
 
     /**
@@ -51,33 +50,7 @@ class UserIdentityService implements UserIdentityServiceInterface
      */
     public function createSessionLog($previousHash = null, $returnUrl = null, $data = null)
     {
-        $datetime = new \DateTime();
-        $random   = bin2hex(openssl_random_pseudo_bytes(self::RANDOM_STRING_LEN));
-        $salt     = bin2hex(openssl_random_pseudo_bytes(self::RANDOM_STRING_LEN));
-
-        $this->bcrypt->setSalt($salt);
-
-        $sequence = $datetime->format(\DateTime::RFC3339) . '+' . $random;
-        $hash     = $this->bcrypt->create($sequence);
-
-        $row             = new RowGateway(UserSessionLogTable::ID_NAME, UserSessionLogTable::TABLE_NAME, $this->dbAdapter);
-        $row['datetime'] = $datetime->format(self::DATETIME_FORMAT);
-        $row['random']   = $random;
-        $row['salt']     = $salt;
-        $row['hash']     = $hash;
-
-        if ($previousHash)
-            $row['previousHash'] = $previousHash;
-
-        if ($returnUrl)
-            $row['returnUrl'] = $returnUrl;
-
-        if ($data)
-            $row['dataJson'] = json_encode($data);
-
-        $row->save();
-
-        return $row['hash'];
+        return $this->userSessionService->createSessionLog($previousHash, $returnUrl, $data);
     }
 
     /**
@@ -86,14 +59,7 @@ class UserIdentityService implements UserIdentityServiceInterface
      */
     public function getSessionLog($hash)
     {
-        $result = $this->userSignInLogTable->getByHash($hash);
-
-        if ($result) {
-            $sessionLog = (new ClassMethods())->hydrate($result->getArrayCopy(), new SessionLog());
-            return $sessionLog;
-        } else {
-            return null;
-        }
+        return $this->userSessionService->getSessionLog($hash);
     }
 
     /**
