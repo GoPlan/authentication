@@ -12,9 +12,17 @@
 namespace CreativeDelta\User\Core\Controller;
 
 
+use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
 
 class SecuredActionController extends AbstractActionController
 {
+    const AUTHENTICATION_SERVICE = 'Zend\Authentication\AuthenticationService';
 
+    public function getAuthenticationService()
+    {
+        /** @var AuthenticationService $authService */
+        $authService = $this->getServiceLocator()->get(self::AUTHENTICATION_SERVICE);
+        return $authService;
+    }
 }

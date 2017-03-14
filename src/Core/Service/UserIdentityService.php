@@ -24,8 +24,6 @@ use Zend\Stdlib\Hydrator\ClassMethods;
 
 class UserIdentityService implements UserIdentityServiceInterface, UserSessionServiceInterface
 {
-    const QUERY_RETURN_URL_NAME = "return";
-    const QUERY_SESSION_NAME    = "session";
 
     protected $bcrypt;
     protected $dbAdapter;
