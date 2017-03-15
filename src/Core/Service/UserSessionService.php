@@ -21,9 +21,10 @@ use Zend\Stdlib\Hydrator\ClassMethods;
 
 class UserSessionService
 {
-    const DATETIME_FORMAT   = 'Y-m-d H:i:s';
-    const SESSION_DATA_NAME = "dataJson";
-    const RANDOM_STRING_LEN = 8;
+
+    const DATETIME_FORMAT       = 'Y-m-d H:i:s';
+    const SESSION_DATA_NAME     = "dataJson";
+    const RANDOM_STRING_LEN     = 8;
     const QUERY_SESSION_NAME    = "session";
     const QUERY_RETURN_URL_NAME = "return";
 

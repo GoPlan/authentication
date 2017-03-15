@@ -24,6 +24,7 @@ use Zend\Stdlib\Hydrator\ClassMethods;
 
 class UserIdentityService implements UserIdentityServiceInterface, UserSessionServiceInterface
 {
+    const AUTHENTICATION_SERVICE_NAME = 'Zend\Authentication\AuthenticationService';
 
     protected $bcrypt;
     protected $dbAdapter;
