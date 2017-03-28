@@ -38,6 +38,7 @@ class FacebookMethod implements UserRegisterMethodAdapter, UserAuthenticationMet
     protected $dbAdapter;
     protected $userFacebookTable;
 
+
     /**
      * UserFacebookService constructor.
      * @param $dbAdapter
@@ -97,14 +98,18 @@ class FacebookMethod implements UserRegisterMethodAdapter, UserAuthenticationMet
     public function initAccessToken($redirectUri, $code)
     {
         $config = [
+            'sslverifypeer' => false
+        ];
+
+        $query = [
             'client_id'     => $this->appId,
             'client_secret' => $this->appSecret,
             'redirect_uri'  => $redirectUri,
             'code'          => $code
         ];
 
-        $client = new Client(self::FACEBOOK_TOKEN_URL);
-        $client->setParameterGet($config);
+        $client = new Client(self::FACEBOOK_TOKEN_URL, $config);
+        $client->setParameterGet($query);
 
         $response  = $client->send();
         $dataArray = json_decode($response->getBody(), true);
@@ -129,12 +134,19 @@ class FacebookMethod implements UserRegisterMethodAdapter, UserAuthenticationMet
      */
     public function getProfileData($fields = null)
     {
+        $config = [
+            'sslverifypeer' => false
+        ];
+
         $fields = $fields ? $fields : self::FACEBOOK_PROFILE_FIELDS;
-        $client = new Client(self::FACEBOOK_GRAPH_URL);
-        $client->setParameterGet([
+
+        $query = [
             'access_token' => $this->token,
             'fields'       => $fields
-        ]);
+        ];
+
+        $client = new Client(self::FACEBOOK_GRAPH_URL, $config);
+        $client->setParameterGet($query);
 
         $response  = $client->send();
         $dataArray = json_decode($response->getBody(), true);
