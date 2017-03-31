@@ -36,4 +36,9 @@ class SecuredActionController extends AbstractActionController
         $authService = new AuthenticationService();
         return $authService;
     }
+
+    public function getServiceLocator()
+    {
+        return $this->serviceLocator;
+    }
 }
