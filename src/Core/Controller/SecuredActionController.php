@@ -12,7 +12,6 @@
 namespace CreativeDelta\User\Core\Controller;
 
 
-use CreativeDelta\User\Core\Service\UserIdentityService;
 use Zend\Authentication\AuthenticationService;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -34,7 +33,7 @@ class SecuredActionController extends AbstractActionController
     public function getAuthenticationService()
     {
         /** @var AuthenticationService $authService */
-        $authService = $this->getServiceLocator()->get(UserIdentityService::AUTHENTICATION_SERVICE_NAME);
+        $authService = new AuthenticationService();
         return $authService;
     }
 }
