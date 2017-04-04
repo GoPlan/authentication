@@ -17,7 +17,7 @@ use CreativeDelta\User\Core\Table\UserSessionLogTable;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\RowGateway\RowGateway;
-use Zend\Stdlib\Hydrator\ClassMethods;
+use Zend\Hydrator\ClassMethods;
 
 class UserSessionService
 {
@@ -54,9 +54,6 @@ class UserSessionService
         $row      = new RowGateway(UserSessionLogTable::ID_NAME, UserSessionLogTable::TABLE_NAME, $this->dbAdapter);
         $datetime = new \DateTime();
         $random   = bin2hex(openssl_random_pseudo_bytes(self::RANDOM_STRING_LEN));
-        $salt     = bin2hex(openssl_random_pseudo_bytes(self::RANDOM_STRING_LEN));
-
-        $this->bcrypt->setSalt($salt);
 
         $sequence = $datetime->format(\DateTime::RFC3339) . '+' . $random;
 
@@ -68,7 +65,6 @@ class UserSessionService
 
         $row['datetime'] = $datetime->format(self::DATETIME_FORMAT);
         $row['random']   = $random;
-        $row['salt']     = $salt;
         $row['hash']     = $hash;
 
         if ($previousHash)
