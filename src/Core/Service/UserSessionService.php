@@ -24,7 +24,7 @@ class UserSessionService
 
     const DATETIME_FORMAT       = 'Y-m-d H:i:s';
     const SESSION_DATA_NAME     = "dataJson";
-    const RANDOM_STRING_LEN     = 8;
+    const RANDOM_STRING_LEN     = 22;
     const QUERY_SESSION_NAME    = "session";
     const QUERY_RETURN_URL_NAME = "return";
 
@@ -51,6 +51,7 @@ class UserSessionService
      */
     public function createSessionLog($previousHash = null, $returnUrl = null, $data = null)
     {
+        $row      = new RowGateway(UserSessionLogTable::ID_NAME, UserSessionLogTable::TABLE_NAME, $this->dbAdapter);
         $datetime = new \DateTime();
         $random   = bin2hex(openssl_random_pseudo_bytes(self::RANDOM_STRING_LEN));
         $salt     = bin2hex(openssl_random_pseudo_bytes(self::RANDOM_STRING_LEN));
@@ -58,9 +59,13 @@ class UserSessionService
         $this->bcrypt->setSalt($salt);
 
         $sequence = $datetime->format(\DateTime::RFC3339) . '+' . $random;
-        $hash     = $this->bcrypt->create($sequence);
 
-        $row             = new RowGateway(UserSessionLogTable::ID_NAME, UserSessionLogTable::TABLE_NAME, $this->dbAdapter);
+//        $salt = bin2hex(openssl_random_pseudo_bytes(self::RANDOM_STRING_LEN));
+//        $this->bcrypt->setSalt($salt);
+//        $row['salt']     = $salt;
+
+        $hash = $this->bcrypt->create($sequence);
+
         $row['datetime'] = $datetime->format(self::DATETIME_FORMAT);
         $row['random']   = $random;
         $row['salt']     = $salt;
