@@ -21,8 +21,8 @@ class SecuredActionController extends AbstractActionController
     /** @var  AdapterInterface $dbAdapter */
     protected $dbAdapter;
 
-    /** @var  AuthenticationService $authService */
-    protected $authService;
+    /** @var  AuthenticationService $authenticationService */
+    protected $authenticationService;
 
     /**
      * ItemController constructor.
@@ -35,10 +35,18 @@ class SecuredActionController extends AbstractActionController
 
     public function getAuthenticationService()
     {
-        if (!$this->authService) {
-            $this->authService = new AuthenticationService();
+        if (!$this->authenticationService) {
+            $this->authenticationService = new AuthenticationService();
         }
 
-        return $this->authService;
+        return $this->authenticationService;
+    }
+
+    /**
+     * @param AuthenticationService $authenticationService
+     */
+    public function setAuthenticationService($authenticationService)
+    {
+        $this->authenticationService = $authenticationService;
     }
 }
