@@ -102,11 +102,11 @@ class UserIdentityService implements UserIdentityServiceInterface, UserSessionSe
      * @param UserRegisterMethodAdapter $adapter
      * @param string $identity
      * @param int $userId
-     * @param array $dataJson
+     * @param array $data
      * @return int
      * @throws UserIdentityException
      */
-    public function register(UserRegisterMethodAdapter $adapter, $identity, $userId, $dataJson)
+    public function register(UserRegisterMethodAdapter $adapter, $identity, $userId, $data)
     {
         if ($this->hasIdentity($identity) || $adapter->has($userId)) {
             throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST);
@@ -119,7 +119,7 @@ class UserIdentityService implements UserIdentityServiceInterface, UserSessionSe
             $identityObj->save();
 
             $identityId  = $identityObj[UserIdentityTable::ID_NAME];
-            $methodRowId = $adapter->register($identityId, $userId, $dataJson);
+            $methodRowId = $adapter->register($identityId, $userId, $data);
 
             $identityObj['state']        = Identity::STATE_ACTIVE;
             $identityObj['primaryTable'] = $adapter->getTableName();
