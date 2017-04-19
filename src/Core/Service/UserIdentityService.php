@@ -101,12 +101,12 @@ class UserIdentityService implements UserIdentityServiceInterface, UserSessionSe
     /**
      * @param UserRegisterMethodAdapter $adapter
      * @param string $identity
-     * @param int $userId
-     * @param array $data
-     * @return int
+     * @param $userId
+     * @param null $data
+     * @return mixed
      * @throws UserIdentityException
      */
-    public function register(UserRegisterMethodAdapter $adapter, $identity, $userId, $data)
+    public function register(UserRegisterMethodAdapter $adapter, $identity, $userId, $data = null)
     {
         if ($this->hasIdentity($identity) || $adapter->has($userId)) {
             throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST);

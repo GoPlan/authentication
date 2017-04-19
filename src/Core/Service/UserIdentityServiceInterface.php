@@ -37,13 +37,13 @@ interface UserIdentityServiceInterface
     public function getIdentityById($identityId);
 
     /**
-     * @param UserRegisterMethodAdapter|UserAuthenticationMethodServiceInterface $adapter
+     * @param UserRegisterMethodAdapter $adapter
      * @param string $identity
-     * @param $userId // This field is a primary key of user record stored in (authentication) method tables - email, facebook, g+. It is usually either email, user_id depending on your authentication method record.
-     * @param mixed $data // This field is a data field in json format storing additional data such as profile data, or configuration.
-     * @return int
+     * @param $userId // This field is a primary key of user record stored in (authentication) method tables - email, facebook, g+. It is usually either email, user_id depending on your authentication method record
+     * @param mixed $data // This field is for additional data such as profile data, password, or configuration. Array type is recommended
+     * @return int Primary key of the newly created UserIdentity record
      */
-    public function register(UserRegisterMethodAdapter $adapter, $identity, $userId, $data);
+    public function register(UserRegisterMethodAdapter $adapter, $identity, $userId, $data = null);
 
     /**
      * @param $previousHash
