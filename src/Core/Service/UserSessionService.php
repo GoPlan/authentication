@@ -57,10 +57,6 @@ class UserSessionService
 
         $sequence = $datetime->format(\DateTime::RFC3339) . '+' . $random;
 
-//        $salt = bin2hex(openssl_random_pseudo_bytes(self::RANDOM_STRING_LEN));
-//        $this->bcrypt->setSalt($salt);
-//        $row['salt']     = $salt;
-
         $hash = $this->bcrypt->create($sequence);
 
         $row['datetime'] = $datetime->format(self::DATETIME_FORMAT);

@@ -14,10 +14,20 @@ namespace CreativeDelta\User\Core\Service;
 
 interface UserRegisterMethodAdapter
 {
+    /**
+     * @param $userId
+     * @return mixed
+     */
     public function has($userId);
 
+    /**
+     * @return mixed
+     */
     public function getName();
 
+    /**
+     * @return mixed
+     */
     public function getTableName();
 
     /**

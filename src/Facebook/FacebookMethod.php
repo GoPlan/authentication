@@ -30,6 +30,14 @@ class FacebookMethod implements UserRegisterMethodAdapter, UserAuthenticationMet
     const FACEBOOK_PROFILE_FIELDS  = "id, first_name, last_name, email";
     const FACEBOOK_PROFILE_ID_NAME = "id";
 
+    const RESULT_QUERY_CODE  = "code";
+    const RESULT_QUERY_STATE = "state";
+
+    const PROFILE_FIELD_ID         = "id";
+    const PROFILE_FIELD_FIRST_NAME = "first_name";
+    const PROFILE_FIELD_LAST_NAME  = "last_name";
+    const PROFILE_FIELD_EMAIL      = "email";
+
     protected $appId;
     protected $appSecret;
     protected $token;

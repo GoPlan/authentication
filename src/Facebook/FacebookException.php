@@ -25,6 +25,7 @@ class FacebookException extends \Exception
     const ERROR_SUB_CODE_EXPIRED              = 463;
     const ERROR_SUB_CODE_INVALID_ACCESS_TOKEN = 467;
 
+
     protected $type;
     protected $errorSubCode;
     protected $errorUserMessage;
@@ -74,7 +75,7 @@ class FacebookException extends \Exception
     }
 
     /**
-     * @return \Exception
+     * @return mixed
      */
     public function getType()
     {
