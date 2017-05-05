@@ -4,9 +4,7 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff:
-.idea/**/workspace.xml
 .idea/**/tasks.xml
-.idea/dictionaries
 .idea/*
 
 # Sensitive or high-churn files:
@@ -47,4 +45,31 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+
+### ZendFramework template
+# Composer files
+composer.phar
+vendor/
+
+# Local configs
+config/autoload/*.local.php
+
+# Binary gettext files
+*.mo
+
+# Data
+data/logs/
+data/cache/
+data/sessions/
+data/tmp/
+temp/
+
+#Doctrine 2
+data/DoctrineORMModule/Proxy/
+data/DoctrineORMModule/cache/
+
+
+# Legacy ZF1
+demos/
+extras/documentation
 
