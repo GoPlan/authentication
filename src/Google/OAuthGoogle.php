@@ -12,10 +12,10 @@
 namespace CreativeDelta\User\Google;
 
 
-use CreativeDelta\User\Core\Service\UserAuthenticationMethodServiceInterface;
+use CreativeDelta\User\Core\Service\OAuthAuthenticationInterface;
 use CreativeDelta\User\Core\Service\UserRegisterMethodAdapter;
 
-class UserGoogleMethod implements UserAuthenticationMethodServiceInterface, UserRegisterMethodAdapter
+class OAuthGoogle implements OAuthAuthenticationInterface, UserRegisterMethodAdapter
 {
     const METHOD_NAME       = "Google";
     const METHOD_TABLE_NAME = "UserGoogle";

@@ -12,13 +12,13 @@
 namespace CreativeDelta\User\Facebook;
 
 
-use CreativeDelta\User\Core\Service\UserAuthenticationMethodServiceInterface;
+use CreativeDelta\User\Core\Service\OAuthAuthenticationInterface;
 use CreativeDelta\User\Core\Service\UserRegisterMethodAdapter;
 use Zend\Db\RowGateway\RowGateway;
 use Zend\Http\Client;
 use Zend\Http\Response;
 
-class FacebookMethod implements UserRegisterMethodAdapter, UserAuthenticationMethodServiceInterface
+class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationInterface
 {
     const METHOD_NAME              = "Facebook";
     const METHOD_TABLE_NAME        = "UserFacebook";

@@ -14,7 +14,7 @@ namespace CreativeDelta\User\Core\Service;
 
 use CreativeDelta\User\Core\Model\AbstractProfile;
 
-interface UserAuthenticationMethodServiceInterface
+interface OAuthAuthenticationInterface
 {
 
     /**
