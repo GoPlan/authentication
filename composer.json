@@ -11,7 +11,8 @@
   ],
   "version": "0.9.0",
   "require": {
-    "php": ">=5.3.3"
+    "php": ">=5.3.3",
+    "google/apiclient": "^2.0"
   },
   "require-dev": {
   },
