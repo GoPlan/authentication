@@ -9,11 +9,11 @@
  * Time: 12:02 PM
  */
 
-namespace CreativeDelta\User\Core\Service;
+namespace CreativeDelta\User\Core\Impl\Service;
 
 
-use CreativeDelta\User\Core\Model\SessionLog;
-use CreativeDelta\User\Core\Table\UserSessionLogTable;
+use CreativeDelta\User\Core\Domain\Entity\SessionLog;
+use CreativeDelta\User\Core\Impl\Table\UserSessionLogTable;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\RowGateway\RowGateway;

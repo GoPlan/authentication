@@ -14,9 +14,6 @@
     "php": ">=5.3.3"
   },
   "require-dev": {
-    "zendframework/zendframework": "~2.4.11",
-    "phpunit/phpunit": "~5.7",
-    "zendframework/zftool": "v0.1.0"
   },
   "autoload": {
     "psr-4": {

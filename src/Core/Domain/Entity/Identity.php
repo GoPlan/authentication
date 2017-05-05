@@ -9,7 +9,7 @@
  * Time: 3:31 PM
  */
 
-namespace CreativeDelta\User\Core\Model;
+namespace CreativeDelta\User\Core\Domain\Entity;
 
 
 class Identity

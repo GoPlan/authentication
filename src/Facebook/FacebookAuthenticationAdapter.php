@@ -12,11 +12,11 @@
 namespace CreativeDelta\User\Facebook;
 
 
-use CreativeDelta\User\Core\Model\Identity;
-use Zend\Authentication\Adapter\AdapterInterface;
+use CreativeDelta\User\Core\Domain\AuthenticationAdapterInterface;
+use CreativeDelta\User\Core\Domain\Entity\Identity;
 use Zend\Authentication\Result;
 
-class FacebookAuthenticationAdapter implements AdapterInterface
+class FacebookAuthenticationAdapter implements AuthenticationAdapterInterface
 {
 
     /** @var  Identity $identity */
@@ -47,4 +47,10 @@ class FacebookAuthenticationAdapter implements AdapterInterface
 
         return new Result(Result::SUCCESS, $this->identity);
     }
+
+    public function hasExpired()
+    {
+        // TODO: Implement hasExpired() method.
+    }
+
 }

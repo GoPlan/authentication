@@ -9,7 +9,7 @@
  * Time: 3:32 PM
  */
 
-namespace CreativeDelta\User\Core\Table;
+namespace CreativeDelta\User\Core\Impl\Table;
 
 
 use Zend\Db\Adapter\AdapterInterface;
@@ -19,6 +19,11 @@ class UserIdentityTable
 {
     const TABLE_NAME = "UserIdentity";
     const ID_NAME    = "id";
+
+    const COLUMN_STATE         = "state";
+    const COLUMN_IDENTITY      = "identity";
+    const COLUMN_PRIMARY_TABLE = "primaryTable";
+    const COLUMN_PRIMARY_ID    = "primaryId";
 
     protected $tableGateway;
     protected $dbAdapter;
@@ -35,7 +40,7 @@ class UserIdentityTable
      */
     public function get($id)
     {
-        return $this->tableGateway->select(['id' => $id])->current();
+        return $this->tableGateway->select([self::ID_NAME => $id])->current();
     }
 
     /**
@@ -44,7 +49,7 @@ class UserIdentityTable
      */
     public function getByIdentity($identity)
     {
-        $result = $this->tableGateway->select(['identity' => $identity])->current();
+        $result = $this->tableGateway->select([self::COLUMN_IDENTITY => $identity])->current();
         return $result;
     }
 
@@ -54,7 +59,7 @@ class UserIdentityTable
      */
     public function hasIdentity($identity)
     {
-        return $this->tableGateway->select(['identity' => $identity])->count() > 0;
+        return $this->tableGateway->select([self::COLUMN_IDENTITY => $identity])->count() > 0;
     }
 
 }

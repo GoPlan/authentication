@@ -17,10 +17,11 @@ use Zend\Db\TableGateway\TableGateway;
 
 class FacebookTable
 {
-    const TABLE_NAME           = "UserFacebook";
-    const ID_NAME              = "id";
-    const REF_USER_ID_NAME     = "userId";
-    const REF_IDENTITY_ID_NAME = "identityId";
+    const TABLE_NAME         = "UserFacebook";
+    const ID_NAME            = "id";
+    const COLUMN_FACEBOOK_ID = "userId";
+    const COLUMN_IDENTITY_ID = "identityId";
+    const COLUMN_DATA_JSON   = "dataJson";
 
     protected $tableGateway;
     protected $dbAdapter;

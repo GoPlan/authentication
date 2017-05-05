@@ -12,8 +12,8 @@
 namespace CreativeDelta\User\Facebook;
 
 
-use CreativeDelta\User\Core\Service\OAuthAuthenticationInterface;
-use CreativeDelta\User\Core\Service\UserRegisterMethodAdapter;
+use CreativeDelta\User\Core\Domain\OAuthAuthenticationInterface;
+use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
 use Zend\Db\RowGateway\RowGateway;
 use Zend\Http\Client;
 use Zend\Http\Response;
@@ -198,10 +198,12 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
 
     public function register($identityId, $userId, $dataJson)
     {
-        $row               = new RowGateway(FacebookTable::ID_NAME, FacebookTable::TABLE_NAME, $this->dbAdapter);
-        $row['identityId'] = $identityId;
-        $row['userId']     = $userId;
-        $row['dataJson']   = json_encode($dataJson);
+        $row = new RowGateway(FacebookTable::ID_NAME, FacebookTable::TABLE_NAME, $this->dbAdapter);
+
+        $row[FacebookTable::COLUMN_IDENTITY_ID] = $identityId;
+        $row[FacebookTable::COLUMN_FACEBOOK_ID] = $userId;
+        $row[FacebookTable::COLUMN_DATA_JSON]   = json_encode($dataJson);
+
         $row->save();
 
         return $row[FacebookTable::ID_NAME];

@@ -9,10 +9,10 @@
  * Time: 8:56 AM
  */
 
-namespace CreativeDelta\User\Core\Service;
+namespace CreativeDelta\User\Core\Domain;
 
 
-use CreativeDelta\User\Core\Model\AbstractProfile;
+use CreativeDelta\User\Core\Domain\Entity\AbstractProfile;
 
 interface OAuthAuthenticationInterface
 {

@@ -9,7 +9,7 @@
  * Time: 9:49 AM
  */
 
-namespace CreativeDelta\User\Core\Exception;
+namespace CreativeDelta\User\Core\Impl\Exception;
 
 
 use Exception;

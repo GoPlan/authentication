@@ -12,7 +12,7 @@
 namespace CreativeDelta\User\Facebook;
 
 
-use CreativeDelta\User\Core\Model\AbstractProfile;
+use CreativeDelta\User\Core\Domain\Entity\AbstractProfile;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\RowGateway\RowGateway;
 use Zend\Db\RowGateway\RowGatewayInterface;
@@ -69,12 +69,12 @@ class FacebookProfile extends AbstractProfile implements RowGatewayInterface
 
     function getUserId()
     {
-        return $this->rowGateway[FacebookTable::REF_USER_ID_NAME];
+        return $this->rowGateway[FacebookTable::COLUMN_FACEBOOK_ID];
     }
 
     function getIdentityId()
     {
-        return $this->rowGateway[FacebookTable::REF_IDENTITY_ID_NAME];
+        return $this->rowGateway[FacebookTable::COLUMN_IDENTITY_ID];
     }
 
 }
