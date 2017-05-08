@@ -14,9 +14,8 @@ namespace CreativeDelta\User\Facebook;
 
 use CreativeDelta\User\Core\Domain\OAuthAuthenticationInterface;
 use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
+use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\RowGateway\RowGateway;
-use Zend\Http\Client;
-use Zend\Http\Response;
 
 class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationInterface
 {
@@ -38,31 +37,28 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
     const PROFILE_FIELD_LAST_NAME  = "last_name";
     const PROFILE_FIELD_EMAIL      = "email";
 
-    protected $appId;
-    protected $appSecret;
-    protected $token;
-    protected $scope;
-    protected $state;
+    /** @var  AdapterInterface $dbAdapter */
     protected $dbAdapter;
-    protected $userFacebookTable;
 
+    /** @var  FacebookClient $facebookClient */
+    protected $facebookClient;
+
+    /** @var FacebookTable $facebookTable */
+    protected $facebookTable;
 
     /**
      * UserFacebookService constructor.
      * @param $dbAdapter
      * @param $appId
      * @param $appSecret
-     * @param $scope
+     * @param $appScope
      * @internal param $redirectUri
      */
-    public function __construct($dbAdapter, $appId, $appSecret, $scope)
+    public function __construct($dbAdapter, $appId, $appSecret, $appScope)
     {
-        $this->appId     = $appId;
-        $this->appSecret = $appSecret;
-        $this->scope     = $scope;
-
-        $this->dbAdapter         = $dbAdapter;
-        $this->userFacebookTable = new FacebookTable($this->dbAdapter);
+        $this->dbAdapter      = $dbAdapter;
+        $this->facebookTable  = new FacebookTable($this->dbAdapter);
+        $this->facebookClient = new FacebookClient($appId, $appSecret, $appScope);
     }
 
     /**
@@ -76,20 +72,7 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
      */
     public function makeAuthenticationUrl($redirectUri, $state = null)
     {
-        $config = [
-            'response_type' => self::FACEBOOK_RESPONSE,
-            'scope'         => $this->scope,
-            'client_id'     => $this->appId,
-            'redirect_uri'  => $redirectUri
-        ];
-
-        if ($state)
-            $config['state'] = $state;
-
-        $query = http_build_query($config);
-        $url   = self::FACEBOOK_OAUTH_URL . '?' . $query;
-
-        return $url;
+        return $this->facebookClient->makeAuthenticationUrl($redirectUri, $state);
     }
 
     /**
@@ -105,35 +88,18 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
      */
     public function initAccessToken($redirectUri, $code)
     {
-        $config = [
-            'sslverifypeer' => false
-        ];
-
-        $query = [
-            'client_id'     => $this->appId,
-            'client_secret' => $this->appSecret,
-            'redirect_uri'  => $redirectUri,
-            'code'          => $code
-        ];
-
-        $client = new Client(self::FACEBOOK_TOKEN_URL, $config);
-        $client->setParameterGet($query);
-
-        $response  = $client->send();
-        $dataArray = json_decode($response->getBody(), true);
-
-        switch ($response->getStatusCode()) {
-            case Response::STATUS_CODE_200:
-                $this->token = $dataArray['access_token'];
-                break;
-            case Response::STATUS_CODE_400:
-                throw FacebookException::newFromArray($dataArray);
-            default:
-                break;
-        }
-
+        $this->facebookClient->initAccessToken($redirectUri, $code);
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getAccessToken()
+    {
+        return $this->facebookClient->getAccessToken();
+    }
+
 
     /**
      * @param string $fields // a comma separated string of profile fields to be retrieved
@@ -142,33 +108,7 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
      */
     public function getProfileData($fields = null)
     {
-        $config = [
-            'sslverifypeer' => false
-        ];
-
-        $fields = $fields ? $fields : self::FACEBOOK_PROFILE_FIELDS;
-
-        $query = [
-            'access_token' => $this->token,
-            'fields'       => $fields
-        ];
-
-        $client = new Client(self::FACEBOOK_GRAPH_URL, $config);
-        $client->setParameterGet($query);
-
-        $response  = $client->send();
-        $dataArray = json_decode($response->getBody(), true);
-
-        switch ($response->getStatusCode()) {
-            case Response::STATUS_CODE_200:
-                return $dataArray;
-            case Response::STATUS_CODE_400:
-                throw FacebookException::newFromArray($dataArray, null);
-            default:
-                break;
-        }
-
-        return $dataArray;
+        return $this->facebookClient->getProfileData($fields);
     }
 
     /**
@@ -177,7 +117,7 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
     public function getStoredProfile()
     {
         $profileData         = $this->getProfileData();
-        $storedProfileResult = $this->userFacebookTable->get($profileData[self::FACEBOOK_PROFILE_ID_NAME]);
+        $storedProfileResult = $this->facebookTable->getByUserId($profileData[self::FACEBOOK_PROFILE_ID_NAME]);
 
         if ($storedProfileResult) {
             $facebookProfile = FacebookProfile::newFromArray($this->dbAdapter, $storedProfileResult->getArrayCopy(), true);
@@ -193,7 +133,7 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
      */
     public function has($userId)
     {
-        return $this->userFacebookTable->has($userId);
+        return $this->facebookTable->hasUserId($userId);
     }
 
     public function register($identityId, $userId, $dataJson)
@@ -202,7 +142,6 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
 
         $row[FacebookTable::COLUMN_IDENTITY_ID] = $identityId;
         $row[FacebookTable::COLUMN_FACEBOOK_ID] = $userId;
-        $row[FacebookTable::COLUMN_DATA_JSON]   = json_encode($dataJson);
 
         $row->save();
 

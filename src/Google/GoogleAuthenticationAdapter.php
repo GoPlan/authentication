@@ -45,7 +45,7 @@ class GoogleAuthenticationAdapter implements AuthenticationAdapterInterface
         // TODO: Implement authenticate() method.
     }
 
-    public function hasExpired()
+    public function isActive()
     {
         // TODO: Implement hasExpired() method.
     }

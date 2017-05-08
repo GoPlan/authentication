@@ -102,4 +102,9 @@ class GoogleMethod implements OAuthAuthenticationInterface
         $this->accessToken = $this->client->getRefreshToken();
     }
 
+    public function getAccessToken()
+    {
+        // TODO: Implement getAccessToken() method.
+    }
+
 }

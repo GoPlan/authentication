@@ -41,13 +41,23 @@ interface OAuthAuthenticationInterface
     public function initAccessToken($redirectUri, $code);
 
     /**
+     * Return profile data (array) from OAuth server (Google, Facebook)
+     *
      * @param string $fields // a comma separated string of profile fields to be retrieved
      * @return null|array
      */
     public function getProfileData($fields = null);
 
     /**
+     *
+     * Return profile stored on your server.
+     *
      * @return null|AbstractProfile
      */
     public function getStoredProfile();
+
+    /**
+     * @return mixed
+     */
+    public function getAccessToken();
 }

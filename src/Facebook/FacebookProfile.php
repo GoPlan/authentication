@@ -12,12 +12,12 @@
 namespace CreativeDelta\User\Facebook;
 
 
-use CreativeDelta\User\Core\Domain\Entity\AbstractProfile;
+use CreativeDelta\User\Core\Domain\Entity\AbstractOAuthProfile;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\RowGateway\RowGateway;
 use Zend\Db\RowGateway\RowGatewayInterface;
 
-class FacebookProfile extends AbstractProfile implements RowGatewayInterface
+class FacebookProfile extends AbstractOAuthProfile implements RowGatewayInterface
 {
     /** @var  AdapterInterface $dbAdapter */
     protected $dbAdapter;
@@ -75,6 +75,26 @@ class FacebookProfile extends AbstractProfile implements RowGatewayInterface
     function getIdentityId()
     {
         return $this->rowGateway[FacebookTable::COLUMN_IDENTITY_ID];
+    }
+
+    function getCode()
+    {
+        return $this->rowGateway[FacebookTable::COLUMN_CODE];
+    }
+
+    function getRefreshToken()
+    {
+        return $this->rowGateway[FacebookTable::COLUMN_REFRESH_TOKEN];
+    }
+
+    function getAccessToken()
+    {
+        return $this->rowGateway[FacebookTable::COLUMN_ACCESS_TOKEN];
+    }
+
+    function setAccessToken($token)
+    {
+        $this->rowGateway[FacebookTable::COLUMN_ACCESS_TOKEN] = $token;
     }
 
 }

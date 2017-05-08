@@ -16,6 +16,8 @@ class FacebookException extends \Exception
 {
     const ERROR_TYPE = "OAuthException";
 
+    const ERROR_CODE_ACCESS_TOKEN_IS_NULL = -1;
+
     const ERROR_CODE_ACCESS_TOKEN_EXPIRED    = 190;
     const ERROR_CODE_API_TOO_MANY_CALLS      = 1;
     const ERROR_CODE_API_USER_TOO_MANY_CALLS = 2;
@@ -55,12 +57,15 @@ class FacebookException extends \Exception
     }
 
     /**
-     * @param array $errorData
+     * @param array $error
      * @param null|\Exception $prevException
      * @return FacebookException
+     * @internal param array $errorData
      */
-    static function newFromArray(array $errorData, \Exception $prevException = null)
+    static function newFromArray(array $error, \Exception $prevException = null)
     {
+        $errorData = $error['error'];
+
         $message          = $errorData['message'];
         $code             = $errorData['code'];
         $type             = $errorData['type'];

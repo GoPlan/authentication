@@ -12,45 +12,81 @@
 namespace CreativeDelta\User\Facebook;
 
 
-use CreativeDelta\User\Core\Domain\AuthenticationAdapterInterface;
+use CreativeDelta\User\Core\Domain\AbstractAuthenticationAdapter;
 use CreativeDelta\User\Core\Domain\Entity\Identity;
-use Zend\Authentication\Result;
+use Zend\Db\Adapter\AdapterInterface;
 
-class FacebookAuthenticationAdapter implements AuthenticationAdapterInterface
+class FacebookAuthenticationAdapter extends AbstractAuthenticationAdapter
 {
+    const QUERY_ID    = "id";
+    const METHOD_NAME = "facebook";
 
-    /** @var  Identity $identity */
-    protected $identity;
+    /** @var  FacebookClient $facebookClient */
+    protected $facebookClient;
 
-    /**
-     * FacebookAuthenticationAdapter constructor.
-     * @param Identity|null $identity
-     */
-    public function __construct(Identity $identity = null)
+    /** @var  FacebookTable $facebookTable */
+    protected $facebookTable;
+
+
+    public function __construct(array $config, AdapterInterface $dbAdapter, $identity = null)
     {
-        $this->identity = $identity;
+        parent::__construct($config, $dbAdapter, $identity);
+
+        $this->facebookTable = new FacebookTable($this->dbAdapter);
+
+        $appId     = $this->config['appId'];
+        $appSecret = $this->config['appSecret'];
+        $appScope  = $this->config['appScope'];
+
+        $this->facebookClient = new FacebookClient($appId, $appSecret, $appScope);
+
+        $this->loadIdentityProfile();
     }
 
-    /**
-     * @return Result
-     */
-    public function authenticate()
+    public function isCurrent()
     {
 
-        if (!$this->identity) {
-            return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null);
-        }
+        $oauthProfile = $this->facebookClient->getProfileData(self::QUERY_ID);
 
-        if (!($this->identity->getState() == Identity::STATE_ACTIVE)) {
-            return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, ['USER_NOT_ACTIVE']);
-        }
+        if (!$oauthProfile)
+            return false;
 
-        return new Result(Result::SUCCESS, $this->identity);
+        $identityProfile = $this->identity->getProfile();
+
+        if (!$identityProfile)
+            return false;
+
+        $facebookId = $oauthProfile[self::QUERY_ID];
+
+        return $facebookId == $identityProfile['userId'];
     }
 
-    public function hasExpired()
+    public function setAccessToken($token)
     {
-        // TODO: Implement hasExpired() method.
+        $this->facebookClient->setAccessToken($token);
     }
 
+    public function isActive()
+    {
+        return true;
+    }
+
+    function pokeIdentity(Identity $identity)
+    {
+        /** @var FacebookProfile $profile */
+        $profileData = $identity->getProfile();
+
+        $profileInstance = FacebookProfile::newFromArray($this->dbAdapter, $profileData, true);
+        $profileInstance->setAccessToken($this->facebookClient->getAccessToken());
+        $profileInstance->save();
+    }
+
+    private function loadIdentityProfile()
+    {
+        if (!$this->identity)
+            return;
+
+        $result = $this->facebookTable->getByIdentityId($this->identity->getId());
+        $this->identity->setProfile($result->getArrayCopy());
+    }
 }

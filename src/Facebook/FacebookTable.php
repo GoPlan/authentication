@@ -17,14 +17,32 @@ use Zend\Db\TableGateway\TableGateway;
 
 class FacebookTable
 {
-    const TABLE_NAME         = "UserFacebook";
-    const ID_NAME            = "id";
-    const COLUMN_FACEBOOK_ID = "userId";
-    const COLUMN_IDENTITY_ID = "identityId";
-    const COLUMN_DATA_JSON   = "dataJson";
+    const TABLE_NAME           = "UserFacebook";
+    const ID_NAME              = "id";
+    const COLUMN_FACEBOOK_ID   = "userId";
+    const COLUMN_IDENTITY_ID   = "identityId";
+    const COLUMN_CODE          = "code";
+    const COLUMN_ACCESS_TOKEN  = "accessToken";
+    const COLUMN_REFRESH_TOKEN = "refreshToken";
 
     protected $tableGateway;
     protected $dbAdapter;
+
+    /**
+     * @return AdapterInterface
+     */
+    public function getDbAdapter()
+    {
+        return $this->dbAdapter;
+    }
+
+    /**
+     * @return TableGateway
+     */
+    public function getTableGateway()
+    {
+        return $this->tableGateway;
+    }
 
     function __construct(AdapterInterface $dbAdapter)
     {
@@ -36,17 +54,35 @@ class FacebookTable
      * @param $userId
      * @return bool
      */
-    public function has($userId)
+    public function hasUserId($userId)
     {
-        return $this->tableGateway->select(['userId' => $userId])->count() > 0;
+        return $this->tableGateway->select([self::COLUMN_FACEBOOK_ID => $userId])->count() > 0;
     }
 
     /**
      * @param $userId
      * @return array|\ArrayObject|null
      */
-    public function get($userId)
+    public function getByUserId($userId)
     {
-        return $this->tableGateway->select(['userId' => $userId])->current();
+        return $this->tableGateway->select([self::COLUMN_FACEBOOK_ID => $userId])->current();
+    }
+
+    /**
+     * @param $identityId
+     * @return array|\ArrayObject|null
+     */
+    public function getByIdentityId($identityId)
+    {
+        return $this->tableGateway->select([self::COLUMN_IDENTITY_ID => $identityId])->current();
+    }
+
+    /**
+     * @param $identityId
+     * @return bool
+     */
+    public function hasIdentityId($identityId)
+    {
+        return $this->tableGateway->select([self::COLUMN_IDENTITY_ID => $identityId])->count() > 0;
     }
 }
