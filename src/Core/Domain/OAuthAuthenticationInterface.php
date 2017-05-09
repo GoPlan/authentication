@@ -46,7 +46,7 @@ interface OAuthAuthenticationInterface
      * @param string $fields // a comma separated string of profile fields to be retrieved
      * @return null|array
      */
-    public function getProfileData($fields = null);
+    public function getOAuthProfile($fields = null);
 
     /**
      *
@@ -54,7 +54,7 @@ interface OAuthAuthenticationInterface
      *
      * @return null|AbstractProfile
      */
-    public function getStoredProfile();
+    public function getLocalProfile();
 
     /**
      * @return mixed

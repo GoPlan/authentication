@@ -21,9 +21,8 @@ class FacebookTable
     const ID_NAME              = "id";
     const COLUMN_FACEBOOK_ID   = "userId";
     const COLUMN_IDENTITY_ID   = "identityId";
-    const COLUMN_CODE          = "code";
     const COLUMN_ACCESS_TOKEN  = "accessToken";
-    const COLUMN_REFRESH_TOKEN = "refreshToken";
+
 
     protected $tableGateway;
     protected $dbAdapter;

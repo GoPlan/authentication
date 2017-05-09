@@ -12,12 +12,54 @@
 namespace CreativeDelta\User\Google;
 
 
-use Application\Table\AbstractTable;
+use Zend\Db\TableGateway\TableGateway;
 
-class GoogleTable extends AbstractTable
+class GoogleTable
 {
+    const TABLE_NAME          = "GoogleUser";
+    const ID_NAME             = "id";
+    const COLUMN_IDENTITY_ID  = "identityId";
+    const COLUMN_GOOGLE_ID    = "userId";
+    const COLUMN_ACCESS_TOKEN = "accessToken";
 
-    const TABLE_NAME = "GoogleUser";
-    const ID_NAME = "id";
+
+    protected $tableGateway;
+    protected $dbAdapter;
+
+    /**
+     * @return mixed
+     */
+    public function getTableGateway()
+    {
+        return $this->tableGateway;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDbAdapter()
+    {
+        return $this->dbAdapter;
+    }
+
+    /**
+     * GoogleTable constructor.
+     * @param $dbAdapter
+     */
+    public function __construct($dbAdapter)
+    {
+        $this->dbAdapter    = $dbAdapter;
+        $this->tableGateway = new TableGateway(self::TABLE_NAME, $this->dbAdapter);
+    }
+
+    public function getByIdentityId($identityId)
+    {
+        return $this->tableGateway->select([self::COLUMN_IDENTITY_ID => $identityId])->current();
+    }
+
+    public function getByUserId($userId)
+    {
+        return $this->tableGateway->select([self::COLUMN_GOOGLE_ID => $userId])->current();
+    }
 
 }

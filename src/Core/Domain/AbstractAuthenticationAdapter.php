@@ -16,8 +16,13 @@ use CreativeDelta\User\Core\Domain\Entity\Identity;
 use Zend\Authentication\Result;
 use Zend\Db\Adapter\AdapterInterface;
 
-abstract class AbstractAuthenticationAdapter implements AuthenticationAdapterInterface
+abstract class AbstractAuthenticationAdapter implements \Zend\Authentication\Adapter\AdapterInterface
 {
+    /**
+     * $METHOD_NAME is used for identifying which deriving method (adapter) is being used.
+     * It is useful for situation such as loading config where specific method needs to be provide.
+     * This field is supposed to be overriden by deriving classes.
+     */
     const METHOD_NAME = null;
 
     /** @var  array $config */
@@ -47,12 +52,29 @@ abstract class AbstractAuthenticationAdapter implements AuthenticationAdapterInt
 
     static function newFromConfig(array $config, AdapterInterface $dbAdapter, Identity $identity = null)
     {
-        $methodConfig = $config[self::METHOD_NAME];
-        $instance     = new static($methodConfig, $dbAdapter, $identity);
-        return $instance;
+        $methodConfig   = $config[self::METHOD_NAME];
+        $methodInstance = new static($methodConfig, $dbAdapter, $identity);
+        return $methodInstance;
     }
 
-    abstract function pokeIdentity(Identity $identity);
+    /**
+     * This abstract function is called each time a user is authenticated successfully.
+     * It is used to renew (User) Identity information such as new access token, new logged-in time, etc.
+     * Therefore, deriving classes will define behaviours of this function.
+     *
+     * @return void
+     */
+    abstract function pokeIdentity();
+
+    /**
+     * This method provides another mechanism for re-verifying an Identity.
+     * It is additionally called by AuthenticationService::hasIdentity().
+     * Since authentication OAuth token can expire or mis-provided,
+     * this method is defined and called to make sure current Identity is valid.
+     *
+     * @return bool
+     */
+    abstract function verifyIdentity();
 
     /**
      * @return Result
@@ -73,7 +95,7 @@ abstract class AbstractAuthenticationAdapter implements AuthenticationAdapterInt
                 [Identity::CREDENTIAL_RESULT_MESSAGES[Result::FAILURE_CREDENTIAL_INVALID]]);
         }
 
-        $this->pokeIdentity($this->identity);
+        $this->pokeIdentity();
 
         return new Result(Result::SUCCESS, $this->identity);
     }

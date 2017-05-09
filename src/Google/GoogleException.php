@@ -12,7 +12,9 @@
 namespace CreativeDelta\User\Google;
 
 
-class GoogleException extends \Exception
+use Exception;
+
+class GoogleException extends Exception
 {
 
 

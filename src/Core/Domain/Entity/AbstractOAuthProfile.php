@@ -24,15 +24,4 @@ abstract class AbstractOAuthProfile extends AbstractProfile
      * @return mixed
      */
     abstract function setAccessToken($token);
-
-    /**
-     * @return mixed
-     */
-    abstract function getCode();
-
-    /**
-     * @return mixed
-     */
-    abstract function getRefreshToken();
-
 }

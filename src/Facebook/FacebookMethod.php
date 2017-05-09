@@ -110,7 +110,7 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
      * @return array
      * @throws FacebookException|\Exception
      */
-    public function getProfileData($fields = null)
+    public function getOAuthProfile($fields = null)
     {
         return $this->facebookClient->getFacebookProfile($fields);
     }
@@ -118,14 +118,14 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
     /**
      * @return null|FacebookProfile
      */
-    public function getStoredProfile()
+    public function getLocalProfile()
     {
-        $profileData         = $this->getProfileData();
-        $storedProfileResult = $this->facebookTable->getByUserId($profileData[self::FACEBOOK_PROFILE_ID_NAME]);
+        $oauthProfile     = $this->getOAuthProfile();
+        $localProfileData = $this->facebookTable->getByUserId($oauthProfile[self::FACEBOOK_PROFILE_ID_NAME]);
 
-        if ($storedProfileResult) {
-            $facebookProfile = FacebookProfile::newFromArray($this->dbAdapter, $storedProfileResult->getArrayCopy(), true);
-            return $facebookProfile;
+        if ($localProfileData) {
+            $localProfileEntity = FacebookProfile::newFromArray($this->dbAdapter, $localProfileData->getArrayCopy(), true);
+            return $localProfileEntity;
         } else {
             return null;
         }

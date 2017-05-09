@@ -77,16 +77,6 @@ class FacebookProfile extends AbstractOAuthProfile implements RowGatewayInterfac
         return $this->rowGateway[FacebookTable::COLUMN_IDENTITY_ID];
     }
 
-    function getCode()
-    {
-        return $this->rowGateway[FacebookTable::COLUMN_CODE];
-    }
-
-    function getRefreshToken()
-    {
-        return $this->rowGateway[FacebookTable::COLUMN_REFRESH_TOKEN];
-    }
-
     function getAccessToken()
     {
         return $this->rowGateway[FacebookTable::COLUMN_ACCESS_TOKEN];

@@ -12,32 +12,80 @@
 namespace CreativeDelta\User\Google;
 
 
-use CreativeDelta\User\Core\Domain\Entity\AbstractProfile;
+use CreativeDelta\User\Core\Domain\Entity\AbstractOAuthProfile;
+use Zend\Db\Adapter\AdapterInterface;
+use Zend\Db\RowGateway\RowGateway;
+use Zend\Db\RowGateway\RowGatewayInterface;
 
-class GoogleProfile extends AbstractProfile
+class GoogleProfile extends AbstractOAuthProfile implements RowGatewayInterface
 {
 
-    public static function newFromData($data)
+    /** @var  AdapterInterface $dbAdapter */
+    protected $dbAdapter;
+
+    /** @var  RowGateway $rowGateway */
+    protected $rowGateway;
+
+    /**
+     * ProfileRow constructor.
+     * @param AdapterInterface $dbAdapter
+     */
+    public function __construct(AdapterInterface $dbAdapter)
     {
-        $profile = new GoogleProfile();
+        $this->dbAdapter  = $dbAdapter;
+        $this->rowGateway = new RowGateway(GoogleTable::ID_NAME, GoogleTable::TABLE_NAME, $dbAdapter);
+    }
 
-
-
-        return $profile;
+    static function newFromArray(AdapterInterface $dbAdapter, $data, $exist = false)
+    {
+        $row = new GoogleProfile($dbAdapter);
+        $row->populate($data, $exist);
+        return $row;
     }
 
     function getId()
     {
-        // TODO: Implement getId() method.
+        return $this->rowGateway[GoogleTable::ID_NAME];
     }
 
     function getUserId()
     {
-        // TODO: Implement getUserId() method.
+        return $this->rowGateway[GoogleTable::COLUMN_GOOGLE_ID];
     }
 
     function getIdentityId()
     {
-        // TODO: Implement getIdentityId() method.
+        return $this->rowGateway[GoogleTable::COLUMN_IDENTITY_ID];
     }
+
+    function getAccessToken()
+    {
+        return $this->rowGateway[GoogleTable::COLUMN_ACCESS_TOKEN];
+    }
+
+    function setAccessToken($token)
+    {
+        $this->rowGateway[GoogleTable::COLUMN_ACCESS_TOKEN] = $token;
+    }
+
+    public function exchangeArray($data)
+    {
+        $this->rowGateway->exchangeArray($data);
+    }
+
+    public function populate($data, $exist = false)
+    {
+        $this->rowGateway->populate($data, $exist);
+    }
+
+    public function save()
+    {
+        $this->rowGateway->save();
+    }
+
+    public function delete()
+    {
+        $this->rowGateway->delete();
+    }
+
 }

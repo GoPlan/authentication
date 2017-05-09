@@ -40,9 +40,9 @@ class GoogleMethod implements OAuthAuthenticationInterface
     protected $client;
 
     /**
-     * @var GoogleTable $userTable ;
+     * @var GoogleTable $localTable ;
      */
-    protected $userTable;
+    protected $localTable;
 
     /**
      * GoogleMethod constructor.
@@ -51,10 +51,10 @@ class GoogleMethod implements OAuthAuthenticationInterface
      */
     public function __construct(AdapterInterface $dbAdapter, array $config)
     {
-        $this->dbAdapter = $dbAdapter;
-        $this->config    = $config;
-        $this->client    = new Google_Client($this->config);
-        $this->userTable = new GoogleTable($this->dbAdapter);
+        $this->dbAdapter  = $dbAdapter;
+        $this->config     = $config;
+        $this->client     = new Google_Client($this->config);
+        $this->localTable = new GoogleTable($this->dbAdapter);
     }
 
     public function makeAuthenticationUrl($redirectUri, $state = null)
@@ -70,41 +70,24 @@ class GoogleMethod implements OAuthAuthenticationInterface
         return $this;
     }
 
-    public function getProfileData($fields = null)
+    public function getOAuthProfile($fields = null)
     {
         $service = new Google_Service_People($this->client);
         $profile = $service->people->get('people/me');
-
         return $profile;
     }
 
-    public function getStoredProfile()
+    public function getLocalProfile()
     {
         $userId  = $this->client->getClientId();
-        $result  = $this->userTable->get($userId);
-        $profile = $result ? GoogleProfile::newFromData($result->getArrayCopy()) : null;
-
+        $result  = $this->localTable->getByUserId($userId);
+        $profile = $result ? GoogleProfile::newFromArray($this->dbAdapter, $result->getArrayCopy(), true) : null;
         return $profile;
-    }
-
-    public function verifyUserId($userId)
-    {
-        $this->client->
-    }
-
-    public function hasExpired()
-    {
-        return $this->client->isAccessTokenExpired();
-    }
-
-    public function refreshToken()
-    {
-        $this->accessToken = $this->client->getRefreshToken();
     }
 
     public function getAccessToken()
     {
-        // TODO: Implement getAccessToken() method.
+        return $this->accessToken;
     }
 
 }

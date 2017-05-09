@@ -56,7 +56,7 @@ class FacebookAuthenticationAdapter extends AbstractOAuthAuthenticationAdapter
         return $this->facebookClient->getAccessToken();
     }
 
-    public function verify()
+    public function verifyIdentity()
     {
         $facebookData = null;
 
@@ -89,10 +89,10 @@ class FacebookAuthenticationAdapter extends AbstractOAuthAuthenticationAdapter
         return $facebookId == $identityProfile[FacebookTable::COLUMN_FACEBOOK_ID];
     }
 
-    function pokeIdentity(Identity $identity)
+    function pokeIdentity()
     {
         /** @var FacebookProfile $profile */
-        $profileData = $identity->getProfile();
+        $profileData = $this->identity->getProfile();
 
         $profileInstance = FacebookProfile::newFromArray($this->dbAdapter, $profileData, true);
         $profileInstance->setAccessToken($this->facebookClient->getAccessToken());

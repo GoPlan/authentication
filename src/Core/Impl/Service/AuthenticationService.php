@@ -12,7 +12,7 @@
 namespace CreativeDelta\User\Core\Impl\Service;
 
 
-use CreativeDelta\User\Core\Domain\AuthenticationAdapterInterface;
+use CreativeDelta\User\Core\Domain\AbstractAuthenticationAdapter;
 use CreativeDelta\User\Core\Domain\Entity\Identity;
 use CreativeDelta\User\Core\Impl\Exception\AuthenticationException;
 use Zend\Db\Adapter\AdapterInterface;
@@ -92,11 +92,11 @@ class AuthenticationService extends \Zend\Authentication\AuthenticationService
             $this->adapter = new $adapterClass($adapterConfig, $this->getDbAdapter(), $identity);
         }
 
-        if (!$this->adapter instanceof AuthenticationAdapterInterface) {
+        if (!$this->adapter instanceof AbstractAuthenticationAdapter) {
             throw new AuthenticationException(AuthenticationException::ERROR_CODE_UNKNOWN_IMPLEMENTATION_OF_ADAPTER);
         }
 
-        return $this->adapter->verify();
+        return $this->adapter->verifyIdentity();
     }
 
 }
