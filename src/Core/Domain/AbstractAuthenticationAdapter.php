@@ -45,6 +45,15 @@ abstract class AbstractAuthenticationAdapter implements AuthenticationAdapterInt
             $this->identity->setAdapterClassName(static::class);
     }
 
+    static function newFromConfig(array $config, AdapterInterface $dbAdapter, Identity $identity = null)
+    {
+        $methodConfig = $config[self::METHOD_NAME];
+        $instance     = new static($methodConfig, $dbAdapter, $identity);
+        return $instance;
+    }
+
+    abstract function pokeIdentity(Identity $identity);
+
     /**
      * @return Result
      */
@@ -67,14 +76,5 @@ abstract class AbstractAuthenticationAdapter implements AuthenticationAdapterInt
         $this->pokeIdentity($this->identity);
 
         return new Result(Result::SUCCESS, $this->identity);
-    }
-
-    abstract function pokeIdentity(Identity $identity);
-
-    static function newFromConfig(array $config, AdapterInterface $dbAdapter, Identity $identity = null)
-    {
-        $methodConfig = $config[self::METHOD_NAME];
-        $instance     = new static($methodConfig, $dbAdapter, $identity);
-        return $instance;
     }
 }

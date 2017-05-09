@@ -18,16 +18,7 @@ interface AuthenticationAdapterInterface extends AdapterInterface
 {
 
     /**
-     * Check if user is current to OAuth user
-     *
      * @return bool
      */
-    public function isCurrent();
-
-    /**
-     * Check if token is still active (not expired)
-     *
-     * @return bool
-     */
-    public function isActive();
+    public function verify();
 }

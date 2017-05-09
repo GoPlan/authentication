@@ -21,6 +21,10 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
 {
     const METHOD_NAME              = "Facebook";
     const METHOD_TABLE_NAME        = "UserFacebook";
+    const METHOD_CONFIG_APP_ID     = "appId";
+    const METHOD_CONFIG_APP_SECRET = "appSecret";
+    const METHOD_CONFIG_APP_SCOPE  = "appScope";
+
     const FACEBOOK_RESPONSE        = "code";
     const FACEBOOK_OAUTH_URL       = "https://www.facebook.com/v2.8/dialog/oauth";
     const FACEBOOK_TOKEN_URL       = "https://graph.facebook.com/v2.8/oauth/access_token";
@@ -108,7 +112,7 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
      */
     public function getProfileData($fields = null)
     {
-        return $this->facebookClient->getProfileData($fields);
+        return $this->facebookClient->getFacebookProfile($fields);
     }
 
     /**

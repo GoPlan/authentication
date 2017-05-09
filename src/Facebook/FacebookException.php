@@ -66,13 +66,26 @@ class FacebookException extends \Exception
     {
         $errorData = $error['error'];
 
-        $message          = $errorData['message'];
-        $code             = $errorData['code'];
-        $type             = $errorData['type'];
-        $errorSubCode     = $errorData['error_subcode'];
-        $errorUserMessage = $errorData['error_user_msg'];
-        $errorUserTitle   = $errorData['error_user_title'];
-        $errorFbTraceId   = $errorData['fbtrace_id'];
+        $message = $errorData['message'];
+        $code    = $errorData['code'];
+        $type    = $errorData['type'];
+
+        $errorSubCode     = null;
+        $errorUserMessage = null;
+        $errorUserTitle   = null;
+        $errorFbTraceId   = null;
+
+        if (isset($errorData['error_subcode']))
+            $errorSubCode = $errorData['error_subcode'];
+
+        if (isset($errorData['error_user_msg']))
+            $errorUserMessage = $errorData['error_user_msg'];
+
+        if (isset($errorData['error_user_title']))
+            $errorUserTitle = $errorData['error_user_title'];
+
+        if (isset($errorData['fbtrace_id']))
+            $errorFbTraceId = $errorData['fbtrace_id'];
 
         $exception = new FacebookException($message, $code, $type, $errorSubCode, $errorUserMessage, $errorUserTitle, $errorFbTraceId, $prevException);
 

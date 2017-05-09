@@ -71,27 +71,32 @@ class AuthenticationService extends \Zend\Authentication\AuthenticationService
 
     public function hasIdentity()
     {
-        return $this->hasIdentityLocal();
+        $valid = parent::hasIdentity() && $this->_verifyIdentity();
+
+        if (parent::hasIdentity() && !$valid) {
+            $this->clearIdentity();
+        }
+
+        return $valid;
     }
 
-    private function hasIdentityLocal()
+    private function _verifyIdentity()
     {
         if ((!$identity = $this->getIdentity()) || !($identity instanceof Identity)) {
             return false;
         }
 
         if (!$this->adapter) {
-            $class         = $identity->getAdapterClassName();
-            $adapterConfig = $this->config[$class::METHOD_NAME];
-            $this->adapter = new $class($adapterConfig, $this->getDbAdapter(), $identity);
-            $this->adapter->setAccessToken($identity->getProfile()['accessToken']);
+            $adapterClass  = $identity->getAdapterClassName();
+            $adapterConfig = $this->config[$adapterClass::METHOD_NAME];
+            $this->adapter = new $adapterClass($adapterConfig, $this->getDbAdapter(), $identity);
         }
 
         if (!$this->adapter instanceof AuthenticationAdapterInterface) {
             throw new AuthenticationException(AuthenticationException::ERROR_CODE_UNKNOWN_IMPLEMENTATION_OF_ADAPTER);
         }
 
-        return $this->adapter->isCurrent() && $this->adapter->isActive();
+        return $this->adapter->verify();
     }
 
 }

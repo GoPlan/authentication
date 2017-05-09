@@ -150,7 +150,7 @@ class FacebookClient
      * @return array
      * @throws FacebookException
      */
-    public function getProfileData($fields = null)
+    public function getFacebookProfile($fields = null)
     {
         if (!$this->accessToken)
             return null;

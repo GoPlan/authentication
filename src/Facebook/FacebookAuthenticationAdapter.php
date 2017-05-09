@@ -12,13 +12,13 @@
 namespace CreativeDelta\User\Facebook;
 
 
-use CreativeDelta\User\Core\Domain\AbstractAuthenticationAdapter;
+use CreativeDelta\User\Core\Domain\AbstractOAuthAuthenticationAdapter;
 use CreativeDelta\User\Core\Domain\Entity\Identity;
+use Exception;
 use Zend\Db\Adapter\AdapterInterface;
 
-class FacebookAuthenticationAdapter extends AbstractAuthenticationAdapter
+class FacebookAuthenticationAdapter extends AbstractOAuthAuthenticationAdapter
 {
-    const QUERY_ID    = "id";
     const METHOD_NAME = "facebook";
 
     /** @var  FacebookClient $facebookClient */
@@ -28,27 +28,55 @@ class FacebookAuthenticationAdapter extends AbstractAuthenticationAdapter
     protected $facebookTable;
 
 
-    public function __construct(array $config, AdapterInterface $dbAdapter, $identity = null)
+    public function __construct(array $config, AdapterInterface $dbAdapter, Identity $identity = null)
     {
         parent::__construct($config, $dbAdapter, $identity);
 
         $this->facebookTable = new FacebookTable($this->dbAdapter);
 
-        $appId     = $this->config['appId'];
-        $appSecret = $this->config['appSecret'];
-        $appScope  = $this->config['appScope'];
+        $appId     = $this->config[FacebookMethod::METHOD_CONFIG_APP_ID];
+        $appSecret = $this->config[FacebookMethod::METHOD_CONFIG_APP_SECRET];
+        $appScope  = $this->config[FacebookMethod::METHOD_CONFIG_APP_SCOPE];
 
         $this->facebookClient = new FacebookClient($appId, $appSecret, $appScope);
 
-        $this->loadIdentityProfile();
+        if ($identity) {
+            $this->_loadLocalProfile();
+            $this->facebookClient->setAccessToken($identity->getProfile()[FacebookTable::COLUMN_ACCESS_TOKEN]);
+        }
     }
 
-    public function isCurrent()
+    function setAccessToken($token)
     {
+        $this->facebookClient->setAccessToken($token);
+    }
 
-        $oauthProfile = $this->facebookClient->getProfileData(self::QUERY_ID);
+    function getAccessToken()
+    {
+        return $this->facebookClient->getAccessToken();
+    }
 
-        if (!$oauthProfile)
+    public function verify()
+    {
+        $facebookData = null;
+
+        try {
+
+            $facebookData = $this->facebookClient->getFacebookProfile();
+
+        } catch (FacebookException $e) {
+
+            if ($e->getCode() == FacebookException::ERROR_CODE_ACCESS_TOKEN_EXPIRED) {
+                return false;
+            } else {
+                throw $e;
+            }
+
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        if (!$facebookData)
             return false;
 
         $identityProfile = $this->identity->getProfile();
@@ -56,19 +84,9 @@ class FacebookAuthenticationAdapter extends AbstractAuthenticationAdapter
         if (!$identityProfile)
             return false;
 
-        $facebookId = $oauthProfile[self::QUERY_ID];
+        $facebookId = $facebookData[FacebookMethod::FACEBOOK_PROFILE_ID_NAME];
 
-        return $facebookId == $identityProfile['userId'];
-    }
-
-    public function setAccessToken($token)
-    {
-        $this->facebookClient->setAccessToken($token);
-    }
-
-    public function isActive()
-    {
-        return true;
+        return $facebookId == $identityProfile[FacebookTable::COLUMN_FACEBOOK_ID];
     }
 
     function pokeIdentity(Identity $identity)
@@ -81,11 +99,8 @@ class FacebookAuthenticationAdapter extends AbstractAuthenticationAdapter
         $profileInstance->save();
     }
 
-    private function loadIdentityProfile()
+    private function _loadLocalProfile()
     {
-        if (!$this->identity)
-            return;
-
         $result = $this->facebookTable->getByIdentityId($this->identity->getId());
         $this->identity->setProfile($result->getArrayCopy());
     }
