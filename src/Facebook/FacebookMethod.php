@@ -19,7 +19,7 @@ use Zend\Db\RowGateway\RowGateway;
 
 class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationInterface
 {
-    const METHOD_NAME              = "Facebook";
+    const METHOD_NAME              = "facebook";
     const METHOD_TABLE_NAME        = "UserFacebook";
     const METHOD_CONFIG_APP_ID     = "appId";
     const METHOD_CONFIG_APP_SECRET = "appSecret";

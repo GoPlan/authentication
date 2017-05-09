@@ -16,7 +16,7 @@ use Zend\Db\TableGateway\TableGateway;
 
 class GoogleTable
 {
-    const TABLE_NAME          = "GoogleUser";
+    const TABLE_NAME          = "UserGoogle";
     const ID_NAME             = "id";
     const COLUMN_IDENTITY_ID  = "identityId";
     const COLUMN_GOOGLE_ID    = "userId";
