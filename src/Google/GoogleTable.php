@@ -62,4 +62,9 @@ class GoogleTable
         return $this->tableGateway->select([self::COLUMN_GOOGLE_ID => $userId])->current();
     }
 
+    public function hasUserId($userId)
+    {
+        return $this->tableGateway->select([self::COLUMN_GOOGLE_ID => $userId])->count() > 0;
+    }
+
 }

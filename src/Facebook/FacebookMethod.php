@@ -146,7 +146,6 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
 
         $row[FacebookTable::COLUMN_IDENTITY_ID] = $identityId;
         $row[FacebookTable::COLUMN_FACEBOOK_ID] = $userId;
-
         $row->save();
 
         return $row[FacebookTable::ID_NAME];
