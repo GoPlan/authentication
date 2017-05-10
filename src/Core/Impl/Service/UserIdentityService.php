@@ -9,14 +9,17 @@
  * Time: 8:47 AM
  */
 
-namespace CreativeDelta\User\Core\Service;
+namespace CreativeDelta\User\Core\Impl\Service;
 
 
-use CreativeDelta\User\Core\Exception\UserIdentityException;
-use CreativeDelta\User\Core\Model\Identity;
-use CreativeDelta\User\Core\Model\SessionLog;
-use CreativeDelta\User\Core\Table\UserIdentityTable;
-use CreativeDelta\User\Core\Table\UserSessionLogTable;
+use CreativeDelta\User\Core\Domain\Entity\Identity;
+use CreativeDelta\User\Core\Domain\Entity\SessionLog;
+use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
+use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
+use CreativeDelta\User\Core\Domain\UserSessionServiceInterface;
+use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
+use CreativeDelta\User\Core\Impl\Table\UserIdentityTable;
+use CreativeDelta\User\Core\Impl\Table\UserSessionLogTable;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\RowGateway\RowGateway;
@@ -114,16 +117,17 @@ class UserIdentityService implements UserIdentityServiceInterface, UserSessionSe
 
         try {
 
-            $identityObj             = new RowGateway(UserIdentityTable::ID_NAME, UserIdentityTable::TABLE_NAME, $this->dbAdapter);
-            $identityObj['identity'] = $identity;
+            $identityObj = new RowGateway(UserIdentityTable::ID_NAME, UserIdentityTable::TABLE_NAME, $this->dbAdapter);
+
+            $identityObj[UserIdentityTable::COLUMN_IDENTITY] = $identity;
             $identityObj->save();
 
             $identityId  = $identityObj[UserIdentityTable::ID_NAME];
             $methodRowId = $adapter->register($identityId, $userId, $data);
 
-            $identityObj['state']        = Identity::STATE_ACTIVE;
-            $identityObj['primaryTable'] = $adapter->getTableName();
-            $identityObj['primaryId']    = $methodRowId;
+            $identityObj[UserIdentityTable::COLUMN_STATE]         = Identity::STATE_ACTIVE;
+            $identityObj[UserIdentityTable::COLUMN_PRIMARY_TABLE] = $adapter->getTableName();
+            $identityObj[UserIdentityTable::COLUMN_PRIMARY_ID]    = $methodRowId;
             $identityObj->save();
 
             return $identityObj[UserIdentityTable::ID_NAME];

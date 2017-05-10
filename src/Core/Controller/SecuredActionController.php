@@ -13,6 +13,7 @@ namespace CreativeDelta\User\Core\Controller;
 
 
 use Zend\Authentication\AuthenticationService;
+use Zend\Authentication\AuthenticationServiceInterface;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Mvc\Controller\AbstractActionController;
 
@@ -21,7 +22,7 @@ class SecuredActionController extends AbstractActionController
     /** @var  AdapterInterface $dbAdapter */
     protected $dbAdapter;
 
-    /** @var  AuthenticationService $authenticationService */
+    /** @var  AuthenticationServiceInterface $authenticationService */
     protected $authenticationService;
 
     /**
@@ -33,6 +34,9 @@ class SecuredActionController extends AbstractActionController
         $this->dbAdapter = $dbAdapter;
     }
 
+    /**
+     * @return AuthenticationServiceInterface
+     */
     public function getAuthenticationService()
     {
         if (!$this->authenticationService) {
@@ -43,7 +47,7 @@ class SecuredActionController extends AbstractActionController
     }
 
     /**
-     * @param AuthenticationService $authenticationService
+     * @param AuthenticationServiceInterface $authenticationService
      */
     public function setAuthenticationService($authenticationService)
     {

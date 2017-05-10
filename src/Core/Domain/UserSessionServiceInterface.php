@@ -9,10 +9,10 @@
  * Time: 12:02 PM
  */
 
-namespace CreativeDelta\User\Core\Service;
+namespace CreativeDelta\User\Core\Domain;
 
 
-use CreativeDelta\User\Core\Model\SessionLog;
+use CreativeDelta\User\Core\Domain\Entity\SessionLog;
 
 interface UserSessionServiceInterface
 {

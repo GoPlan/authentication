@@ -9,7 +9,7 @@
  * Time: 2:25 PM
  */
 
-namespace CreativeDelta\User\Core\Model;
+namespace CreativeDelta\User\Core\Domain\Entity;
 
 
 abstract class AbstractProfile

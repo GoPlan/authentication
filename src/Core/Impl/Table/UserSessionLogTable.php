@@ -17,7 +17,7 @@
  * back to your page, use the hash (stored in "state") to retrieve back your configuration variables (which were setup earlier).
  */
 
-namespace CreativeDelta\User\Core\Table;
+namespace CreativeDelta\User\Core\Impl\Table;
 
 
 use Zend\Crypt\Password\Bcrypt;
@@ -31,10 +31,8 @@ class UserSessionLogTable
 
     /** @var  TableGateway $tableGateway */
     protected $tableGateway;
-
     /** @var  AdapterInterface $dbAdapter */
     protected $dbAdapter;
-
     /** @var  Bcrypt $bcrypt */
     protected $bcrypt;
 

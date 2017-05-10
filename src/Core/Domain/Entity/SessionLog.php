@@ -9,7 +9,7 @@
  * Time: 4:12 PM
  */
 
-namespace CreativeDelta\User\Core\Model;
+namespace CreativeDelta\User\Core\Domain\Entity;
 
 
 class SessionLog

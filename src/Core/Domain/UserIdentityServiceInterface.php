@@ -9,11 +9,11 @@
  * Time: 3:31 PM
  */
 
-namespace CreativeDelta\User\Core\Service;
+namespace CreativeDelta\User\Core\Domain;
 
 
-use CreativeDelta\User\Core\Model\Identity;
-use CreativeDelta\User\Core\Model\SessionLog;
+use CreativeDelta\User\Core\Domain\Entity\Identity;
+use CreativeDelta\User\Core\Domain\Entity\SessionLog;
 
 interface UserIdentityServiceInterface
 {

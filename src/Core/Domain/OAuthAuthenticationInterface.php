@@ -9,12 +9,12 @@
  * Time: 8:56 AM
  */
 
-namespace CreativeDelta\User\Core\Service;
+namespace CreativeDelta\User\Core\Domain;
 
 
-use CreativeDelta\User\Core\Model\AbstractProfile;
+use CreativeDelta\User\Core\Domain\Entity\AbstractProfile;
 
-interface UserAuthenticationMethodServiceInterface
+interface OAuthAuthenticationInterface
 {
 
     /**
@@ -41,13 +41,23 @@ interface UserAuthenticationMethodServiceInterface
     public function initAccessToken($redirectUri, $code);
 
     /**
+     * Return profile data (array) from OAuth server (Google, Facebook)
+     *
      * @param string $fields // a comma separated string of profile fields to be retrieved
      * @return null|array
      */
-    public function getProfileData($fields = null);
+    public function getOAuthProfile($fields = null);
 
     /**
+     *
+     * Return profile stored on your server.
+     *
      * @return null|AbstractProfile
      */
-    public function getStoredProfile();
+    public function getLocalProfile();
+
+    /**
+     * @return mixed
+     */
+    public function getAccessToken();
 }
