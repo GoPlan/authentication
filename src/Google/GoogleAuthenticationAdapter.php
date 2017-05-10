@@ -14,8 +14,8 @@ namespace CreativeDelta\User\Google;
 
 use CreativeDelta\User\Core\Domain\AbstractOAuthAuthenticationAdapter;
 use CreativeDelta\User\Core\Domain\Entity\Identity;
-use CreativeDelta\User\Facebook\FacebookTable;
 use Google_Client;
+use Google_Service_Oauth2;
 use Zend\Db\Adapter\AdapterInterface;
 
 class GoogleAuthenticationAdapter extends AbstractOAuthAuthenticationAdapter
@@ -33,36 +33,53 @@ class GoogleAuthenticationAdapter extends AbstractOAuthAuthenticationAdapter
     {
         parent::__construct($config, $dbAdapter, $identity);
 
-        $this->localTable  = new GoogleTable($this->dbAdapter);
+        $this->localTable = new GoogleTable($this->dbAdapter);
+
         $this->oauthClient = new Google_Client();
+        $this->oauthClient->setClientId($this->config[GoogleMethod::METHOD_CONFIG_APP_ID]);
+        $this->oauthClient->setClientSecret($this->config[GoogleMethod::METHOD_CONFIG_APP_SECRET]);
+        $this->oauthClient->setDeveloperKey($this->config[GoogleMethod::METHOD_CONFIG_API_KEY]);
+        $this->oauthClient->setScopes(explode(' ', $this->config[GoogleMethod::METHOD_CONFIG_APP_SCOPE]));
 
         if ($identity) {
+
             $this->_loadLocalProfile();
-            $this->oauthClient->setAccessToken($identity->getProfile()[FacebookTable::COLUMN_ACCESS_TOKEN]);
+            $profile = $identity->getProfile();
+
+            if ($profile && isset($profile[GoogleTable::COLUMN_ACCESS_TOKEN])) {
+                $this->oauthClient->setAccessToken($profile[GoogleTable::COLUMN_ACCESS_TOKEN]);
+            }
         }
     }
 
     function pokeIdentity()
     {
+        $token = $this->oauthClient->getAccessToken();
+
         $profileData     = $this->identity->getProfile();
         $profileInstance = GoogleProfile::newFromArray($this->dbAdapter, $profileData, true);
-        $profileInstance->setAccessToken($this->oauthClient->getAccessToken());
+        $profileInstance->setAccessToken($token[GoogleMethod::TOKEN_ACCESS_TOKEN]);
         $profileInstance->save();
     }
 
     public function verifyIdentity()
     {
-        $oauthId = $this->oauthClient->getClientId();
+        $service = new Google_Service_Oauth2($this->oauthClient);
+
+        if (!$service)
+            throw new GoogleException(GoogleException::ERROR_CODE_VERIFY_IDENTITY_FAILED_TO_INITIATE_GOOGLE_OAUTH2);
+
+        $oauthId = $service->userinfo->get()->getId();
 
         if (!$oauthId)
             return false;
 
-        $identityProfile = $this->identity->getProfile();
+        $profile = $this->identity->getProfile();
 
-        if (!$identityProfile)
+        if (!$profile)
             return false;
 
-        $localUserId = $identityProfile[GoogleTable::COLUMN_GOOGLE_ID];
+        $localUserId = $profile[GoogleTable::COLUMN_GOOGLE_ID];
 
         return $oauthId == $localUserId;
     }

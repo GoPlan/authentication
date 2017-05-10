@@ -27,7 +27,6 @@ class FacebookAuthenticationAdapter extends AbstractOAuthAuthenticationAdapter
     /** @var  FacebookTable $facebookTable */
     protected $facebookTable;
 
-
     public function __construct(array $config, AdapterInterface $dbAdapter, Identity $identity = null)
     {
         parent::__construct($config, $dbAdapter, $identity);

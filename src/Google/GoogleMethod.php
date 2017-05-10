@@ -21,12 +21,19 @@ use Zend\Db\RowGateway\RowGateway;
 
 class GoogleMethod implements OAuthAuthenticationInterface, UserRegisterMethodAdapter
 {
-    const METHOD_NAME              = "google";
-    const METHOD_TABLE_NAME        = "UserGoogle";
+    const METHOD_NAME       = "google";
+    const METHOD_TABLE_NAME = "UserGoogle";
+
     const METHOD_CONFIG_APP_ID     = "clientId";
     const METHOD_CONFIG_APP_SECRET = "clientSecret";
     const METHOD_CONFIG_APP_SCOPE  = "clientScope";
     const METHOD_CONFIG_API_KEY    = "apiKey";
+
+    const TOKEN_ACCESS_TOKEN = "access_token";
+    const TOKEN_TOKEN_TYPE   = "token_type";
+    const TOKEN_EXPIRES_IN   = "expires_in";
+    const TOKEN_ID_TOKEN     = "id_token";
+    const TOKEN_CREATED      = "created";
 
     const RESULT_QUERY_CODE  = "code";
     const RESULT_QUERY_STATE = "state";
@@ -114,9 +121,9 @@ class GoogleMethod implements OAuthAuthenticationInterface, UserRegisterMethodAd
 
     public function getLocalProfile()
     {
-        $userId  = $this->client->getClientId();
-        $result  = $this->localTable->getByUserId($userId);
-        $profile = $result ? GoogleProfile::newFromArray($this->dbAdapter, $result->getArrayCopy(), true) : null;
+        $oauthData = $this->getOAuthProfile();
+        $result    = $this->localTable->getByUserId($oauthData[self::PROFILE_FIELD_ID]);
+        $profile   = $result ? GoogleProfile::newFromArray($this->dbAdapter, $result->getArrayCopy(), true) : null;
         return $profile;
     }
 
