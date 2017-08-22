@@ -22,7 +22,7 @@ use Zend\Http\Request;
 use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractActionController;
 
-abstract class FacebookController extends AbstractActionController
+abstract class FacebookAbstractController extends AbstractActionController
 {
     /**
      * @var array
