@@ -17,7 +17,7 @@ use CreativeDelta\User\Core\Impl\Table\UserSessionLogTable;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\RowGateway\RowGateway;
-use Zend\Stdlib\Hydrator\ClassMethods;
+use Zend\Hydrator\ClassMethods;
 
 class UserSessionService
 {

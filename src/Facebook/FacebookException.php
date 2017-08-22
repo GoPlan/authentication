@@ -57,7 +57,7 @@ class FacebookException extends \Exception
     }
 
     /**
-     * @param array $error
+     * @param array           $error
      * @param null|\Exception $prevException
      * @return FacebookException
      * @internal param array $errorData
@@ -75,7 +75,9 @@ class FacebookException extends \Exception
         $errorUserTitle   = null;
         $errorFbTraceId   = null;
 
+        /** @noinspection SpellCheckingInspection */
         if (isset($errorData['error_subcode']))
+            /** @noinspection SpellCheckingInspection */
             $errorSubCode = $errorData['error_subcode'];
 
         if (isset($errorData['error_user_msg']))
@@ -84,7 +86,9 @@ class FacebookException extends \Exception
         if (isset($errorData['error_user_title']))
             $errorUserTitle = $errorData['error_user_title'];
 
+        /** @noinspection SpellCheckingInspection */
         if (isset($errorData['fbtrace_id']))
+            /** @noinspection SpellCheckingInspection */
             $errorFbTraceId = $errorData['fbtrace_id'];
 
         $exception = new FacebookException($message, $code, $type, $errorSubCode, $errorUserMessage, $errorUserTitle, $errorFbTraceId, $prevException);

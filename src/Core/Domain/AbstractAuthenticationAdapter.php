@@ -21,7 +21,7 @@ abstract class AbstractAuthenticationAdapter implements \Zend\Authentication\Ada
     /**
      * $METHOD_NAME is used for identifying which deriving method (adapter) is being used.
      * It is useful for situation such as loading config where specific method needs to be provide.
-     * This field is supposed to be overriden by deriving classes.
+     * This field is supposed to be overridden by deriving classes.
      */
     const METHOD_NAME = null;
 

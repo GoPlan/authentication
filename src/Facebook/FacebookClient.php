@@ -115,6 +115,7 @@ class FacebookClient
     {
         $this->code = $code;
 
+        /** @noinspection SpellCheckingInspection */
         $config = [
             'sslverifypeer' => false
         ];
@@ -155,6 +156,7 @@ class FacebookClient
         if (!$this->accessToken)
             return null;
 
+        /** @noinspection SpellCheckingInspection */
         $config = [
             'sslverifypeer' => false
         ];

@@ -23,7 +23,7 @@ use CreativeDelta\User\Core\Impl\Table\UserSessionLogTable;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\RowGateway\RowGateway;
-use Zend\Stdlib\Hydrator\ClassMethods;
+use Zend\Hydrator\ClassMethods;
 
 class UserIdentityService implements UserIdentityServiceInterface, UserSessionServiceInterface
 {
@@ -37,8 +37,8 @@ class UserIdentityService implements UserIdentityServiceInterface, UserSessionSe
 
     function __construct(AdapterInterface $dbAdapter)
     {
-        $this->bcrypt             = new Bcrypt();
         $this->dbAdapter          = $dbAdapter;
+        $this->bcrypt             = new Bcrypt();
         $this->userIdentityTable  = new UserIdentityTable($dbAdapter);
         $this->userSignInLogTable = new UserSessionLogTable($dbAdapter);
         $this->userSessionService = new UserSessionService($this->dbAdapter);
@@ -103,9 +103,9 @@ class UserIdentityService implements UserIdentityServiceInterface, UserSessionSe
 
     /**
      * @param UserRegisterMethodAdapter $adapter
-     * @param string $identity
-     * @param $userId
-     * @param null $data
+     * @param string                    $identity
+     * @param int                       $userId
+     * @param null                      $data
      * @return mixed
      * @throws UserIdentityException
      */
