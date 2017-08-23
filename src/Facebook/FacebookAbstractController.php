@@ -12,10 +12,10 @@ namespace CreativeDelta\User\Facebook;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use CreativeDelta\User\Core\Impl\Exception\AuthenticationException;
 use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
+use CreativeDelta\User\Core\Impl\Service\AuthenticationService;
 use CreativeDelta\User\Core\Impl\Service\UserIdentityService;
 use CreativeDelta\User\Core\Impl\Service\UserSessionService;
 use Exception;
-use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\Result;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Http\Request;
@@ -42,25 +42,21 @@ abstract class FacebookAbstractController extends AbstractActionController
     /**
      * @var AuthenticationService
      */
-    protected $zendAuthenticationService;
+    protected $authenticationService;
 
     /**
      * @var AdapterInterface;
      */
-    protected $zendDbAdapter;
+    protected $dbAdapter;
 
 
-    public function __construct(array $facebookConfig,
-                                AdapterInterface $dbAdapter,
-                                AuthenticationService $authenticationService,
-                                FacebookMethod $facebookMethod = null,
-                                UserIdentityServiceInterface $userIdentityService = null)
+    public function __construct(AdapterInterface $dbAdapter, AuthenticationService $authenticationService, FacebookMethod $facebookMethod = null, UserIdentityServiceInterface $userIdentityService = null)
     {
-        $this->facebookConfig            = $facebookConfig;
-        $this->zendDbAdapter             = $dbAdapter;
-        $this->zendAuthenticationService = $authenticationService;
-        $this->facebookMethod            = $facebookMethod;
-        $this->userIdentityService       = $userIdentityService;
+        $this->dbAdapter             = $dbAdapter;
+        $this->authenticationService = $authenticationService;
+        $this->facebookConfig        = $authenticationService->getConfig()[FacebookMethod::METHOD_NAME];
+        $this->facebookMethod        = $facebookMethod;
+        $this->userIdentityService   = $userIdentityService;
     }
 
     /**
@@ -74,7 +70,7 @@ abstract class FacebookAbstractController extends AbstractActionController
             $appSecret = $this->facebookConfig[FacebookMethod::METHOD_CONFIG_APP_SECRET];
             $appScope  = $this->facebookConfig[FacebookMethod::METHOD_CONFIG_APP_SCOPE];
 
-            $this->facebookMethod = new FacebookMethod($this->zendDbAdapter, $appId, $appSecret, $appScope);
+            $this->facebookMethod = new FacebookMethod($this->dbAdapter, $appId, $appSecret, $appScope);
         }
 
         return $this->facebookMethod;
@@ -86,7 +82,7 @@ abstract class FacebookAbstractController extends AbstractActionController
     public function getUserIdentityService()
     {
         if (!$this->userIdentityService) {
-            $this->userIdentityService = new UserIdentityService($this->zendDbAdapter);
+            $this->userIdentityService = new UserIdentityService($this->dbAdapter);
         }
 
         return $this->userIdentityService;
@@ -143,6 +139,13 @@ abstract class FacebookAbstractController extends AbstractActionController
      * @return void
      */
     abstract function createUserInLocalDatabase($identity, array $facebookData);
+
+    /**
+     * @param int   $facebookId
+     * @param array $facebookData
+     * @return string
+     */
+    abstract function newIdentity($facebookId, $facebookData);
 
 
     public function getAuthenticationReturnUrl()
@@ -203,7 +206,7 @@ abstract class FacebookAbstractController extends AbstractActionController
             // Register new identity that has Identity field with value as "facebook" + facebookId
             $facebookData  = $this->getFacebookMethod()->getOAuthProfile();
             $facebookId    = $facebookData[FacebookMethod::PROFILE_FIELD_ID];
-            $newIdentity   = "facebook" . '+' . $facebookId;
+            $newIdentity   = $this->newIdentity($facebookId, $facebookData);
             $newIdentityId = $this->getUserIdentityService()->register($this->getFacebookMethod(), $newIdentity, $facebookId, $facebookData);
 
             // Create a user record from facebook data
@@ -256,10 +259,10 @@ abstract class FacebookAbstractController extends AbstractActionController
             $localProfile = $this->getFacebookMethod()->initAccessToken($this->getAuthenticationReturnUrl(), $code)->getLocalProfile();
             $identity     = $localProfile ? $this->getUserIdentityService()->getIdentityById($localProfile->getIdentityId()) : null;
 
-            if ($this->zendAuthenticationService instanceof AuthenticationService) {
-                $adapter = new FacebookAuthenticationAdapter($this->facebookConfig, $this->zendDbAdapter, $identity);
+            if ($this->authenticationService instanceof AuthenticationService) {
+                $adapter = new FacebookAuthenticationAdapter($this->facebookConfig, $this->dbAdapter, $identity);
                 $adapter->setAccessToken($this->getFacebookMethod()->getAccessToken());
-                $result = $this->zendAuthenticationService->authenticate($adapter);
+                $result = $this->authenticationService->authenticate($adapter);
             } else {
                 throw new AuthenticationException(AuthenticationException::ERROR_CODE_AUTHENTICATION_SERVICE_NOT_SUPPORTED);
             }
