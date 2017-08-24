@@ -5,13 +5,13 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Application;
+namespace CreativeDelta\User\Application;
 
-use Application\Controller\FacebookController;
-use Application\Controller\Factory\FacebookControllerFactory;
-use Application\Controller\Factory\IndexControllerFactory;
-use Application\Controller\Factory\UserControllerFactory;
-use Application\Controller\UserController;
+use CreativeDelta\User\Application\Controller\FacebookController;
+use CreativeDelta\User\Application\Controller\Factory\FacebookControllerFactory;
+use CreativeDelta\User\Application\Controller\Factory\IndexControllerFactory;
+use CreativeDelta\User\Application\Controller\Factory\UserControllerFactory;
+use CreativeDelta\User\Application\Controller\UserController;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 
@@ -143,10 +143,10 @@ return [
         'not_found_template'       => 'error/404',
         'exception_template'       => 'error/index',
         'template_map'             => [
-            'layout/layout'           => __DIR__ . '/../view/layout/layout.phtml',
-            'application/index/index' => __DIR__ . '/../view/application/index/index.phtml',
-            'error/404'               => __DIR__ . '/../view/error/404.phtml',
-            'error/index'             => __DIR__ . '/../view/error/index.phtml',
+            'layout/layout'           => __DIR__ . '/../view/creative-delta/user/layout/layout.phtml',
+            'application/index/index' => __DIR__ . '/../view/creative-delta/user/application/index/index.phtml',
+            'error/404'               => __DIR__ . '/../view/creative-delta/user/error/404.phtml',
+            'error/index'             => __DIR__ . '/../view/creative-delta/user/error/index.phtml',
         ],
         'template_path_stack'      => [
             __DIR__ . '/../view',

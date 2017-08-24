@@ -6,10 +6,10 @@
  * Time: 12:34 PM
  */
 
-namespace Application\Controller\Factory;
+namespace CreativeDelta\User\Application\Controller\Factory;
 
 
-use Application\Controller\IndexController;
+use CreativeDelta\User\Application\Controller\IndexController;
 use Interop\Container\ContainerInterface;
 use Zend\Authentication\AuthenticationService;
 use Zend\ServiceManager\Factory\FactoryInterface;

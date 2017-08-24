@@ -1,7 +1,8 @@
 <?php
 
-use Application\Controller\IndexController;
-use Application\Controller\UserController;
+
+use CreativeDelta\User\Application\Controller\IndexController;
+use CreativeDelta\User\Application\Controller\UserController;
 
 $userLink     = $this->url(UserController::ROUTE_NAME);
 $registerLink = $this->url(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'register']);
@@ -24,7 +25,7 @@ $signOutLink  = $this->url(IndexController::ROUTE_APPLICATION_NAME, ['action' =>
     <p>
         Congratulations! You have successfully installed the
         <a href="https://github.com/zendframework/ZendSkeletonApplication" target="_blank">ZF Skeleton Application</a>.
-        You are currently running Zend Framework version <?= \Application\Module::VERSION ?>.
+        You are currently running Zend Framework version <?= \CreativeDelta\User\Application\Module::VERSION ?>.
         This skeleton can serve as a simple starting point for you to begin
         building your application on ZF.
     </p>

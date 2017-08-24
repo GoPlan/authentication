@@ -13,5 +13,5 @@
 return [
     'Zend\Router',
     'Zend\Validator',
-    'Application',
+    'CreativeDelta\User\Application',
 ];

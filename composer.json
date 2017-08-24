@@ -35,8 +35,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Application\\": "example/module/Application/src/",
-      "ApplicationTest\\": "example/module/Application/test/"
+      "CreativeDelta\\User\\Application\\": "example/module/Application/src/"
     }
   }
 }

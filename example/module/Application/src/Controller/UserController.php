@@ -6,7 +6,7 @@
  * Time: 11:44 AM
  */
 
-namespace Application\Controller;
+namespace CreativeDelta\User\Application\Controller;
 
 
 use CreativeDelta\User\Core\Controller\AbstractSecuredActionController;

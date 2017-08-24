@@ -5,7 +5,7 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Application\Controller;
+namespace CreativeDelta\User\Application\Controller;
 
 use CreativeDelta\User\Core\Impl\Service\AuthenticationService;
 use CreativeDelta\User\Core\Impl\Service\UserSessionService;

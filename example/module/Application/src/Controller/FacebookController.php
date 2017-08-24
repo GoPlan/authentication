@@ -6,7 +6,7 @@
  * Time: 11:45 AM
  */
 
-namespace Application\Controller;
+namespace CreativeDelta\User\Application\Controller;
 
 
 use CreativeDelta\User\Facebook\FacebookAbstractController;

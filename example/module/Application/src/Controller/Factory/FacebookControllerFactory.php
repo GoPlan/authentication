@@ -6,10 +6,10 @@
  * Time: 11:57 AM
  */
 
-namespace Application\Controller\Factory;
+namespace CreativeDelta\User\Application\Controller\Factory;
 
 
-use Application\Controller\FacebookController;
+use CreativeDelta\User\Application\Controller\FacebookController;
 use Interop\Container\ContainerInterface;
 use Zend\Authentication\AuthenticationService;
 use Zend\Db\Adapter\Adapter;

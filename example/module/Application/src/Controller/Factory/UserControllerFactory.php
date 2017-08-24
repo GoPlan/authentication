@@ -6,10 +6,10 @@
  * Time: 3:41 PM
  */
 
-namespace Application\Controller\Factory;
+namespace CreativeDelta\User\Application\Controller\Factory;
 
 
-use Application\Controller\UserController;
+use CreativeDelta\User\Application\Controller\UserController;
 use CreativeDelta\User\Core\Impl\Service\AuthenticationService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
