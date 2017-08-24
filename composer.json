@@ -26,12 +26,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Application\\": "example/module/Application/src",
       "CreativeDelta\\User\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
+      "Application\\": "example/module/Application/src",
       "ApplicationTest\\": "example/module/Application/test/"
     }
   }
