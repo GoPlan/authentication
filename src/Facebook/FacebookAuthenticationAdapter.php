@@ -40,7 +40,7 @@ class FacebookAuthenticationAdapter extends AbstractOAuthAuthenticationAdapter
         $this->facebookClient = new FacebookClient($appId, $appSecret, $appScope);
 
         if ($identity) {
-            $this->_loadLocalProfile();
+            $this->loadLocalProfile();
             $this->facebookClient->setAccessToken($identity->getProfile()[FacebookTable::COLUMN_ACCESS_TOKEN]);
         }
     }
@@ -98,9 +98,11 @@ class FacebookAuthenticationAdapter extends AbstractOAuthAuthenticationAdapter
         $profileInstance->save();
     }
 
-    private function _loadLocalProfile()
+    private function loadLocalProfile()
     {
         $result = $this->facebookTable->getByIdentityId($this->identity->getId());
-        $this->identity->setProfile($result->getArrayCopy());
+
+        if ($result)
+            $this->identity->setProfile($result->getArrayCopy());
     }
 }

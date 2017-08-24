@@ -50,7 +50,6 @@ fabric.properties
 # Composer files
 composer.phar
 vendor/
-example/
 
 # Local configs
 config/autoload/*.local.php
