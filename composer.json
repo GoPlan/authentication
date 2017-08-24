@@ -6,10 +6,9 @@
   "authors": [
     {
       "name": "Duc-Anh Le",
-      "email": "ducanh.ke@gmail.com, ducanh.ki2519@gmail.com"
+      "email": "ducanh.ke@gmail.com"
     }
   ],
-  "version": "0.9.0",
   "require": {
     "php": "^5.3.3 || ^7.0",
     "google/apiclient": "^2.0",
