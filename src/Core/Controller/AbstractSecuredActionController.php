@@ -23,15 +23,6 @@ abstract class AbstractSecuredActionController extends AbstractActionController
     protected $authenticationService;
 
     /**
-     * SecuredActionController constructor.
-     * @param AuthenticationServiceInterface $authenticationService
-     */
-    public function __construct(AuthenticationServiceInterface $authenticationService = null)
-    {
-        $this->authenticationService = $authenticationService;
-    }
-
-    /**
      * @return AuthenticationServiceInterface
      */
     public function getAuthenticationService()
