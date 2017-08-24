@@ -1,6 +1,21 @@
-<div class="jumbotron">
-    <h1>Welcome to <span class="zf-green">Zend Framework</span></h1>
+<?php
 
+use Application\Controller\IndexController;
+
+$registerLink = $this->url(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'register']);
+$signInLink   = $this->url(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'sign-in']);
+$signOutLink  = $this->url(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'sign-out']);
+?>
+<div class="jumbotron">
+    <?php if ($this->identity()) : ?>
+        <h3>Identity: <?= $this->identity() ? $this->identity()->getIdentity() : null ?></h3>
+        <a href="<?= $signOutLink ?>">Sign-out</a>
+    <?php else: ?>
+        <a class="btn btn-primary" href="<?= $registerLink ?>">Register</a>
+        <br>
+        <a class="btn btn-primary" href="<?= $signInLink ?>">Sign-in</a>
+    <?php endif; ?>
+    <h1>Welcome to <span class="zf-green">Zend Framework</span></h1>
     <p>
         Congratulations! You have successfully installed the
         <a href="https://github.com/zendframework/ZendSkeletonApplication" target="_blank">ZF Skeleton Application</a>.
@@ -9,7 +24,8 @@
         building your application on ZF.
     </p>
 
-    <p><a class="btn btn-success btn-lg" href="https://github.com/zendframework/zendframework" target="_blank">Fork Zend Framework on GitHub &raquo;</a></p>
+    <p><a class="btn btn-success btn-lg" href="https://github.com/zendframework/zendframework" target="_blank">Fork Zend Framework on GitHub
+            &raquo;</a></p>
 </div>
 
 <div class="row">
@@ -67,7 +83,8 @@
                     and post questions to the <a href="http://framework.zend.com/archives/">mailing lists</a>.
                 </p>
 
-                <p><a class="btn btn-success pull-right" href="http://webchat.freenode.net?channels=zftalk" target="_blank">Ping us on IRC &raquo;</a></p>
+                <p><a class="btn btn-success pull-right" href="http://webchat.freenode.net?channels=zftalk" target="_blank">Ping us on IRC &raquo;</a>
+                </p>
             </div>
         </div>
     </div>

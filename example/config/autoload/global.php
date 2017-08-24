@@ -12,5 +12,33 @@
  */
 
 return [
-    // ...
+
+    'service_manager' => [
+        'factories' => [
+            \Zend\Db\Adapter\Adapter::class                                    => \Zend\Db\Adapter\AdapterServiceFactory::class,
+            \CreativeDelta\User\Core\Impl\Service\AuthenticationService::class => \CreativeDelta\User\Core\Impl\Factory\AuthenticationServiceFactory::class
+        ],
+        'aliases'   => [
+            \Zend\Authentication\AuthenticationService::class => \CreativeDelta\User\Core\Impl\Service\AuthenticationService::class
+        ]
+    ],
+
+
+    // User should define below configurations in local.php for security purpose.
+
+    'authConfig' => [
+        'facebook' => [
+            'appId'     => "",
+            "appSecret" => "",
+            "appScope"  => ""
+        ]
+    ],
+
+    'db' => [
+        'driver'   => 'Pdo_Mysql',
+        'hostname' => 'localhost',
+        'database' => 'user-example',
+        'username' => 'user-example',
+        'password' => 'user-example'
+    ],
 ];
