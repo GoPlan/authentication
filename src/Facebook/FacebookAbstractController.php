@@ -269,7 +269,7 @@ abstract class FacebookAbstractController extends AbstractActionController
 
             if ($result->isValid()) {
                 $returnQuery = [UserSessionService::QUERY_SESSION_NAME => $prevSessionHash];
-                $returnUrl   = urldecode($prevReturnUrl) . '?' . http_build_query($returnQuery);
+                $returnUrl   = isset($returnQuery[UserSessionService::QUERY_SESSION_NAME]) ? urldecode($prevReturnUrl) . '?' . http_build_query($returnQuery) : urldecode($prevReturnUrl);
                 return $this->redirect()->toUrl($returnUrl);
             } else {
                 switch ($result->getCode()) {

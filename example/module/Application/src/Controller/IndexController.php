@@ -8,6 +8,7 @@
 namespace Application\Controller;
 
 use CreativeDelta\User\Core\Impl\Service\AuthenticationService;
+use CreativeDelta\User\Core\Impl\Service\UserSessionService;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -37,12 +38,16 @@ class IndexController extends AbstractActionController
 
     public function signInAction()
     {
-        return [];
+        $return  = $this->params()->fromQuery(UserSessionService::QUERY_RETURN_URL_NAME);
+        $session = $this->params()->fromQuery(UserSessionService::QUERY_SESSION_NAME);
+        return ['return' => $return, 'session' => $session];
     }
 
     public function registerAction()
     {
-        return [];
+        $return  = $this->params()->fromQuery(UserSessionService::QUERY_RETURN_URL_NAME);
+        $session = $this->params()->fromQuery(UserSessionService::QUERY_SESSION_NAME);
+        return ['return' => $return, 'session' => $session];
     }
 
     public function signOutAction()

@@ -9,7 +9,7 @@
 use Application\Controller\FacebookController;
 use Application\Controller\IndexController;
 
-$returnLink           = $this->url(IndexController::ROUTE_HOME_NAME);
+$returnLink           = $this->return ? $this->return : $this->url(IndexController::ROUTE_HOME_NAME);
 $facebookRegisterLink = $this->url(FacebookController::ROUTE_REGISTER_NAME, [], ['query' => ['return' => $returnLink]]);
 ?>
 <h1>REGISTER PAGE</h1>

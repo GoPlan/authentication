@@ -10,6 +10,8 @@ namespace Application;
 use Application\Controller\FacebookController;
 use Application\Controller\Factory\FacebookControllerFactory;
 use Application\Controller\Factory\IndexControllerFactory;
+use Application\Controller\Factory\UserControllerFactory;
+use Application\Controller\UserController;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 
@@ -115,10 +117,21 @@ return [
                     ]
                 ]
             ],
+            'user'        => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/user',
+                    'defaults' => [
+                        'controller' => UserController::class,
+                        'action'     => 'index'
+                    ]
+                ]
+            ]
         ],
     ],
     'controllers'  => [
         'factories' => [
+            Controller\UserController::class     => UserControllerFactory::class,
             Controller\IndexController::class    => IndexControllerFactory::class,
             Controller\FacebookController::class => FacebookControllerFactory::class
         ],

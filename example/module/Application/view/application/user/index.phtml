@@ -1,0 +1,15 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: ducanhle
+ * Date: 8/24/17
+ * Time: 3:33 PM
+ */
+
+use Application\Controller\IndexController;
+
+$homeLink = $this->url(IndexController::ROUTE_HOME_NAME);
+?>
+<h1>Secured Page</h1>
+<h3>Identity: <?= $this->identity()->getIdentity() ?></h3>
+<a class="btn btn-default" href="<?= $homeLink ?>">Back to home</a>

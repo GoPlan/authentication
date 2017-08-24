@@ -1,7 +1,9 @@
 <?php
 
 use Application\Controller\IndexController;
+use Application\Controller\UserController;
 
+$userLink     = $this->url(UserController::ROUTE_NAME);
 $registerLink = $this->url(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'register']);
 $signInLink   = $this->url(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'sign-in']);
 $signOutLink  = $this->url(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'sign-out']);
@@ -15,6 +17,9 @@ $signOutLink  = $this->url(IndexController::ROUTE_APPLICATION_NAME, ['action' =>
         <br>
         <a class="btn btn-primary" href="<?= $signInLink ?>">Sign-in</a>
     <?php endif; ?>
+    <br>
+    <br>
+    <a class="btn btn-default" href="<?= $userLink ?>">User</a>
     <h1>Welcome to <span class="zf-green">Zend Framework</span></h1>
     <p>
         Congratulations! You have successfully installed the

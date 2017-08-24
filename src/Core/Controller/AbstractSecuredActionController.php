@@ -14,24 +14,21 @@ namespace CreativeDelta\User\Core\Controller;
 
 use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\AuthenticationServiceInterface;
-use Zend\Db\Adapter\AdapterInterface;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Mvc\MvcEvent;
 
-class SecuredActionController extends AbstractActionController
+abstract class AbstractSecuredActionController extends AbstractActionController
 {
-    /** @var  AdapterInterface $dbAdapter */
-    protected $dbAdapter;
-
     /** @var  AuthenticationServiceInterface $authenticationService */
     protected $authenticationService;
 
     /**
-     * ItemController constructor.
-     * @param AdapterInterface $dbAdapter
+     * SecuredActionController constructor.
+     * @param AuthenticationServiceInterface $authenticationService
      */
-    public function __construct(AdapterInterface $dbAdapter)
+    public function __construct(AuthenticationServiceInterface $authenticationService = null)
     {
-        $this->dbAdapter = $dbAdapter;
+        $this->authenticationService = $authenticationService;
     }
 
     /**
@@ -53,4 +50,11 @@ class SecuredActionController extends AbstractActionController
     {
         $this->authenticationService = $authenticationService;
     }
+
+    public function onDispatch(MvcEvent $e)
+    {
+        return $this->getAuthenticationService()->hasIdentity() ? parent::onDispatch($e) : $this->noIdentityDispatch($e);
+    }
+
+    abstract function noIdentityDispatch(MvcEvent $e);
 }
