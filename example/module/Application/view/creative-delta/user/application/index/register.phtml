@@ -8,10 +8,13 @@
 
 
 use CreativeDelta\User\Application\Controller\FacebookController;
+use CreativeDelta\User\Application\Controller\GoogleController;
 use CreativeDelta\User\Application\Controller\IndexController;
 
 $returnLink           = $this->return ? $this->return : $this->url(IndexController::ROUTE_HOME_NAME);
 $facebookRegisterLink = $this->url(FacebookController::ROUTE_REGISTER_NAME, [], ['query' => ['return' => $returnLink]]);
+$googleRegisterLink   = $this->url(GoogleController::ROUTE_REGISTER_NAME, [], ['query' => ['return' => $returnLink]]);
 ?>
 <h1>REGISTER PAGE</h1>
 <a class="btn btn-primary" href="<?= $facebookRegisterLink ?>">Facebook</a>
+<a class="btn btn-primary" href="<?= $googleRegisterLink ?>">Google</a>

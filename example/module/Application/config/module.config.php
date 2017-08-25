@@ -9,8 +9,10 @@ namespace CreativeDelta\User\Application;
 
 use CreativeDelta\User\Application\Controller\FacebookController;
 use CreativeDelta\User\Application\Controller\Factory\FacebookControllerFactory;
+use CreativeDelta\User\Application\Controller\Factory\GoogleControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\IndexControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\UserControllerFactory;
+use CreativeDelta\User\Application\Controller\GoogleController;
 use CreativeDelta\User\Application\Controller\UserController;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
@@ -74,6 +76,35 @@ return [
                                         ]
                                     ]
                                 ]
+                            ],
+                            'google'   => [
+                                'type'          => Literal::class,
+                                'options'       => [
+                                    'route' => '/google'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'register'        => [
+                                        'type'    => Literal::class,
+                                        'options' => [
+                                            'route'    => '/register',
+                                            'defaults' => [
+                                                'controller' => GoogleController::class,
+                                                'action'     => 'register'
+                                            ]
+                                        ]
+                                    ],
+                                    'register-return' => [
+                                        'type'    => Literal::class,
+                                        'options' => [
+                                            'route'    => '/register-return',
+                                            'defaults' => [
+                                                'controller' => GoogleController::class,
+                                                'action'     => 'register-return'
+                                            ]
+                                        ]
+                                    ]
+                                ]
                             ]
                         ]
                     ],
@@ -112,6 +143,35 @@ return [
                                         ]
                                     ]
                                 ]
+                            ],
+                            'google'   => [
+                                'type'          => Literal::class,
+                                'options'       => [
+                                    'route' => '/google'
+                                ],
+                                'may_terminate' => false,
+                                'child_routes'  => [
+                                    'sign-in'        => [
+                                        'type'    => Literal::class,
+                                        'options' => [
+                                            'route'    => '/sign-in',
+                                            'defaults' => [
+                                                'controller' => GoogleController::class,
+                                                'action'     => 'sign-in'
+                                            ]
+                                        ]
+                                    ],
+                                    'sign-in-return' => [
+                                        'type'    => Literal::class,
+                                        'options' => [
+                                            'route'    => '/sign-in-return',
+                                            'defaults' => [
+                                                'controller' => GoogleController::class,
+                                                'action'     => 'sign-in-return'
+                                            ]
+                                        ]
+                                    ]
+                                ]
                             ]
                         ]
                     ]
@@ -133,7 +193,8 @@ return [
         'factories' => [
             Controller\UserController::class     => UserControllerFactory::class,
             Controller\IndexController::class    => IndexControllerFactory::class,
-            Controller\FacebookController::class => FacebookControllerFactory::class
+            Controller\FacebookController::class => FacebookControllerFactory::class,
+            Controller\GoogleController::class   => GoogleControllerFactory::class,
         ],
     ],
     'view_manager' => [
