@@ -31,14 +31,20 @@ return [
             'appId'     => "",
             "appSecret" => "",
             "appScope"  => ""
+        ],
+        'google'   => [
+            "clientId"     => "",
+            "clientSecret" => "",
+            "clientScope"  => "",
+            "apiKey"       => "",
         ]
     ],
 
     'db' => [
-        'driver'   => 'Pdo_Mysql',
-        'hostname' => 'localhost',
-        'database' => 'user-example',
-        'username' => 'user-example',
-        'password' => 'user-example'
+        'driver'   => '',
+        'hostname' => '',
+        'database' => '',
+        'username' => '',
+        'password' => ''
     ],
 ];
