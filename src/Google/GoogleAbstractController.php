@@ -21,6 +21,7 @@ use Zend\Db\Adapter\AdapterInterface;
 use Zend\Http\Request;
 use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Session\Container;
 
 abstract class GoogleAbstractController extends AbstractActionController
 {
@@ -183,20 +184,25 @@ abstract class GoogleAbstractController extends AbstractActionController
         if (!$returnUrl)
             throw AuthenticationException::ReturnUrlIsNotProvided();
 
-        $newSession = $this->getUserIdentityService()->createSessionLog($sessionHash, $returnUrl);
-        $oauthUrl   = $this->getGoogleMethod()->makeAuthenticationUrl($this->getRegisterReturnPath(), $newSession);
+        $container                = new Container();
+        $container['returnUrl']   = $returnUrl;
+        $container['sessionHash'] = $sessionHash;
+
+        $oauthUrl = $this->getGoogleMethod()->makeAuthenticationUrl($this->getRegisterReturnPath(), null);
 
         return $this->redirect()->toUrl($oauthUrl);
     }
 
     public function registerReturnAction()
     {
-        $data    = $this->params()->fromQuery();
-        $code    = $data[GoogleMethod::RESULT_QUERY_CODE];
-        $state   = $data[GoogleMethod::RESULT_QUERY_STATE];
-        $session = $this->getUserIdentityService()->getSessionLog($state);
+        $data = $this->params()->fromQuery();
+        $code = $data[GoogleMethod::RESULT_QUERY_CODE];
 
         try {
+
+            $container       = new Container();
+            $prevReturnUrl   = $container['returnUrl'];
+            $prevSessionHash = $container['sessionHash'];
 
             $this->getGoogleMethod()->initAccessToken($this->getRegisterReturnPath(), $code);
 
@@ -207,12 +213,12 @@ abstract class GoogleAbstractController extends AbstractActionController
 
             $this->createUserInLocalDatabase($newIdentityId, $oauthData);
 
-            return $this->getReturnResponseForNewUserCreated($session->getReturnUrl(), $session->getPreviousHash());
+            return $this->getReturnResponseForNewUserCreated($prevReturnUrl, $prevSessionHash);
 
         } catch (UserIdentityException $exception) {
             switch ($exception->getCode()) {
                 case UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST:
-                    return $this->getReturnResponseForUserAlreadyExisted($session->getReturnUrl(), $session->getPreviousHash());
+                    return $this->getReturnResponseForUserAlreadyExisted($prevReturnUrl, $prevSessionHash);
                 default:
                     throw $exception;
             }
@@ -231,8 +237,12 @@ abstract class GoogleAbstractController extends AbstractActionController
         if (!$returnUrl)
             throw AuthenticationException::ReturnUrlIsNotProvided();
 
-        $newSession = $this->getUserIdentityService()->createSessionLog($sessionHash, $returnUrl);
-        $oauthUrl   = $this->getGoogleMethod()->makeAuthenticationUrl($this->getAuthenticationReturnPath(), $newSession);
+        $container                = new Container();
+        $container['returnUrl']   = $returnUrl;
+        $container['sessionHash'] = $sessionHash;
+
+//        $newSession = $this->getUserIdentityService()->createSessionLog($sessionHash, $returnUrl);
+        $oauthUrl = $this->getGoogleMethod()->makeAuthenticationUrl($this->getAuthenticationReturnPath(), null);
 
         return $this->redirect()->toUrl($oauthUrl);
     }
@@ -243,27 +253,30 @@ abstract class GoogleAbstractController extends AbstractActionController
         $req  = $this->getRequest();
         $data = $req->getQuery();
         $code = $data[GoogleMethod::RESULT_QUERY_CODE];
-        $hash = $data[GoogleMethod::RESULT_QUERY_STATE];
 
         try {
 
-            $prevSession     = $hash ? $this->getUserIdentityService()->getSessionLog($hash) : null;
-            $prevReturnUrl   = $prevSession->getReturnUrl();
-            $prevSessionHash = $prevSession->getPreviousHash();
+            $container       = new Container();
+            $prevReturnUrl   = $container['returnUrl'];
+            $prevSessionHash = $container['sessionHash'];
 
             $storedProfile = $this->getGoogleMethod()->initAccessToken($this->getAuthenticationReturnPath(), $code)->getLocalProfile();
             $identity      = $storedProfile ? $this->getUserIdentityService()->getIdentityById($storedProfile->getIdentityId()) : null;
             $authService   = $this->getAuthenticationService();
 
             if ($authService instanceof AuthenticationService) {
+
                 $adapter = new GoogleAuthenticationAdapter($this->googleConfig, $this->dbAdapter, $identity);
                 $adapter->setAccessToken($this->getGoogleMethod()->getAccessToken());
                 $result = $authService->authenticate($adapter);
+
             } else {
+
                 throw new AuthenticationException(AuthenticationException::ERROR_CODE_AUTHENTICATION_SERVICE_NOT_SUPPORTED);
             }
 
             if ($result->isValid()) {
+
                 $returnQuery = [UserSessionService::QUERY_SESSION_NAME => $prevSessionHash];
                 $returnUrl   = isset($returnQuery[UserSessionService::QUERY_SESSION_NAME]) ? urldecode($prevReturnUrl) . '?' . http_build_query($returnQuery) : urldecode($prevReturnUrl);
                 return $this->redirect()->toUrl($returnUrl);
@@ -272,11 +285,11 @@ abstract class GoogleAbstractController extends AbstractActionController
 
                 switch ($result->getCode()) {
                     case Result::FAILURE_IDENTITY_NOT_FOUND:
-                        return $this->getReturnResponseForIdentityNotFound($prevSession->getReturnUrl(), $prevSession->getPreviousHash());
+                        return $this->getReturnResponseForIdentityNotFound($prevReturnUrl, $prevSessionHash);
                     case Result::FAILURE_CREDENTIAL_INVALID:
                         throw new UserIdentityException(UserIdentityException::CODE_ERROR_AUTHENTICATION_USER_NOT_ACTIVE);
                     default:
-                        return $this->getReturnResponseForInvalidCredential($prevSession->getReturnUrl(), $prevSession->getPreviousHash());
+                        return $this->getReturnResponseForInvalidCredential($prevReturnUrl, $prevSessionHash);
                 }
             }
 

@@ -17,13 +17,13 @@ use Zend\Db\TableGateway\TableGateway;
 
 class UserIdentityTable
 {
-    const TABLE_NAME = "UserIdentity";
+    const TABLE_NAME = "user_identity";
     const ID_NAME    = "id";
 
     const COLUMN_STATE         = "state";
     const COLUMN_IDENTITY      = "identity";
-    const COLUMN_PRIMARY_TABLE = "primaryTable";
-    const COLUMN_PRIMARY_ID    = "primaryId";
+    const COLUMN_PRIMARY_TABLE = "primary_table";
+    const COLUMN_PRIMARY_ID    = "primary_id";
 
     protected $tableGateway;
     protected $dbAdapter;

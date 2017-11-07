@@ -16,11 +16,11 @@ use Zend\Db\TableGateway\TableGateway;
 
 class GoogleTable
 {
-    const TABLE_NAME          = "UserGoogle";
+    const TABLE_NAME          = "user_google";
     const ID_NAME             = "id";
-    const COLUMN_IDENTITY_ID  = "identityId";
-    const COLUMN_GOOGLE_ID    = "userId";
-    const COLUMN_ACCESS_TOKEN = "accessToken";
+    const COLUMN_IDENTITY_ID  = "identity_id";
+    const COLUMN_GOOGLE_ID    = "user_id";
+    const COLUMN_ACCESS_TOKEN = "access_token";
 
 
     protected $tableGateway;

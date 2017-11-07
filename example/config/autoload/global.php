@@ -16,6 +16,7 @@ return [
     'service_manager' => [
         'factories' => [
             \Zend\Db\Adapter\Adapter::class                                    => \Zend\Db\Adapter\AdapterServiceFactory::class,
+            \Zend\Session\SessionManager::class                                => \CreativeDelta\User\Core\Impl\Factory\SessionManagerFactory::class,
             \CreativeDelta\User\Core\Impl\Service\AuthenticationService::class => \CreativeDelta\User\Core\Impl\Factory\AuthenticationServiceFactory::class
         ],
         'aliases'   => [
@@ -26,25 +27,25 @@ return [
 
     // User should define below configurations in local.php for security purpose.
 
-    'authConfig' => [
-        'facebook' => [
-            'appId'     => "",
-            "appSecret" => "",
-            "appScope"  => ""
-        ],
-        'google'   => [
-            "clientId"     => "",
-            "clientSecret" => "",
-            "clientScope"  => "",
-            "apiKey"       => "",
-        ]
-    ],
-
-    'db' => [
-        'driver'   => '',
-        'hostname' => '',
-        'database' => '',
-        'username' => '',
-        'password' => ''
-    ],
+    //    'authConfig' => [
+    //        'facebook' => [
+    //            'appId'     => "",
+    //            "appSecret" => "",
+    //            "appScope"  => ""
+    //        ],
+    //        'google'   => [
+    //            "clientId"     => "",
+    //            "clientSecret" => "",
+    //            "clientScope"  => "",
+    //            "apiKey"       => "",
+    //        ]
+    //    ],
+    //
+    //    'db' => [
+    //        'driver'   => '',
+    //        'hostname' => '',
+    //        'database' => '',
+    //        'username' => '',
+    //        'password' => ''
+    //    ],
 ];
