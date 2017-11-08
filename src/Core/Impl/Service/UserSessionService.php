@@ -14,6 +14,7 @@ namespace CreativeDelta\User\Core\Impl\Service;
 
 use CreativeDelta\User\Core\Domain\Entity\SessionLog;
 use CreativeDelta\User\Core\Impl\Table\UserSessionLogTable;
+use DateTime;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\RowGateway\RowGateway;
@@ -22,19 +23,22 @@ use Zend\Hydrator\ClassMethods;
 class UserSessionService
 {
 
-    const DATETIME_FORMAT = 'Y-m-d H:i:s';
-    const SESSION_DATA_NAME = "dataJson";
-    const RANDOM_STRING_LEN = 22;
-    const QUERY_SESSION_NAME = "session";
+    const DATETIME_FORMAT       = 'Y-m-d H:i:s';
+    const SESSION_DATA_NAME     = self::FIELD_DATA_JSON;
+    const RANDOM_STRING_LEN     = 22;
+    const QUERY_SESSION_NAME    = "session";
     const QUERY_RETURN_URL_NAME = "return";
 
     protected $dbAdapter;
     protected $userSessionTable;
     protected $bcrypt;
 
-    const PREVIOUS_HASH = 'previousHash';
-    const RETURN_URL = 'returnUrl';
-    const DATA_JSON = 'dataJson';
+    const FIELD_DATETIME      = 'datetime';
+    const FIELD_RANDOM        = 'random';
+    const FIELD_HASH          = 'hash';
+    const FIELD_PREVIOUS_HASH = 'previous_hash';
+    const FIELD_RETURN_URL    = 'return_url';
+    const FIELD_DATA_JSON     = 'data_json';
 
     /**
      * UserSessionService constructor.
@@ -42,8 +46,8 @@ class UserSessionService
      */
     public function __construct(AdapterInterface $dbAdapter)
     {
-        $this->bcrypt = new Bcrypt();
-        $this->dbAdapter = $dbAdapter;
+        $this->bcrypt           = new Bcrypt();
+        $this->dbAdapter        = $dbAdapter;
         $this->userSessionTable = new UserSessionLogTable($dbAdapter);
     }
 
@@ -55,32 +59,31 @@ class UserSessionService
      */
     public function createSessionLog($previousHash = null, $returnUrl = null, $data = null)
     {
-        $row = new RowGateway(UserSessionLogTable::ID_NAME, UserSessionLogTable::TABLE_NAME, $this->dbAdapter);
+        $row      = new RowGateway(UserSessionLogTable::ID_NAME, UserSessionLogTable::TABLE_NAME, $this->dbAdapter);
+        $datetime = new DateTime();
+        $random   = bin2hex(openssl_random_pseudo_bytes(self::RANDOM_STRING_LEN));
 
-        $datetime = new \DateTime();
-        $random = bin2hex(openssl_random_pseudo_bytes(self::RANDOM_STRING_LEN));
-        $sequence = $datetime->format(\DateTime::RFC3339) . '+' . $random;
+        $sequence = $datetime->format(DateTime::RFC3339) . '+' . $random;
+
         $hash = $this->bcrypt->create($sequence);
 
-        $rowData = [
-            'id' => 0,
-            'random' => $random,
-            'hash' => $hash
-        ];
+        $row[self::FIELD_DATETIME] = $datetime->format(self::DATETIME_FORMAT);
+        $row[self::FIELD_RANDOM]   = $random;
+        $row[self::FIELD_HASH]     = $hash;
 
         if ($previousHash)
-            $rowData[self::PREVIOUS_HASH] = $previousHash;
+            $row[self::FIELD_PREVIOUS_HASH] = $previousHash;
 
         if ($returnUrl)
-            $rowData[self::RETURN_URL] = $returnUrl;
+            $row[self::FIELD_RETURN_URL] = $returnUrl;
 
         if ($data)
-            $rowData[self::DATA_JSON] = json_encode($data);
+            $row[self::FIELD_DATA_JSON] = json_encode($data);
 
-        $row->populate($rowData, false);
+        $row->initialize();
         $row->save();
 
-        return $row['hash'];
+        return $row[self::FIELD_HASH];
     }
 
     /**

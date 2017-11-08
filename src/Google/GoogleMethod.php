@@ -16,8 +16,8 @@ use CreativeDelta\User\Core\Domain\OAuthAuthenticationInterface;
 use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
 use Google_Client;
 use Google_Service_Oauth2;
+use Zend\Db\Adapter\Adapter;
 use Zend\Db\Adapter\AdapterInterface;
-use Zend\Db\RowGateway\RowGateway;
 
 class GoogleMethod implements OAuthAuthenticationInterface, UserRegisterMethodAdapter
 {
@@ -44,32 +44,32 @@ class GoogleMethod implements OAuthAuthenticationInterface, UserRegisterMethodAd
     const PROFILE_FIELD_EMAIL      = "email";
 
     /**
-     * @var AdapterInterface $dbAdapter
+     * @var AdapterInterface
      */
     protected $dbAdapter;
 
     /**
-     * @var array $config ;
+     * @var array
      */
     protected $config;
 
     /**
-     * @var Google_Client $client
+     * @var Google_Client
      */
     protected $client;
 
     /**
-     * @var GoogleTable $localTable ;
+     * @var GoogleTable;
      */
-    protected $localTable;
+    protected $googleTable;
 
     /**
      * GoogleMethod constructor.
-     * @param AdapterInterface $dbAdapter
-     * @param array $config
-     * @param null $authConfigFile
+     * @param Adapter $dbAdapter
+     * @param array   $config
+     * @param null    $authConfigFile
      */
-    public function __construct(AdapterInterface $dbAdapter, array $config, $authConfigFile = null)
+    public function __construct($dbAdapter, array $config, $authConfigFile = null)
     {
         $this->dbAdapter = $dbAdapter;
         $this->config    = $config;
@@ -87,7 +87,7 @@ class GoogleMethod implements OAuthAuthenticationInterface, UserRegisterMethodAd
         $this->client->addScope(Google_Service_Oauth2::USERINFO_PROFILE);
         $this->client->addScope(Google_Service_Oauth2::USERINFO_EMAIL);
 
-        $this->localTable = new GoogleTable($this->dbAdapter);
+        $this->googleTable = new GoogleTable($this->dbAdapter);
     }
 
     public function makeAuthenticationUrl($redirectUri, $state = null)
@@ -122,8 +122,8 @@ class GoogleMethod implements OAuthAuthenticationInterface, UserRegisterMethodAd
     public function getLocalProfile()
     {
         $oauthData = $this->getOAuthProfile();
-        $result    = $this->localTable->getByUserId($oauthData[self::PROFILE_FIELD_ID]);
-        $profile   = $result ? GoogleProfile::newFromArray($this->dbAdapter, $result->getArrayCopy(), true) : null;
+        $result    = $this->googleTable->getByUserId($oauthData[self::PROFILE_FIELD_ID]);
+        $profile   = $result ? GoogleProfile::newFromArray($this->googleTable, $result->getArrayCopy(), true) : null;
         return $profile;
     }
 
@@ -134,7 +134,7 @@ class GoogleMethod implements OAuthAuthenticationInterface, UserRegisterMethodAd
 
     public function has($userId)
     {
-        return $this->localTable->hasUserId($userId);
+        return $this->googleTable->hasUserId($userId);
     }
 
     public function getName()
@@ -149,13 +149,13 @@ class GoogleMethod implements OAuthAuthenticationInterface, UserRegisterMethodAd
 
     public function register($identityId, $userId, $dataJson)
     {
-        $row = new RowGateway(GoogleTable::ID_NAME, GoogleTable::TABLE_NAME, $this->dbAdapter);
-
-        $row[GoogleTable::COLUMN_IDENTITY_ID] = $identityId;
-        $row[GoogleTable::COLUMN_GOOGLE_ID]   = $userId;
+        $row = new GoogleProfile($this->googleTable);
+        $row->setAutoSequence(GoogleTable::AUTO_SEQUENCE);
+        $row->setIdentityId($identityId);
+        $row->setUserId($userId);
         $row->save();
 
-        return $row[GoogleTable::ID_NAME];
+        return $row->getId();
     }
 
 }

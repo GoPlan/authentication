@@ -26,7 +26,7 @@ use Zend\Db\TableGateway\TableGateway;
 
 class UserSessionLogTable
 {
-    const TABLE_NAME = "UserSessionLog";
+    const TABLE_NAME = "user_session_log";
     const ID_NAME    = "id";
 
     /** @var  TableGateway $tableGateway */

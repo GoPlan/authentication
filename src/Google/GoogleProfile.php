@@ -13,79 +13,143 @@ namespace CreativeDelta\User\Google;
 
 
 use CreativeDelta\User\Core\Domain\Entity\AbstractOAuthProfile;
-use Zend\Db\Adapter\AdapterInterface;
-use Zend\Db\RowGateway\RowGateway;
+use Zend\Db\Adapter\Driver\Pdo\Pdo;
 use Zend\Db\RowGateway\RowGatewayInterface;
 
 class GoogleProfile extends AbstractOAuthProfile implements RowGatewayInterface
 {
-
-    /** @var  AdapterInterface $dbAdapter */
-    protected $dbAdapter;
-
-    /** @var  RowGateway $rowGateway */
-    protected $rowGateway;
+    /**
+     * @var GoogleTable
+     */
+    protected $googleTable;
 
     /**
-     * ProfileRow constructor.
-     * @param AdapterInterface $dbAdapter
+     * @var array
      */
-    public function __construct(AdapterInterface $dbAdapter)
+    protected $data;
+
+    /**
+     * @var bool
+     */
+    protected $rowExistInDatabase;
+
+    /**
+     * @var string
+     */
+    protected $autoSequence;
+
+    /**
+     * GoogleProfile constructor.
+     * @param GoogleTable $googleTable
+     */
+    public function __construct(GoogleTable $googleTable)
     {
-        $this->dbAdapter  = $dbAdapter;
-        $this->rowGateway = new RowGateway(GoogleTable::ID_NAME, GoogleTable::TABLE_NAME, $dbAdapter);
+        $this->googleTable        = $googleTable;
+        $this->rowExistInDatabase = false;
     }
 
-    static function newFromArray(AdapterInterface $dbAdapter, $data, $exist = false)
+    static function newFromArray(GoogleTable $googleTable, $data, $exist = false)
     {
-        $row = new GoogleProfile($dbAdapter);
+        $row = new GoogleProfile($googleTable);
         $row->populate($data, $exist);
         return $row;
     }
 
-    function getId()
+    /**
+     * @return string
+     */
+    public function getAutoSequence()
     {
-        return $this->rowGateway[GoogleTable::ID_NAME];
+        return $this->autoSequence;
     }
 
-    function getUserId()
+    /**
+     * @param string $autoSequence
+     */
+    public function setAutoSequence($autoSequence)
     {
-        return $this->rowGateway[GoogleTable::COLUMN_GOOGLE_ID];
+        $this->autoSequence = $autoSequence;
     }
 
-    function getIdentityId()
+    public function getId()
     {
-        return $this->rowGateway[GoogleTable::COLUMN_IDENTITY_ID];
+        return $this->data[GoogleTable::ID_NAME];
+    }
+
+    public function setId($id)
+    {
+        $this->data[GoogleTable::ID_NAME] = $id;
+    }
+
+    public function getIdentityId()
+    {
+        return $this->data[GoogleTable::COLUMN_IDENTITY_ID];
+    }
+
+    public function setIdentityId($identityId)
+    {
+        $this->data[GoogleTable::COLUMN_IDENTITY_ID] = $identityId;
+    }
+
+    public function getUserId()
+    {
+        return $this->data[GoogleTable::COLUMN_GOOGLE_ID];
+    }
+
+    public function setUserId($userId)
+    {
+        $this->data[GoogleTable::COLUMN_GOOGLE_ID] = $userId;
     }
 
     function getAccessToken()
     {
-        return $this->rowGateway[GoogleTable::COLUMN_ACCESS_TOKEN];
+        return $this->data[GoogleTable::COLUMN_ACCESS_TOKEN];
     }
 
     function setAccessToken($token)
     {
-        $this->rowGateway[GoogleTable::COLUMN_ACCESS_TOKEN] = $token;
+        $this->data[GoogleTable::COLUMN_ACCESS_TOKEN] = $token;
     }
 
     public function exchangeArray($data)
     {
-        $this->rowGateway->exchangeArray($data);
+        $this->setId($data[GoogleTable::ID_NAME]);
+        $this->setIdentityId($data[GoogleTable::COLUMN_IDENTITY_ID]);
+        $this->setUserId($data[GoogleTable::COLUMN_GOOGLE_ID]);
+        $this->setAccessToken($data[GoogleTable::COLUMN_ACCESS_TOKEN]);
     }
 
     public function populate($data, $exist = false)
     {
-        $this->rowGateway->populate($data, $exist);
+        $this->exchangeArray($data);
+        $this->rowExistInDatabase = $exist;
     }
 
     public function save()
     {
-        $this->rowGateway->save();
+        if ($this->rowExistInDatabase) {
+
+            $this->googleTable->getTableGateway()->update($this->data, [
+                GoogleTable::ID_NAME => $this->data[GoogleTable::ID_NAME]
+            ]);
+
+        } else {
+
+            $count = $this->googleTable->getTableGateway()->insert($this->data);
+
+            if ($count > 0) {
+
+                $driver = $this->googleTable->getDbAdapter()->getDriver();
+                $newId  = $driver instanceof Pdo ? $driver->getLastGeneratedValue($this->getAutoSequence()) : $driver->getLastGeneratedValue();
+                $this->setId($newId);
+            }
+        }
     }
 
     public function delete()
     {
-        $this->rowGateway->delete();
+        $this->googleTable->getTableGateway()->delete([
+            GoogleTable::ID_NAME => $this->getId()
+        ]);
     }
-
 }

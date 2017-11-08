@@ -14,6 +14,7 @@ namespace CreativeDelta\User\Core\Domain;
 
 use CreativeDelta\User\Core\Domain\Entity\Identity;
 use Zend\Authentication\Result;
+use Zend\Db\Adapter\Adapter;
 use Zend\Db\Adapter\AdapterInterface;
 
 abstract class AbstractAuthenticationAdapter implements \Zend\Authentication\Adapter\AdapterInterface
@@ -25,22 +26,28 @@ abstract class AbstractAuthenticationAdapter implements \Zend\Authentication\Ada
      */
     const METHOD_NAME = null;
 
-    /** @var  array $config */
+    /**
+     * @var  array
+     */
     protected $config;
 
-    /** @var  Identity $identity */
+    /**
+     * @var  Identity
+     */
     protected $identity;
 
-    /** @var  AdapterInterface $dbAdapter */
+    /**
+     * @var  Adapter
+     */
     protected $dbAdapter;
 
     /**
      * FacebookAuthenticationAdapter constructor.
-     * @param array $config
+     * @param array            $config
      * @param AdapterInterface $dbAdapter
-     * @param Identity|null $identity
+     * @param Identity|null    $identity
      */
-    public function __construct(array $config, AdapterInterface $dbAdapter, Identity $identity = null)
+    public function __construct(array $config, $dbAdapter, Identity $identity = null)
     {
         $this->config    = $config;
         $this->dbAdapter = $dbAdapter;
@@ -50,7 +57,7 @@ abstract class AbstractAuthenticationAdapter implements \Zend\Authentication\Ada
             $this->identity->setAdapterClassName(static::class);
     }
 
-    static function newFromConfig(array $config, AdapterInterface $dbAdapter, Identity $identity = null)
+    static function newFromConfig(array $config, $dbAdapter, Identity $identity = null)
     {
         $methodConfig   = $config[self::METHOD_NAME];
         $methodInstance = new static($methodConfig, $dbAdapter, $identity);
@@ -83,16 +90,11 @@ abstract class AbstractAuthenticationAdapter implements \Zend\Authentication\Ada
     {
 
         if (!$this->identity) {
-            return new Result(
-                Result::FAILURE_IDENTITY_NOT_FOUND,
-                null);
+            return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null);
         }
 
         if (!($this->identity->getState() == Identity::STATE_ACTIVE)) {
-            return new Result(
-                Result::FAILURE_CREDENTIAL_INVALID,
-                null,
-                [Identity::CREDENTIAL_RESULT_MESSAGES[Result::FAILURE_CREDENTIAL_INVALID]]);
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, [Identity::CREDENTIAL_RESULT_MESSAGES[Result::FAILURE_CREDENTIAL_INVALID]]);
         }
 
         $this->pokeIdentity();

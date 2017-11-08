@@ -12,22 +12,30 @@
 namespace CreativeDelta\User\Google;
 
 
+use Zend\Db\Adapter\Adapter;
 use Zend\Db\TableGateway\TableGateway;
 
 class GoogleTable
 {
-    const TABLE_NAME          = "UserGoogle";
+    const AUTO_SEQUENCE       = "erp_identity.user_google_id_seq";
+    const TABLE_NAME          = "user_google";
     const ID_NAME             = "id";
-    const COLUMN_IDENTITY_ID  = "identityId";
-    const COLUMN_GOOGLE_ID    = "userId";
-    const COLUMN_ACCESS_TOKEN = "accessToken";
+    const COLUMN_IDENTITY_ID  = "identity_id";
+    const COLUMN_GOOGLE_ID    = "user_id";
+    const COLUMN_ACCESS_TOKEN = "access_token";
 
-
+    /**
+     * @var TableGateway
+     */
     protected $tableGateway;
+
+    /**
+     * @var Adapter
+     */
     protected $dbAdapter;
 
     /**
-     * @return mixed
+     * @return TableGateway
      */
     public function getTableGateway()
     {
@@ -35,7 +43,7 @@ class GoogleTable
     }
 
     /**
-     * @return mixed
+     * @return Adapter
      */
     public function getDbAdapter()
     {
@@ -44,7 +52,7 @@ class GoogleTable
 
     /**
      * GoogleTable constructor.
-     * @param $dbAdapter
+     * @param Adapter $dbAdapter
      */
     public function __construct($dbAdapter)
     {
