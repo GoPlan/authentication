@@ -20,9 +20,9 @@ class UserIdentityTable
     const AUTO_SEQUENCE   = "erp_identity.user_identity_id_seq";
     const TABLE_NAME      = "user_identity";
     const ID_NAME         = "id";
+    const COLUMN_ACCOUNT  = "account";
+    const COLUMN_PASSWORD = "password";
     const COLUMN_STATE    = "state";
-    const COLUMN_IDENTITY = "identity";
-    const COLUMN_SECRET   = "secret";
 
     protected $tableGateway;
     protected $dbAdapter;
@@ -53,22 +53,23 @@ class UserIdentityTable
     }
 
     /**
-     * @param $identity
+     * @param $account
      * @return array|\ArrayObject|null
      */
-    public function getByIdentity($identity)
+    public function getByAccount($account)
     {
-        $result = $this->tableGateway->select([self::COLUMN_IDENTITY => $identity])->current();
+        $result = $this->tableGateway->select([self::COLUMN_ACCOUNT => $account])->current();
         return $result;
     }
 
     /**
-     * @param $identity
+     * @param $account
      * @return bool
+     * @internal param $identity
      */
-    public function hasIdentity($identity)
+    public function hasAccount($account)
     {
-        return $this->tableGateway->select([self::COLUMN_IDENTITY => $identity])->count() > 0;
+        return $this->tableGateway->select([self::COLUMN_ACCOUNT => $account])->count() > 0;
     }
 }
 

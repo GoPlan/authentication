@@ -78,7 +78,7 @@ class GoogleController extends GoogleAbstractController
         // If you need to store newly created profile, use this method to create the profile on your local database.
     }
 
-    function newIdentity($googleId, $googleData)
+    function newAccountName($googleId, $googleData)
     {
         return "Google+{$googleId}";
     }

@@ -64,7 +64,7 @@ class FacebookController extends FacebookAbstractController
         // If you need to store newly created profile, use this method to create the profile on your local database.
     }
 
-    function newIdentity($facebookId, $facebookData)
+    function newAccountName($facebookId, $facebookData)
     {
         return "Facebook+{$facebookId}";
     }

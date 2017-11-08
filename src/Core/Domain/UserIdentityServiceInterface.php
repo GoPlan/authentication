@@ -18,22 +18,22 @@ interface UserIdentityServiceInterface
 {
 
     /**
-     * @param string $identity
+     * @param $account
      * @return bool
      */
-    public function hasIdentity($identity);
+    public function hasAccount($account);
 
     /**
-     * @param string $identity
+     * @param $account
      * @return Identity
      */
-    public function getIdentityByIdentity($identity);
+    public function getIdentityByAccount($account);
 
     /**
-     * @param $identityId
+     * @param $id
      * @return Identity
      */
-    public function getIdentityById($identityId);
+    public function getIdentityById($id);
 
     /**
      * @param UserRegisterMethodAdapter $adapter

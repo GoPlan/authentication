@@ -60,16 +60,17 @@ abstract class GoogleAbstractController extends AbstractActionController
 
     /**
      * GoogleAbstractController constructor.
-     * @param AdapterInterface             $dbAdapter
+     * @param Adapter                      $dbAdapter
      * @param AuthenticationService        $authenticationService
      * @param GoogleMethod                 $googleMethod
      * @param UserIdentityServiceInterface $userIdentityService
      * @internal param array $googleConfig
      */
-    public function __construct(AdapterInterface $dbAdapter,
-                                AuthenticationService $authenticationService,
-                                GoogleMethod $googleMethod = null,
-                                UserIdentityServiceInterface $userIdentityService = null)
+    public function __construct(
+        Adapter $dbAdapter,
+        AuthenticationService $authenticationService,
+        GoogleMethod $googleMethod = null,
+        UserIdentityServiceInterface $userIdentityService = null)
     {
         $this->dbAdapter             = $dbAdapter;
         $this->authenticationService = $authenticationService;
@@ -191,7 +192,7 @@ abstract class GoogleAbstractController extends AbstractActionController
      * @param array $googleData
      * @return string
      */
-    abstract function newIdentity($googleId, $googleData);
+    abstract function newAccountName($googleId, $googleData);
 
 
     public function registerAction()
@@ -218,11 +219,12 @@ abstract class GoogleAbstractController extends AbstractActionController
         try {
 
             $this->getGoogleMethod()->initAccessToken($this->getRegisterReturnPath(), $code);
+            $oauthData = $this->getGoogleMethod()->getOAuthProfile();
+            $oauthId   = $oauthData[GoogleMethod::PROFILE_FIELD_ID];
 
-            $oauthData     = $this->getGoogleMethod()->getOAuthProfile();
-            $oauthId       = $oauthData[GoogleMethod::PROFILE_FIELD_ID];
-            $newIdentity   = $this->newIdentity($oauthId, $oauthData);
-            $newIdentityId = $this->getUserIdentityService()->register($this->getGoogleMethod(), $newIdentity, $oauthId, $oauthData);
+            $registerAdapter = $this->getGoogleMethod();
+            $newAccountName  = $this->newAccountName($oauthId, $oauthData);
+            $newIdentityId   = $this->getUserIdentityService()->register($registerAdapter, $newAccountName, null, $oauthId, $oauthData);
 
             $this->createUserInLocalDatabase($newIdentityId, $oauthData);
 

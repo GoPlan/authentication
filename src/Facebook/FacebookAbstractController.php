@@ -65,10 +65,11 @@ abstract class FacebookAbstractController extends AbstractActionController
      * @param FacebookMethod|null               $facebookMethod
      * @param UserIdentityServiceInterface|null $userIdentityService
      */
-    public function __construct($dbAdapter,
-        $authenticationService,
-        $facebookMethod = null,
-        $userIdentityService = null)
+    public function __construct(
+        Adapter $dbAdapter,
+        AuthenticationService $authenticationService,
+        FacebookMethod $facebookMethod = null,
+        UserIdentityServiceInterface $userIdentityService = null)
     {
         $this->dbAdapter             = $dbAdapter;
         $this->authenticationService = $authenticationService;
@@ -171,7 +172,7 @@ abstract class FacebookAbstractController extends AbstractActionController
      * @param array $facebookData
      * @return string
      */
-    abstract function newIdentity($facebookId, $facebookData);
+    abstract function newAccountName($facebookId, $facebookData);
 
 
     public function getAuthenticationReturnUrl()
@@ -226,14 +227,13 @@ abstract class FacebookAbstractController extends AbstractActionController
         try {
 
             $this->getFacebookMethod()->initAccessToken($this->getRegisterReturnUrl(), $code);
+            $facebookData = $this->getFacebookMethod()->getOAuthProfile();
+            $facebookId   = $facebookData[FacebookMethod::PROFILE_FIELD_ID];
 
-            // Register new identity that has Identity field with value as "facebook" + facebookId
-            $facebookData  = $this->getFacebookMethod()->getOAuthProfile();
-            $facebookId    = $facebookData[FacebookMethod::PROFILE_FIELD_ID];
-            $newIdentity   = $this->newIdentity($facebookId, $facebookData);
-            $newIdentityId = $this->getUserIdentityService()->register($this->getFacebookMethod(), $newIdentity, null, $facebookId, $facebookData);
+            $registerAdapter = $this->getFacebookMethod();
+            $newAccountName  = $this->newAccountName($facebookId, $facebookData);
+            $newIdentityId   = $this->getUserIdentityService()->register($registerAdapter, $newAccountName, null, $facebookId, $facebookData);
 
-            // Create a user record from facebook data
             $this->createUserInLocalDatabase($newIdentityId, $facebookData);
 
             return $this->getReturnResponseForNewUserCreated();
@@ -296,6 +296,7 @@ abstract class FacebookAbstractController extends AbstractActionController
                 return $this->redirect()->toUrl($returnUrl);
 
             } else {
+
                 switch ($result->getCode()) {
                     case Result::FAILURE_IDENTITY_NOT_FOUND:
                         return $this->getReturnResponseForIdentityNotFound();

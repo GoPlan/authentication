@@ -38,35 +38,35 @@ class UserIdentityService implements UserIdentityServiceInterface
     }
 
     /**
-     * @param Identity|string $identity
+     * @param string $account
      * @return bool
      */
-    public function hasIdentity($identity)
+    public function hasAccount($account)
     {
-        return $this->userIdentityTable->hasIdentity($identity);
+        return $this->userIdentityTable->hasAccount($account);
     }
 
     /**
-     * @param string $identity
-     * @return null|Identity
-     */
-    public function getIdentityByIdentity($identity)
-    {
-        $result = $this->userIdentityTable->getByIdentity($identity);
-
-        /** @var Identity $identity */
-        $identity = $result ? (new ClassMethods())->hydrate($result->getArrayCopy(), new Identity()) : null;
-
-        return $identity;
-    }
-
-    /**
-     * @param $identityId
+     * @param string $account
      * @return Identity|null
      */
-    public function getIdentityById($identityId)
+    public function getIdentityByAccount($account)
     {
-        $result = $this->userIdentityTable->get($identityId);
+        $result = $this->userIdentityTable->getByAccount($account);
+
+        /** @var Identity $account */
+        $account = $result ? (new ClassMethods())->hydrate($result->getArrayCopy(), new Identity()) : null;
+
+        return $account;
+    }
+
+    /**
+     * @param $id
+     * @return Identity|null
+     */
+    public function getIdentityById($id)
+    {
+        $result = $this->userIdentityTable->get($id);
 
         /** @var Identity $identity */
         $identity = $result ? (new ClassMethods())->hydrate($result->getArrayCopy(), new Identity()) : null;
@@ -80,12 +80,12 @@ class UserIdentityService implements UserIdentityServiceInterface
      * @param null                      $password
      * @param int                       $userId
      * @param null                      $data
-     * @return mixed
+     * @return int Newly created IdentityId
      * @throws UserIdentityException
      */
     public function register(UserRegisterMethodAdapter $adapter, $account, $password = null, $userId = null, $data = null)
     {
-        if ($this->hasIdentity($account) || $adapter->has($userId))
+        if ($this->hasAccount($account) || $adapter->has($userId))
             throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST);
 
         $dbConnection = $this->dbAdapter->getDriver()->getConnection();
@@ -95,7 +95,7 @@ class UserIdentityService implements UserIdentityServiceInterface
 
             $identity = new IdentityRow($this->userIdentityTable);
             $identity->setAutoSequence(UserIdentityTable::AUTO_SEQUENCE);
-            $identity->setIdentity($account);
+            $identity->setAccount($account);
             $identity->setState(Identity::STATE_ACTIVE);
             $identity->save();
 

@@ -52,8 +52,8 @@ class IdentityRow implements RowGatewayInterface
     public function exchangeArray(array $data)
     {
         $this->setId($data[UserIdentityTable::ID_NAME]);
-        $this->setIdentity($data[UserIdentityTable::COLUMN_IDENTITY]);
-        $this->setSecret($data[UserIdentityTable::COLUMN_SECRET]);
+        $this->setAccount($data[UserIdentityTable::COLUMN_ACCOUNT]);
+        $this->setSecret($data[UserIdentityTable::COLUMN_PASSWORD]);
         $this->setState($data[UserIdentityTable::COLUMN_STATE]);
     }
 
@@ -89,24 +89,24 @@ class IdentityRow implements RowGatewayInterface
         $this->data[UserIdentityTable::ID_NAME] = $id;
     }
 
-    public function getIdentity()
+    public function getAccount()
     {
-        return $this->data[UserIdentityTable::COLUMN_IDENTITY];
+        return $this->data[UserIdentityTable::COLUMN_ACCOUNT];
     }
 
-    public function setIdentity($identity)
+    public function setAccount($account)
     {
-        $this->data[UserIdentityTable::COLUMN_IDENTITY] = $identity;
+        $this->data[UserIdentityTable::COLUMN_ACCOUNT] = $account;
     }
 
     public function setSecret($secret)
     {
-        return $this->data[UserIdentityTable::COLUMN_SECRET] = $secret;
+        return $this->data[UserIdentityTable::COLUMN_PASSWORD] = $secret;
     }
 
     public function getSecret()
     {
-        $this->data[UserIdentityTable::COLUMN_SECRET];
+        $this->data[UserIdentityTable::COLUMN_PASSWORD];
     }
 
     public function getState()
