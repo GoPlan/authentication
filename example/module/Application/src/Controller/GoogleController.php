@@ -11,6 +11,7 @@ namespace CreativeDelta\User\Application\Controller;
 
 use CreativeDelta\User\Google\GoogleAbstractController;
 use Zend\Http\Request;
+use Zend\Session\Container;
 
 class GoogleController extends GoogleAbstractController
 {
@@ -18,6 +19,23 @@ class GoogleController extends GoogleAbstractController
     const ROUTE_SIGN_IN_RETURN_NAME  = "application/sign-in/google/sign-in-return";
     const ROUTE_REGISTER_NAME        = "application/register/google/register";
     const ROUTE_REGISTER_RETURN_NAME = "application/register/google/register-return";
+
+    /**
+     * @var Container
+     */
+    protected $container;
+
+    /**
+     * @return Container
+     */
+    public function getContainer()
+    {
+        if (!$this->container) {
+            $this->container = new Container();
+        }
+
+        return $this->container;
+    }
 
     function getAuthenticationReturnPath()
     {
@@ -43,27 +61,27 @@ class GoogleController extends GoogleAbstractController
         return $return;
     }
 
-    function getReturnResponseForIdentityNotFound($returnUrl, $sessionHash)
+    function getReturnResponseForIdentityNotFound()
     {
-        $query = ['return' => $returnUrl, 'session' => $sessionHash];
+        $query = ['return' => $this->getContainer()['returnUrl']];
         return $this->redirect()->toRoute(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'register'], ['query' => $query]);
     }
 
-    function getReturnResponseForInvalidCredential($returnUrl, $sessionHash)
+    function getReturnResponseForInvalidCredential()
     {
-        $query = ['return' => $returnUrl, 'session' => $sessionHash];
+        $query = ['return' => $this->getContainer()['returnUrl']];
         return $this->redirect()->toRoute(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'sign-in'], ['query' => $query]);
     }
 
-    function getReturnResponseForNewUserCreated($returnUrl, $sessionHash)
+    function getReturnResponseForNewUserCreated()
     {
-        $query = ['return' => $returnUrl];
+        $query = ['return' => $this->getContainer()['returnUrl']];
         return $this->redirect()->toRoute(self::ROUTE_SIGN_IN_NAME, [], ['query' => $query]);
     }
 
-    function getReturnResponseForUserAlreadyExisted($returnUrl, $sessionHash)
+    function getReturnResponseForUserAlreadyExisted()
     {
-        $query = ['return' => $returnUrl];
+        $query = ['return' => $this->getContainer()['returnUrl']];
         return $this->redirect()->toRoute(self::ROUTE_SIGN_IN_NAME, [], ['query' => $query]);
     }
 

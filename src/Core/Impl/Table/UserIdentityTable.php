@@ -17,20 +17,29 @@ use Zend\Db\TableGateway\TableGateway;
 
 class UserIdentityTable
 {
-    const TABLE_NAME = "user_identity";
-    const ID_NAME    = "id";
-
-    const COLUMN_STATE         = "state";
-    const COLUMN_IDENTITY      = "identity";
-    const COLUMN_PRIMARY_TABLE = "primary_table";
-    const COLUMN_PRIMARY_ID    = "primary_id";
+    const AUTO_SEQUENCE   = "erp_identity.user_identity_id_seq";
+    const TABLE_NAME      = "user_identity";
+    const ID_NAME         = "id";
+    const COLUMN_STATE    = "state";
+    const COLUMN_IDENTITY = "identity";
+    const COLUMN_SECRET   = "secret";
 
     protected $tableGateway;
     protected $dbAdapter;
+    protected $schema;
+
+    /**
+     * @return TableGateway
+     */
+    public function getTableGateway()
+    {
+        return $this->tableGateway;
+    }
 
     function __construct(AdapterInterface $dbAdapter)
     {
         $this->dbAdapter    = $dbAdapter;
+        $this->schema       = $dbAdapter->getDriver()->getConnection()->getCurrentSchema();
         $this->tableGateway = new TableGateway(self::TABLE_NAME, $dbAdapter);
     }
 
@@ -61,5 +70,5 @@ class UserIdentityTable
     {
         return $this->tableGateway->select([self::COLUMN_IDENTITY => $identity])->count() > 0;
     }
-
 }
+

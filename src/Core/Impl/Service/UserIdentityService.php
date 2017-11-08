@@ -18,11 +18,11 @@ use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
 use CreativeDelta\User\Core\Domain\UserSessionServiceInterface;
 use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
+use CreativeDelta\User\Core\Impl\Row\IdentityRow;
 use CreativeDelta\User\Core\Impl\Table\UserIdentityTable;
 use CreativeDelta\User\Core\Impl\Table\UserSessionLogTable;
 use Zend\Crypt\Password\Bcrypt;
-use Zend\Db\Adapter\AdapterInterface;
-use Zend\Db\RowGateway\RowGateway;
+use Zend\Db\Adapter\Adapter;
 use Zend\Hydrator\ClassMethods;
 
 class UserIdentityService implements UserIdentityServiceInterface, UserSessionServiceInterface
@@ -35,7 +35,7 @@ class UserIdentityService implements UserIdentityServiceInterface, UserSessionSe
     protected $userSignInLogTable;
     protected $userSessionService;
 
-    function __construct(AdapterInterface $dbAdapter)
+    function __construct(Adapter $dbAdapter)
     {
         $this->dbAdapter          = $dbAdapter;
         $this->bcrypt             = new Bcrypt();
@@ -103,36 +103,36 @@ class UserIdentityService implements UserIdentityServiceInterface, UserSessionSe
 
     /**
      * @param UserRegisterMethodAdapter $adapter
-     * @param string                    $identity
+     * @param string                    $account
      * @param int                       $userId
      * @param null                      $data
      * @return mixed
      * @throws UserIdentityException
      */
-    public function register(UserRegisterMethodAdapter $adapter, $identity, $userId, $data = null)
+    public function register(UserRegisterMethodAdapter $adapter, $account, $userId, $data = null)
     {
-        if ($this->hasIdentity($identity) || $adapter->has($userId)) {
+        if ($this->hasIdentity($account) || $adapter->has($userId))
             throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST);
-        }
+
+        $dbConnection = $this->dbAdapter->getDriver()->getConnection();
+        $dbConnection->beginTransaction();
 
         try {
 
-            $identityObj = new RowGateway(UserIdentityTable::ID_NAME, UserIdentityTable::TABLE_NAME, $this->dbAdapter);
+            $identity = new IdentityRow($this->userIdentityTable);
+            $identity->setAutoSequence(UserIdentityTable::AUTO_SEQUENCE);
+            $identity->setIdentity($account);
+            $identity->setState(Identity::STATE_ACTIVE);
+            $identity->save();
 
-            $identityObj[UserIdentityTable::COLUMN_IDENTITY] = $identity;
-            $identityObj->save();
+            $adapter->register($identity->getId(), $userId, $data);
+            $dbConnection->commit();
 
-            $identityId  = $identityObj[UserIdentityTable::ID_NAME];
-            $methodRowId = $adapter->register($identityId, $userId, $data);
-
-            $identityObj[UserIdentityTable::COLUMN_STATE]         = Identity::STATE_ACTIVE;
-            $identityObj[UserIdentityTable::COLUMN_PRIMARY_TABLE] = $adapter->getTableName();
-            $identityObj[UserIdentityTable::COLUMN_PRIMARY_ID]    = $methodRowId;
-            $identityObj->save();
-
-            return $identityObj[UserIdentityTable::ID_NAME];
+            return $identity->getId();
 
         } catch (\Exception $exception) {
+
+            $dbConnection->rollback();
             throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_DATABASE_OPERATION_FAILED, $exception);
         }
     }

@@ -14,6 +14,7 @@ namespace CreativeDelta\User\Core\Domain;
 
 use CreativeDelta\User\Core\Domain\Entity\Identity;
 use Zend\Authentication\Result;
+use Zend\Db\Adapter\Adapter;
 use Zend\Db\Adapter\AdapterInterface;
 
 abstract class AbstractAuthenticationAdapter implements \Zend\Authentication\Adapter\AdapterInterface
@@ -36,7 +37,7 @@ abstract class AbstractAuthenticationAdapter implements \Zend\Authentication\Ada
     protected $identity;
 
     /**
-     * @var  AdapterInterface
+     * @var  Adapter
      */
     protected $dbAdapter;
 
@@ -46,7 +47,7 @@ abstract class AbstractAuthenticationAdapter implements \Zend\Authentication\Ada
      * @param AdapterInterface $dbAdapter
      * @param Identity|null    $identity
      */
-    public function __construct(array $config, AdapterInterface $dbAdapter, Identity $identity = null)
+    public function __construct(array $config, $dbAdapter, Identity $identity = null)
     {
         $this->config    = $config;
         $this->dbAdapter = $dbAdapter;
@@ -56,7 +57,7 @@ abstract class AbstractAuthenticationAdapter implements \Zend\Authentication\Ada
             $this->identity->setAdapterClassName(static::class);
     }
 
-    static function newFromConfig(array $config, AdapterInterface $dbAdapter, Identity $identity = null)
+    static function newFromConfig(array $config, $dbAdapter, Identity $identity = null)
     {
         $methodConfig   = $config[self::METHOD_NAME];
         $methodInstance = new static($methodConfig, $dbAdapter, $identity);

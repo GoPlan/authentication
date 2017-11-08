@@ -16,24 +16,27 @@ use CreativeDelta\User\Core\Domain\AbstractOAuthAuthenticationAdapter;
 use CreativeDelta\User\Core\Domain\Entity\Identity;
 use Google_Client;
 use Google_Service_Oauth2;
-use Zend\Db\Adapter\AdapterInterface;
 
 class GoogleAuthenticationAdapter extends AbstractOAuthAuthenticationAdapter
 {
     const METHOD_NAME = "google";
 
-    /** @var Google_Client $oauthClient */
+    /**
+     * @var Google_Client
+     */
     protected $oauthClient;
 
-    /** @var  GoogleTable $localTable */
-    protected $localTable;
+    /**
+     * @var  GoogleTable
+     */
+    protected $googleTable;
 
 
-    public function __construct(array $config, AdapterInterface $dbAdapter, Identity $identity = null)
+    public function __construct(array $config, $dbAdapter, Identity $identity = null)
     {
         parent::__construct($config, $dbAdapter, $identity);
 
-        $this->localTable = new GoogleTable($this->dbAdapter);
+        $this->googleTable = new GoogleTable($this->dbAdapter);
 
         $this->oauthClient = new Google_Client();
         $this->oauthClient->setClientId($this->config[GoogleMethod::METHOD_CONFIG_APP_ID]);
@@ -57,7 +60,7 @@ class GoogleAuthenticationAdapter extends AbstractOAuthAuthenticationAdapter
         $token = $this->oauthClient->getAccessToken();
 
         $profileData     = $this->identity->getProfile();
-        $profileInstance = GoogleProfile::newFromArray($this->dbAdapter, $profileData, true);
+        $profileInstance = GoogleProfile::newFromArray($this->googleTable, $profileData, true);
         $profileInstance->setAccessToken($token[GoogleMethod::TOKEN_ACCESS_TOKEN]);
         $profileInstance->save();
     }
@@ -96,7 +99,7 @@ class GoogleAuthenticationAdapter extends AbstractOAuthAuthenticationAdapter
 
     private function _loadLocalProfile()
     {
-        $result = $this->localTable->getByIdentityId($this->identity->getId());
+        $result = $this->googleTable->getByIdentityId($this->identity->getId());
         $this->identity->setProfile($result->getArrayCopy());
     }
 }
