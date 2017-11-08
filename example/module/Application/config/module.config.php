@@ -7,17 +7,16 @@
 
 namespace CreativeDelta\User\Application;
 
-use CreativeDelta\User\Application\Controller\AccountController;
 use CreativeDelta\User\Application\Controller\FacebookController;
 use CreativeDelta\User\Application\Controller\Factory\AccountControllerFacetory;
-use CreativeDelta\User\Application\Controller\Factory\AccountServiceInterfaceFactory;
 use CreativeDelta\User\Application\Controller\Factory\FacebookControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\GoogleControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\IndexControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\UserControllerFactory;
+use CreativeDelta\User\Application\Controller\Factory\UserIdentityServiceInterfaceFactory;
 use CreativeDelta\User\Application\Controller\GoogleController;
 use CreativeDelta\User\Application\Controller\UserController;
-use CreativeDelta\User\Core\Domain\AccountServiceInterface;
+use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 
@@ -224,7 +223,7 @@ return [
     ],
     'service_manager' => [
         'factories' => [
-            AccountServiceInterface::class => AccountServiceInterfaceFactory::class,
+            UserIdentityServiceInterface::class => UserIdentityServiceInterfaceFactory::class,
         ],
     ],
     'view_manager' => [

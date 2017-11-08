@@ -22,8 +22,6 @@ class AccountTable implements AccountTableGatewayInterface
     const COLUMN_USER_NAME = 'identity';
     const COLUMN_USER_PASSWORD = 'password';
     const COLUMN_STATE = 'state';
-    const COLUMN_PRIMARY_ID = 'primaryId';
-    const COLUMN_PRIMARY_TABLE = 'primaryTable';
 
     public function __construct($dbAdapter)
     {
@@ -53,7 +51,7 @@ class AccountTable implements AccountTableGatewayInterface
     {
         $data = $account->getArrayCopy();
 
-        $id = $account->id;
+        $id = $account->getId();
         if ($id == 0) {
             unset($data[self::ID_NAME]);
             $this->accountTableGateway->insert($data);

@@ -9,10 +9,8 @@
 namespace CreativeDelta\User\Account;
 
 
-use CreativeDelta\User\Core\Domain\AccountServiceInterface;
-use CreativeDelta\User\Core\Impl\Service\AccountService;
+use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Db\Adapter\AdapterInterface;
 use CreativeDelta\User\Core\Impl\Service\AuthenticationService;
 
 abstract class AbstractAccountController extends AbstractActionController
@@ -21,16 +19,18 @@ abstract class AbstractAccountController extends AbstractActionController
      * @var AuthenticationService;
      */
     protected $authService;
-    /** @var AccountServiceInterface $AccountService */
+    /** @var UserIdentityServiceInterface $AccountService */
     protected $AccountService;
 
     /**
      * IndexController constructor.
      * @param AuthenticationService $authService
      */
-    public function __construct(AuthenticationService $authService = null,AccountServiceInterface $accountService = null)
+    public function __construct(AuthenticationService $authService = null,UserIdentityServiceInterface $accountService = null)
     {
         $this->authService = $authService;
         $this->AccountService = $accountService;
     }
+
+
 }

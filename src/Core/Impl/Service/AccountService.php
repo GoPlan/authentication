@@ -30,6 +30,7 @@ class AccountService implements UserIdentityServiceInterface
 //        $testAccount->state = 1;
 //        $jsonData = Json::encode($testAccount);
 //        $this->registerAccount($jsonData);
+        $result = $this->getIdentityById(1);
 
     }
 
@@ -43,7 +44,7 @@ class AccountService implements UserIdentityServiceInterface
             throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST);
         }
 
-        
+        return $adapter->register($identity, $userId, $data);
     }
 
     public function createSessionLog($previousHash = null, $returnUrl = null, $data = null)

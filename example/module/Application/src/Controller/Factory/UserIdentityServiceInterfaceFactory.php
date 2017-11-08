@@ -14,7 +14,7 @@ use Zend\Db\Adapter\Adapter;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use CreativeDelta\User\Core\Impl\Service\AccountService;
 
-class AccountServiceInterfaceFactory implements FactoryInterface
+class UserIdentityServiceInterfaceFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {

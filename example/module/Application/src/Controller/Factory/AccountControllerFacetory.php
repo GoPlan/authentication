@@ -10,11 +10,10 @@ namespace CreativeDelta\User\Application\Controller\Factory;
 
 
 use CreativeDelta\User\Application\Controller\AccountController;
-use CreativeDelta\User\Core\Domain\AccountServiceInterface;
+use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\Authentication\AuthenticationService;
-use Zend\Db\Adapter\Adapter;
 
 class AccountControllerFacetory implements FactoryInterface
 {
@@ -22,7 +21,7 @@ class AccountControllerFacetory implements FactoryInterface
     {
         // TODO: Implement __invoke() method.
         $authService = $container->get(AuthenticationService::class);
-        $AccountServiceInterface = $container->get(AccountServiceInterface::class);
+        $AccountServiceInterface = $container->get(UserIdentityServiceInterface::class);
         $controller  = new AccountController($authService,$AccountServiceInterface);
         return $controller;
 

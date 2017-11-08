@@ -9,42 +9,94 @@
 namespace CreativeDelta\User\Account;
 
 
+use Zend\Hydrator\ClassMethods;
+
 class Account
 {
-    public $id;
-    public $identity;
-    public $state;
-    public $primaryTable;
-    public $primaryId;
-    public $password;
+    protected $id;
+    protected $identity;
+    protected $state;
+    protected $password;
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIdentity()
+    {
+        return $this->identity;
+    }
+
+    /**
+     * @param mixed $identity
+     */
+    public function setIdentity($identity)
+    {
+        $this->identity = $identity;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param mixed $state
+     */
+    public function setState($state)
+    {
+        $this->state = $state;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param mixed $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
 
     const TABLE_NAME = 'UserIdentity';
     const ID_NAME = 'id';
     const COLUMN_USER_NAME = 'identity';
     const COLUMN_USER_PASSWORD = 'password';
     const COLUMN_STATE = 'state';
-    const COLUMN_PRIMARY_ID = 'primaryId';
-    const COLUMN_PRIMARY_TABLE = 'primaryTable';
 
     public function exchangeArray($data)
     {
-        $this->id = (!empty($data['id'])) ? $data['id'] : null;
-        $this->identity = (!empty($data['identity'])) ? $data['identity'] : null;
-        $this->state = (!empty($data[state])) ? $data['state'] : null;
-        $this->primaryTable = (!empty($data['primaryTable'])) ? $data['primaryTable'] : null;
-        $this->primaryId = (!empty($data['primaryId'])) ? $data['primaryId'] : null;
-        $this->password = (!empty($data['password'])) ? $data['password'] : null;
+        $hydrator = new ClassMethods(false);
+        $hydrator->hydrate($data,$this);
     }
 
     public function getArrayCopy()
     {
-        return [
-            self::ID_NAME => $this->id,
-            self::COLUMN_USER_NAME => $this->identity,
-            self::COLUMN_STATE => $this->state,
-            self::COLUMN_PRIMARY_TABLE => $this->primaryTable,
-            self::COLUMN_PRIMARY_ID => $this->primaryId,
-            self::COLUMN_USER_PASSWORD => $this->password
-        ];
+        $hydrator = new ClassMethods(false);
+        return $hydrator->extract($this);
     }
 }
