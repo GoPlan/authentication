@@ -77,9 +77,9 @@ class UserIdentityService implements UserIdentityServiceInterface
     /**
      * @param UserRegisterMethodAdapter $adapter
      * @param string                    $account
-     * @param null                      $password
-     * @param int                       $userId
-     * @param null                      $data
+     * @param string|null               $password
+     * @param string|null               $userId
+     * @param string|null               $data
      * @return int Newly created IdentityId
      * @throws UserIdentityException
      */
