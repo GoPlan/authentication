@@ -64,7 +64,6 @@ abstract class GoogleAbstractController extends AbstractActionController
      * @param AuthenticationService        $authenticationService
      * @param GoogleMethod                 $googleMethod
      * @param UserIdentityServiceInterface $userIdentityService
-     * @internal param array $googleConfig
      */
     public function __construct(
         Adapter $dbAdapter,

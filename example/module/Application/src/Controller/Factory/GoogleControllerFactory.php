@@ -10,8 +10,8 @@ namespace CreativeDelta\User\Application\Controller\Factory;
 
 
 use CreativeDelta\User\Application\Controller\GoogleController;
+use CreativeDelta\User\Core\Impl\Service\AuthenticationService;
 use Interop\Container\ContainerInterface;
-use Zend\Authentication\AuthenticationService;
 use Zend\Db\Adapter\Adapter;
 use Zend\ServiceManager\Factory\FactoryInterface;
 

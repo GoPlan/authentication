@@ -13,6 +13,7 @@ namespace CreativeDelta\User\Core\Domain\Entity;
 
 
 use Zend\Authentication\Result;
+use Zend\Hydrator\ClassMethods;
 
 class Identity
 {
@@ -119,5 +120,10 @@ class Identity
     public function setAdapterClassName($adapterClassName)
     {
         $this->adapterClassName = $adapterClassName;
+    }
+
+    public function getArrayCopy()
+    {
+        return (new ClassMethods(false))->extract($this);
     }
 }

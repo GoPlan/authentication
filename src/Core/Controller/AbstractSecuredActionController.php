@@ -19,8 +19,12 @@ use Zend\Mvc\MvcEvent;
 
 abstract class AbstractSecuredActionController extends AbstractActionController
 {
-    /** @var  AuthenticationServiceInterface $authenticationService */
+    /**
+     * @var  AuthenticationServiceInterface
+     */
     protected $authenticationService;
+
+    protected $sessionManager;
 
     /**
      * @return AuthenticationServiceInterface
