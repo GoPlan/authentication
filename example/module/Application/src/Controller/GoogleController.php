@@ -11,7 +11,6 @@ namespace CreativeDelta\User\Application\Controller;
 
 use CreativeDelta\User\Google\GoogleAbstractController;
 use Zend\Http\Request;
-use Zend\Session\Container;
 
 class GoogleController extends GoogleAbstractController
 {
@@ -19,23 +18,6 @@ class GoogleController extends GoogleAbstractController
     const ROUTE_SIGN_IN_RETURN_NAME  = "application/sign-in/google/sign-in-return";
     const ROUTE_REGISTER_NAME        = "application/register/google/register";
     const ROUTE_REGISTER_RETURN_NAME = "application/register/google/register-return";
-
-    /**
-     * @var Container
-     */
-    protected $container;
-
-    /**
-     * @return Container
-     */
-    public function getContainer()
-    {
-        if (!$this->container) {
-            $this->container = new Container();
-        }
-
-        return $this->container;
-    }
 
     function getAuthenticationReturnPath()
     {
@@ -63,31 +45,31 @@ class GoogleController extends GoogleAbstractController
 
     function getReturnResponseForIdentityNotFound()
     {
-        $query = ['return' => $this->getContainer()['returnUrl']];
+        $query = ['return' => $this->getContainer()[self::RETURN_URL]];
         return $this->redirect()->toRoute(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'register'], ['query' => $query]);
     }
 
     function getReturnResponseForInvalidCredential()
     {
-        $query = ['return' => $this->getContainer()['returnUrl']];
+        $query = ['return' => $this->getContainer()[self::RETURN_URL]];
         return $this->redirect()->toRoute(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'sign-in'], ['query' => $query]);
     }
 
     function getReturnResponseForOtherIssues()
     {
-        $query = ['return' => $this->getContainer()['returnUrl']];
+        $query = ['return' => $this->getContainer()[self::RETURN_URL]];
         return $this->redirect()->toRoute(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'sign-in'], ['query' => $query]);
     }
 
     function getReturnResponseForNewUserCreated()
     {
-        $query = ['return' => $this->getContainer()['returnUrl']];
+        $query = ['return' => $this->getContainer()[self::RETURN_URL]];
         return $this->redirect()->toRoute(self::ROUTE_SIGN_IN_NAME, [], ['query' => $query]);
     }
 
     function getReturnResponseForUserAlreadyExisted()
     {
-        $query = ['return' => $this->getContainer()['returnUrl']];
+        $query = ['return' => $this->getContainer()[self::RETURN_URL]];
         return $this->redirect()->toRoute(self::ROUTE_SIGN_IN_NAME, [], ['query' => $query]);
     }
 
@@ -96,7 +78,7 @@ class GoogleController extends GoogleAbstractController
         // If you need to store newly created profile, use this method to create the profile on your local database.
     }
 
-    function newIdentity($googleId, $googleData)
+    function newAccountName($googleId, $googleData)
     {
         return "Google+{$googleId}";
     }

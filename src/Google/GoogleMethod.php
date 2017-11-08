@@ -122,8 +122,8 @@ class GoogleMethod implements OAuthAuthenticationInterface, UserRegisterMethodAd
     public function getLocalProfile()
     {
         $oauthData = $this->getOAuthProfile();
-        $result    = $this->googleTable->getByUserId($oauthData[self::PROFILE_FIELD_ID]);
-        $profile   = $result ? GoogleProfile::newFromArray($this->googleTable, $result->getArrayCopy(), true) : null;
+        $localData = $this->googleTable->getByUserId($oauthData[self::PROFILE_FIELD_ID]);
+        $profile   = $localData ? GoogleProfile::newFromArray($this->googleTable, $localData->getArrayCopy(), true) : null;
         return $profile;
     }
 

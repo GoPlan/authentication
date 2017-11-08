@@ -36,13 +36,13 @@ class Identity
     ];
 
     protected $id;
-    protected $identity;
+    protected $account;
     protected $state;
     protected $profile;
     protected $adapterClassName;
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
@@ -50,7 +50,7 @@ class Identity
     }
 
     /**
-     * @param mixed $id
+     * @param int $id
      */
     public function setId($id)
     {
@@ -58,23 +58,23 @@ class Identity
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getIdentity()
+    public function getAccount()
     {
-        return $this->identity;
+        return $this->account;
     }
 
     /**
-     * @param mixed $identity
+     * @param string $account
      */
-    public function setIdentity($identity)
+    public function setAccount($account)
     {
-        $this->identity = $identity;
+        $this->account = $account;
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getState()
     {
@@ -82,7 +82,7 @@ class Identity
     }
 
     /**
-     * @param mixed $state
+     * @param int $state
      */
     public function setState($state)
     {

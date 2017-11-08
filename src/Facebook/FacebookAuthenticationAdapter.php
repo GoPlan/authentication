@@ -90,12 +90,11 @@ class FacebookAuthenticationAdapter extends AbstractOAuthAuthenticationAdapter
 
     function pokeIdentity()
     {
-        /** @var FacebookProfile $profile */
-        $profileData = $this->identity->getProfile();
+        $data = $this->identity->getProfile();
 
-        $profileInstance = FacebookProfile::newFromArray($this->dbAdapter, $profileData, true);
-        $profileInstance->setAccessToken($this->facebookClient->getAccessToken());
-        $profileInstance->save();
+        $profile = FacebookProfile::newFromArray($this->facebookTable, $data, true);
+        $profile->setAccessToken($this->getAccessToken());
+        $profile->save();
     }
 
     private function loadLocalProfile()
