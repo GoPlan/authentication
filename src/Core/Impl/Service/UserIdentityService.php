@@ -13,55 +13,28 @@ namespace CreativeDelta\User\Core\Impl\Service;
 
 
 use CreativeDelta\User\Core\Domain\Entity\Identity;
-use CreativeDelta\User\Core\Domain\Entity\SessionLog;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
-use CreativeDelta\User\Core\Domain\UserSessionServiceInterface;
 use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
 use CreativeDelta\User\Core\Impl\Row\IdentityRow;
 use CreativeDelta\User\Core\Impl\Table\UserIdentityTable;
-use CreativeDelta\User\Core\Impl\Table\UserSessionLogTable;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\Adapter;
 use Zend\Hydrator\ClassMethods;
 
-class UserIdentityService implements UserIdentityServiceInterface, UserSessionServiceInterface
+class UserIdentityService implements UserIdentityServiceInterface
 {
-    const AUTHENTICATION_SERVICE_NAME = 'Zend\Authentication\AuthenticationService';
+    const AUTHENTICATION_SERVICE_NAME = \Zend\Authentication\AuthenticationService::class;
 
     protected $bcrypt;
     protected $dbAdapter;
     protected $userIdentityTable;
-    protected $userSignInLogTable;
-    protected $userSessionService;
 
     function __construct(Adapter $dbAdapter)
     {
-        $this->dbAdapter          = $dbAdapter;
-        $this->bcrypt             = new Bcrypt();
-        $this->userIdentityTable  = new UserIdentityTable($dbAdapter);
-        $this->userSignInLogTable = new UserSessionLogTable($dbAdapter);
-        $this->userSessionService = new UserSessionService($this->dbAdapter);
-    }
-
-    /**
-     * @param $previousHash
-     * @param $returnUrl
-     * @param $data
-     * @return string
-     */
-    public function createSessionLog($previousHash = null, $returnUrl = null, $data = null)
-    {
-        return $this->userSessionService->createSessionLog($previousHash, $returnUrl, $data);
-    }
-
-    /**
-     * @param $hash
-     * @return SessionLog|null
-     */
-    public function getSessionLog($hash)
-    {
-        return $this->userSessionService->getSessionLog($hash);
+        $this->dbAdapter         = $dbAdapter;
+        $this->bcrypt            = new Bcrypt();
+        $this->userIdentityTable = new UserIdentityTable($dbAdapter);
     }
 
     /**
@@ -104,12 +77,13 @@ class UserIdentityService implements UserIdentityServiceInterface, UserSessionSe
     /**
      * @param UserRegisterMethodAdapter $adapter
      * @param string                    $account
+     * @param null                      $password
      * @param int                       $userId
      * @param null                      $data
      * @return mixed
      * @throws UserIdentityException
      */
-    public function register(UserRegisterMethodAdapter $adapter, $account, $userId, $data = null)
+    public function register(UserRegisterMethodAdapter $adapter, $account, $password = null, $userId = null, $data = null)
     {
         if ($this->hasIdentity($account) || $adapter->has($userId))
             throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST);

@@ -10,6 +10,7 @@ namespace CreativeDelta\User\Application\Controller;
 
 
 use CreativeDelta\User\Core\Controller\AbstractSecuredActionController;
+use Zend\Authentication\AuthenticationService;
 use Zend\Http\Request;
 use Zend\Mvc\MvcEvent;
 
@@ -23,6 +24,15 @@ use Zend\Mvc\MvcEvent;
 class UserController extends AbstractSecuredActionController
 {
     const ROUTE_NAME = "user";
+
+    /**
+     * UserController constructor.
+     * @param AuthenticationService $authenticationService
+     */
+    public function __construct($authenticationService)
+    {
+        $this->authenticationService = $authenticationService;
+    }
 
     function noIdentityDispatch(MvcEvent $e)
     {

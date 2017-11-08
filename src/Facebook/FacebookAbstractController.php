@@ -17,13 +17,16 @@ use CreativeDelta\User\Core\Impl\Service\UserIdentityService;
 use CreativeDelta\User\Core\Impl\Service\UserSessionService;
 use Exception;
 use Zend\Authentication\Result;
-use Zend\Db\Adapter\AdapterInterface;
+use Zend\Db\Adapter\Adapter;
 use Zend\Http\Request;
 use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Session\Container;
 
 abstract class FacebookAbstractController extends AbstractActionController
 {
+    const RETURN_URL = 'returnUrl';
+
     /**
      * @var array
      */
@@ -45,12 +48,27 @@ abstract class FacebookAbstractController extends AbstractActionController
     protected $authenticationService;
 
     /**
-     * @var AdapterInterface;
+     * @var Adapter
      */
     protected $dbAdapter;
 
+    /**
+     * @var Container
+     */
+    protected $container;
 
-    public function __construct(AdapterInterface $dbAdapter, AuthenticationService $authenticationService, FacebookMethod $facebookMethod = null, UserIdentityServiceInterface $userIdentityService = null)
+
+    /**
+     * FacebookAbstractController constructor.
+     * @param Adapter                           $dbAdapter
+     * @param AuthenticationService             $authenticationService
+     * @param FacebookMethod|null               $facebookMethod
+     * @param UserIdentityServiceInterface|null $userIdentityService
+     */
+    public function __construct($dbAdapter,
+        $authenticationService,
+        $facebookMethod = null,
+        $userIdentityService = null)
     {
         $this->dbAdapter             = $dbAdapter;
         $this->authenticationService = $authenticationService;
@@ -88,6 +106,17 @@ abstract class FacebookAbstractController extends AbstractActionController
         return $this->userIdentityService;
     }
 
+    /**
+     * @return Container
+     */
+    public function getContainer()
+    {
+        if (!$this->container) {
+            $this->container = new Container(self::class);
+        }
+
+        return $this->container;
+    }
 
     /**
      * Because you will have a different route configuration for the authentication pages.
@@ -106,32 +135,29 @@ abstract class FacebookAbstractController extends AbstractActionController
     abstract function getRegisterReturnPath();
 
     /**
-     * @param string $returnUrl
-     * @param string $sessionHash
      * @return Response
      */
-    abstract function getReturnResponseForIdentityNotFound($returnUrl, $sessionHash);
+    abstract function getReturnResponseForIdentityNotFound();
 
     /**
-     * @param string $returnUrl
-     * @param string $sessionHash
      * @return Response
      */
-    abstract function getReturnResponseForInvalidCredential($returnUrl, $sessionHash);
+    abstract function getReturnResponseForInvalidCredential();
 
     /**
-     * @param string $returnUrl
-     * @param string $sessionHash
      * @return Response
      */
-    abstract function getReturnResponseForNewUserCreated($returnUrl, $sessionHash);
+    abstract function getReturnResponseForOtherIssues();
 
     /**
-     * @param string $returnUrl
-     * @param string $sessionHash
      * @return Response
      */
-    abstract function getReturnResponseForUserAlreadyExisted($returnUrl, $sessionHash);
+    abstract function getReturnResponseForNewUserCreated();
+
+    /**
+     * @return Response
+     */
+    abstract function getReturnResponseForUserAlreadyExisted();
 
     /**
      * @param int   $identity
@@ -177,15 +203,15 @@ abstract class FacebookAbstractController extends AbstractActionController
     public function registerAction()
     {
         /** @var Request $request */
-        $request     = $this->getRequest();
-        $returnUrl   = $request->getQuery(UserSessionService::QUERY_RETURN_URL_NAME);
-        $sessionHash = $request->getQuery(UserSessionService::QUERY_SESSION_NAME);
+        $request   = $this->getRequest();
+        $returnUrl = $request->getQuery(UserSessionService::QUERY_RETURN_URL_NAME);
 
         if (!$returnUrl)
             throw AuthenticationException::ReturnUrlIsNotProvided();
 
-        $newSession = $this->getUserIdentityService()->createSessionLog($sessionHash, $returnUrl);
-        $oauthUrl   = $this->getFacebookMethod()->makeAuthenticationUrl($this->getRegisterReturnUrl(), $newSession);
+        $this->getContainer()[self::RETURN_URL] = $returnUrl;
+
+        $oauthUrl = $this->getFacebookMethod()->makeAuthenticationUrl($this->getRegisterReturnUrl(), null);
 
         return $this->redirect()->toUrl($oauthUrl);
     }
@@ -193,11 +219,9 @@ abstract class FacebookAbstractController extends AbstractActionController
     public function registerReturnAction()
     {
         /** @var Request $req */
-        $req     = $this->getRequest();
-        $data    = $req->getQuery()->toArray();
-        $code    = $data[FacebookMethod::RESULT_QUERY_CODE];
-        $state   = $data[FacebookMethod::RESULT_QUERY_STATE];
-        $session = $this->getUserIdentityService()->getSessionLog($state);
+        $req  = $this->getRequest();
+        $data = $req->getQuery()->toArray();
+        $code = $data[FacebookMethod::RESULT_QUERY_CODE];
 
         try {
 
@@ -207,17 +231,17 @@ abstract class FacebookAbstractController extends AbstractActionController
             $facebookData  = $this->getFacebookMethod()->getOAuthProfile();
             $facebookId    = $facebookData[FacebookMethod::PROFILE_FIELD_ID];
             $newIdentity   = $this->newIdentity($facebookId, $facebookData);
-            $newIdentityId = $this->getUserIdentityService()->register($this->getFacebookMethod(), $newIdentity, $facebookId, $facebookData);
+            $newIdentityId = $this->getUserIdentityService()->register($this->getFacebookMethod(), $newIdentity, null, $facebookId, $facebookData);
 
             // Create a user record from facebook data
             $this->createUserInLocalDatabase($newIdentityId, $facebookData);
 
-            return $this->getReturnResponseForNewUserCreated($session->getReturnUrl(), $session->getPreviousHash());
+            return $this->getReturnResponseForNewUserCreated();
 
         } catch (UserIdentityException $exception) {
             switch ($exception->getCode()) {
                 case UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST:
-                    return $this->getReturnResponseForUserAlreadyExisted($session->getReturnUrl(), $session->getPreviousHash());
+                    return $this->getReturnResponseForUserAlreadyExisted();
                 default:
                     throw $exception;
             }
@@ -229,15 +253,15 @@ abstract class FacebookAbstractController extends AbstractActionController
     public function signInAction()
     {
         /** @var Request $request */
-        $request     = $this->getRequest();
-        $returnUrl   = $request->getQuery(UserSessionService::QUERY_RETURN_URL_NAME);
-        $sessionHash = $request->getQuery(UserSessionService::QUERY_SESSION_NAME);
+        $request   = $this->getRequest();
+        $returnUrl = $request->getQuery(UserSessionService::QUERY_RETURN_URL_NAME);
 
         if (!$returnUrl)
             throw AuthenticationException::ReturnUrlIsNotProvided();
 
-        $newSession      = $this->getUserIdentityService()->createSessionLog($sessionHash, $returnUrl);
-        $facebookAuthUrl = $this->getFacebookMethod()->makeAuthenticationUrl($this->getAuthenticationReturnUrl(), $newSession);
+        $this->getContainer()[self::RETURN_URL] = $returnUrl;
+
+        $facebookAuthUrl = $this->getFacebookMethod()->makeAuthenticationUrl($this->getAuthenticationReturnUrl(), null);
 
         return $this->redirect()->toUrl($facebookAuthUrl);
     }
@@ -248,37 +272,37 @@ abstract class FacebookAbstractController extends AbstractActionController
         $req  = $this->getRequest();
         $data = $req->getQuery();
         $code = $data[FacebookMethod::RESULT_QUERY_CODE];
-        $hash = $data[FacebookMethod::RESULT_QUERY_STATE];
 
         try {
 
-            $prevSession     = $hash ? $this->getUserIdentityService()->getSessionLog($hash) : null;
-            $prevReturnUrl   = $prevSession->getReturnUrl();
-            $prevSessionHash = $prevSession->getPreviousHash();
-
-            $localProfile = $this->getFacebookMethod()->initAccessToken($this->getAuthenticationReturnUrl(), $code)->getLocalProfile();
-            $identity     = $localProfile ? $this->getUserIdentityService()->getIdentityById($localProfile->getIdentityId()) : null;
+            $returnUrl = $this->getContainer()[self::RETURN_URL];
+            $profile   = $this->getFacebookMethod()->initAccessToken($this->getAuthenticationReturnUrl(), $code)->getLocalProfile();
+            $identity  = $profile ? $this->getUserIdentityService()->getIdentityById($profile->getIdentityId()) : null;
 
             if ($this->authenticationService instanceof AuthenticationService) {
+
                 $adapter = new FacebookAuthenticationAdapter($this->facebookConfig, $this->dbAdapter, $identity);
                 $adapter->setAccessToken($this->getFacebookMethod()->getAccessToken());
                 $result = $this->authenticationService->authenticate($adapter);
+
             } else {
+
                 throw new AuthenticationException(AuthenticationException::ERROR_CODE_AUTHENTICATION_SERVICE_NOT_SUPPORTED);
             }
 
             if ($result->isValid()) {
-                $returnQuery = [UserSessionService::QUERY_SESSION_NAME => $prevSessionHash];
-                $returnUrl   = isset($returnQuery[UserSessionService::QUERY_SESSION_NAME]) ? urldecode($prevReturnUrl) . '?' . http_build_query($returnQuery) : urldecode($prevReturnUrl);
+
+                $returnUrl = urldecode($returnUrl);
                 return $this->redirect()->toUrl($returnUrl);
+
             } else {
                 switch ($result->getCode()) {
                     case Result::FAILURE_IDENTITY_NOT_FOUND:
-                        return $this->getReturnResponseForIdentityNotFound($prevSession->getReturnUrl(), $prevSession->getPreviousHash());
+                        return $this->getReturnResponseForIdentityNotFound();
                     case Result::FAILURE_CREDENTIAL_INVALID:
-                        throw new UserIdentityException(UserIdentityException::CODE_ERROR_AUTHENTICATION_USER_NOT_ACTIVE);
+                        return $this->getReturnResponseForInvalidCredential();
                     default:
-                        return $this->getReturnResponseForInvalidCredential($prevSession->getReturnUrl(), $prevSession->getPreviousHash());
+                        return $this->getReturnResponseForOtherIssues();
                 }
             }
 

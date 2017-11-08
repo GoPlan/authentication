@@ -123,9 +123,7 @@ class IdentityRow implements RowGatewayInterface
     {
         if ($this->rowExistInDatabase) {
 
-            $this->identityTable->getTableGateway()->update($this->data, [
-                UserIdentityTable::ID_NAME => $this->getId()
-            ]);
+            $this->identityTable->getTableGateway()->update($this->data, [UserIdentityTable::ID_NAME => $this->getId()]);
 
         } else {
 
@@ -135,6 +133,8 @@ class IdentityRow implements RowGatewayInterface
 
                 $driver = $this->identityTable->getTableGateway()->getAdapter()->getDriver();
                 $newId  = $driver instanceof Pdo ? $driver->getLastGeneratedValue($this->getAutoSequence()) : $driver->getLastGeneratedValue();
+
+                $this->rowExistInDatabase = true;
                 $this->setId($newId);
             }
         }

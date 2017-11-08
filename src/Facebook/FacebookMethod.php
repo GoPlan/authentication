@@ -15,7 +15,6 @@ namespace CreativeDelta\User\Facebook;
 use CreativeDelta\User\Core\Domain\OAuthAuthenticationInterface;
 use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
 use Zend\Db\Adapter\AdapterInterface;
-use Zend\Db\RowGateway\RowGateway;
 
 class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationInterface
 {
@@ -71,7 +70,7 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
      * You should have a controller::action catch this redirection. Then in this action, further activities can be arranged using returned the "code" and "state".
      *
      * @param null $redirectUri
-     * @param $state
+     * @param      $state
      * @return string
      */
     public function makeAuthenticationUrl($redirectUri, $state = null)
@@ -120,15 +119,10 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
      */
     public function getLocalProfile()
     {
-        $oauthProfile     = $this->getOAuthProfile();
-        $localProfileData = $this->facebookTable->getByUserId($oauthProfile[self::FACEBOOK_PROFILE_ID_NAME]);
-
-        if ($localProfileData) {
-            $localProfileEntity = FacebookProfile::newFromArray($this->dbAdapter, $localProfileData->getArrayCopy(), true);
-            return $localProfileEntity;
-        } else {
-            return null;
-        }
+        $oauthData = $this->getOAuthProfile();
+        $localData = $this->facebookTable->getByUserId($oauthData[self::FACEBOOK_PROFILE_ID_NAME]);
+        $profile   = $localData ? FacebookProfile::newFromArray($this->facebookTable, $localData->getArrayCopy(), true) : null;
+        return $profile;
     }
 
     /**
@@ -142,13 +136,13 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
 
     public function register($identityId, $userId, $dataJson)
     {
-        $row = new RowGateway(FacebookTable::ID_NAME, FacebookTable::TABLE_NAME, $this->dbAdapter);
+        $profile = new FacebookProfile($this->facebookTable);
+        $profile->setAutoSequence(FacebookTable::AUTO_SEQUENCE);
+        $profile->setIdentityId($identityId);
+        $profile->setUserId($userId);
+        $profile->save();
 
-        $row[FacebookTable::COLUMN_IDENTITY_ID] = $identityId;
-        $row[FacebookTable::COLUMN_FACEBOOK_ID] = $userId;
-        $row->save();
-
-        return $row[FacebookTable::ID_NAME];
+        return $profile->getId();
     }
 
     public function getName()

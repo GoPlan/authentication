@@ -129,9 +129,7 @@ class GoogleProfile extends AbstractOAuthProfile implements RowGatewayInterface
     {
         if ($this->rowExistInDatabase) {
 
-            $this->googleTable->getTableGateway()->update($this->data, [
-                GoogleTable::ID_NAME => $this->data[GoogleTable::ID_NAME]
-            ]);
+            $this->googleTable->getTableGateway()->update($this->data, [GoogleTable::ID_NAME => $this->data[GoogleTable::ID_NAME]]);
 
         } else {
 
@@ -141,6 +139,8 @@ class GoogleProfile extends AbstractOAuthProfile implements RowGatewayInterface
 
                 $driver = $this->googleTable->getDbAdapter()->getDriver();
                 $newId  = $driver instanceof Pdo ? $driver->getLastGeneratedValue($this->getAutoSequence()) : $driver->getLastGeneratedValue();
+
+                $this->rowExistInDatabase = true;
                 $this->setId($newId);
             }
         }

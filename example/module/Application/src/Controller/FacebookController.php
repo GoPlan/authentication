@@ -29,27 +29,33 @@ class FacebookController extends FacebookAbstractController
         return $this->url()->fromRoute(self::ROUTE_REGISTER_RETURN_NAME);
     }
 
-    function getReturnResponseForIdentityNotFound($returnUrl, $sessionHash)
+    function getReturnResponseForIdentityNotFound()
     {
-        $query = ['return' => $returnUrl, 'session' => $sessionHash];
+        $query = ['return' => $this->getContainer()[self::RETURN_URL]];
         return $this->redirect()->toRoute(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'register'], ['query' => $query]);
     }
 
-    function getReturnResponseForInvalidCredential($returnUrl, $sessionHash)
+    function getReturnResponseForInvalidCredential()
     {
-        $query = ['return' => $returnUrl, 'session' => $sessionHash];
+        $query = ['return' => $this->getContainer()[self::RETURN_URL]];
         return $this->redirect()->toRoute(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'sign-in'], ['query' => $query]);
     }
 
-    function getReturnResponseForNewUserCreated($returnUrl, $sessionHash)
+    function getReturnResponseForOtherIssues()
     {
-        $query = ['return' => $returnUrl];
+        $query = ['return' => $this->getContainer()[self::RETURN_URL]];
+        return $this->redirect()->toRoute(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'sign-in'], ['query' => $query]);
+    }
+
+    function getReturnResponseForNewUserCreated()
+    {
+        $query = ['return' => $this->getContainer()[self::RETURN_URL]];
         return $this->redirect()->toRoute(self::ROUTE_SIGN_IN_NAME, [], ['query' => $query]);
     }
 
-    function getReturnResponseForUserAlreadyExisted($returnUrl, $sessionHash)
+    function getReturnResponseForUserAlreadyExisted()
     {
-        $query = ['return' => $returnUrl];
+        $query = ['return' => $this->getContainer()[self::RETURN_URL]];
         return $this->redirect()->toRoute(self::ROUTE_SIGN_IN_NAME, [], ['query' => $query]);
     }
 

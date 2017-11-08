@@ -26,6 +26,8 @@ use Zend\Session\Container;
 
 abstract class GoogleAbstractController extends AbstractActionController
 {
+    const RETURN_URL = 'returnUrl';
+
     /**
      * @var array
      */
@@ -50,6 +52,11 @@ abstract class GoogleAbstractController extends AbstractActionController
      * @var Adapter
      */
     protected $dbAdapter;
+
+    /**
+     * @var Container
+     */
+    protected $container;
 
     /**
      * GoogleAbstractController constructor.
@@ -120,6 +127,18 @@ abstract class GoogleAbstractController extends AbstractActionController
     }
 
     /**
+     * @return Container
+     */
+    public function getContainer()
+    {
+        if (!$this->container) {
+            $this->container = new Container(self::class);
+        }
+
+        return $this->container;
+    }
+
+    /**
      * Because you will have a different route configuration for the authentication pages.
      * Implement this method to return the correct url of returning url.
      * This path should be a resolved route string of signInReturnAction().
@@ -184,8 +203,7 @@ abstract class GoogleAbstractController extends AbstractActionController
         if (!$returnUrl)
             throw AuthenticationException::ReturnUrlIsNotProvided();
 
-        $container              = new Container();
-        $container['returnUrl'] = $returnUrl;
+        $this->getContainer()[self::RETURN_URL] = $returnUrl;
 
         $oauthUrl = $this->getGoogleMethod()->makeAuthenticationUrl($this->getRegisterReturnPath(), null);
 
@@ -231,8 +249,7 @@ abstract class GoogleAbstractController extends AbstractActionController
         if (!$returnUrl)
             throw AuthenticationException::ReturnUrlIsNotProvided();
 
-        $container              = new Container();
-        $container['returnUrl'] = $returnUrl;
+        $this->getContainer()[self::RETURN_URL] = $returnUrl;
 
         $oauthUrl = $this->getGoogleMethod()->makeAuthenticationUrl($this->getAuthenticationReturnPath(), null);
 
@@ -248,8 +265,7 @@ abstract class GoogleAbstractController extends AbstractActionController
 
         try {
 
-            $container   = new Container();
-            $returnUrl   = $container['returnUrl'];
+            $returnUrl   = $this->getContainer()[self::RETURN_URL];
             $profile     = $this->getGoogleMethod()->initAccessToken($this->getAuthenticationReturnPath(), $code)->getLocalProfile();
             $identity    = $profile ? $this->getUserIdentityService()->getIdentityById($profile->getIdentityId()) : null;
             $authService = $this->getAuthenticationService();
@@ -292,4 +308,5 @@ abstract class GoogleAbstractController extends AbstractActionController
             throw $e;
         }
     }
+
 }
