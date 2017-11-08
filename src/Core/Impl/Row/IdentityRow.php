@@ -10,7 +10,7 @@ namespace CreativeDelta\User\Core\Impl\Row;
 
 
 use CreativeDelta\User\Core\Impl\Table\UserIdentityTable;
-use Zend\Db\Adapter\Driver\Pgsql\Pgsql;
+use Zend\Db\Adapter\Driver\Pdo\Pdo;
 use Zend\Db\RowGateway\RowGatewayInterface;
 
 class IdentityRow implements RowGatewayInterface
@@ -134,7 +134,7 @@ class IdentityRow implements RowGatewayInterface
             if ($count > 0) {
 
                 $driver = $this->identityTable->getTableGateway()->getAdapter()->getDriver();
-                $newId  = $driver instanceof Pgsql ? $driver->getLastGeneratedValue($this->getAutoSequence()) : $driver->getLastGeneratedValue();
+                $newId  = $driver instanceof Pdo ? $driver->getLastGeneratedValue($this->getAutoSequence()) : $driver->getLastGeneratedValue();
                 $this->setId($newId);
             }
         }

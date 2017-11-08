@@ -13,7 +13,7 @@ namespace CreativeDelta\User\Google;
 
 
 use CreativeDelta\User\Core\Domain\Entity\AbstractOAuthProfile;
-use Zend\Db\Adapter\Driver\Pgsql\Pgsql;
+use Zend\Db\Adapter\Driver\Pdo\Pdo;
 use Zend\Db\RowGateway\RowGatewayInterface;
 
 class GoogleProfile extends AbstractOAuthProfile implements RowGatewayInterface
@@ -140,7 +140,7 @@ class GoogleProfile extends AbstractOAuthProfile implements RowGatewayInterface
             if ($count > 0) {
 
                 $driver = $this->googleTable->getDbAdapter()->getDriver();
-                $newId  = $driver instanceof Pgsql ? $driver->getLastGeneratedValue($this->getAutoSequence()) : $driver->getLastGeneratedValue();
+                $newId  = $driver instanceof Pdo ? $driver->getLastGeneratedValue($this->getAutoSequence()) : $driver->getLastGeneratedValue();
                 $this->setId($newId);
             }
         }

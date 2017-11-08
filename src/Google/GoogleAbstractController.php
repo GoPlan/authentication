@@ -148,6 +148,11 @@ abstract class GoogleAbstractController extends AbstractActionController
     /**
      * @return Response
      */
+    abstract function getReturnResponseForOtherIssues();
+
+    /**
+     * @return Response
+     */
     abstract function getReturnResponseForNewUserCreated();
 
     /**
@@ -273,7 +278,7 @@ abstract class GoogleAbstractController extends AbstractActionController
                     case Result::FAILURE_CREDENTIAL_INVALID:
                         return $this->getReturnResponseForInvalidCredential();
                     default:
-                        return $this->getReturnResponseForInvalidCredential();
+                        return $this->getReturnResponseForOtherIssues();
                 }
             }
 

@@ -73,6 +73,12 @@ class GoogleController extends GoogleAbstractController
         return $this->redirect()->toRoute(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'sign-in'], ['query' => $query]);
     }
 
+    function getReturnResponseForOtherIssues()
+    {
+        $query = ['return' => $this->getContainer()['returnUrl']];
+        return $this->redirect()->toRoute(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'sign-in'], ['query' => $query]);
+    }
+
     function getReturnResponseForNewUserCreated()
     {
         $query = ['return' => $this->getContainer()['returnUrl']];
