@@ -10,6 +10,7 @@ namespace CreativeDelta\User\Google;
 
 
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
+use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
 use CreativeDelta\User\Core\Impl\Exception\AuthenticationException;
 use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
 use CreativeDelta\User\Core\Impl\Service\AuthenticationService;
@@ -198,12 +199,17 @@ abstract class GoogleAbstractController extends AbstractActionController
 
         try {
 
+            // Retrieve Google details from Google
             $this->getGoogleMethod()->initAccessToken($this->getRegisterReturnPath(), $code);
-
             $oauthData     = $this->getGoogleMethod()->getOAuthProfile();
             $oauthId       = $oauthData[GoogleMethod::PROFILE_FIELD_ID];
-            $newIdentity   = $this->newIdentity($oauthId, $oauthData);
-            $newIdentityId = $this->getUserIdentityService()->register($this->getGoogleMethod(), $newIdentity, $oauthId, $oauthData);
+
+            // Register Google profile into our system
+            $newIdentity   = $this->newIdentity($oauthId, $oauthData); // Generate account (identity) name
+
+            /** @var UserRegisterMethodAdapter $registerAdapter */
+            $registerAdapter = $this->getGoogleMethod();
+            $newIdentityId = $this->getUserIdentityService()->register($registerAdapter, $newIdentity, $oauthId, $oauthData);
 
             $this->createUserInLocalDatabase($newIdentityId, $oauthData);
 
@@ -231,7 +237,7 @@ abstract class GoogleAbstractController extends AbstractActionController
         if (!$returnUrl)
             throw AuthenticationException::ReturnUrlIsNotProvided();
 
-        $newSession = $this->getUserIdentityService()->createSessionLog($sessionHash, $returnUrl);
+        $newSession = null;//$this->getUserIdentityService()->createSessionLog($sessionHash, $returnUrl);
         $oauthUrl   = $this->getGoogleMethod()->makeAuthenticationUrl($this->getAuthenticationReturnPath(), $newSession);
 
         return $this->redirect()->toUrl($oauthUrl);
@@ -248,8 +254,8 @@ abstract class GoogleAbstractController extends AbstractActionController
         try {
 
             $prevSession     = $hash ? $this->getUserIdentityService()->getSessionLog($hash) : null;
-            $prevReturnUrl   = $prevSession->getReturnUrl();
-            $prevSessionHash = $prevSession->getPreviousHash();
+            $prevReturnUrl   = $prevSession ? $prevSession->getReturnUrl() : null;
+            $prevSessionHash = $prevSession ? $prevSession->getPreviousHash() : null;
 
             $storedProfile = $this->getGoogleMethod()->initAccessToken($this->getAuthenticationReturnPath(), $code)->getLocalProfile();
             $identity      = $storedProfile ? $this->getUserIdentityService()->getIdentityById($storedProfile->getIdentityId()) : null;
@@ -272,11 +278,11 @@ abstract class GoogleAbstractController extends AbstractActionController
 
                 switch ($result->getCode()) {
                     case Result::FAILURE_IDENTITY_NOT_FOUND:
-                        return $this->getReturnResponseForIdentityNotFound($prevSession->getReturnUrl(), $prevSession->getPreviousHash());
+                        return $this->getReturnResponseForIdentityNotFound($prevReturnUrl, $prevSessionHash);
                     case Result::FAILURE_CREDENTIAL_INVALID:
                         throw new UserIdentityException(UserIdentityException::CODE_ERROR_AUTHENTICATION_USER_NOT_ACTIVE);
                     default:
-                        return $this->getReturnResponseForInvalidCredential($prevSession->getReturnUrl(), $prevSession->getPreviousHash());
+                        return $this->getReturnResponseForInvalidCredential($prevReturnUrl, $prevSessionHash);
                 }
             }
 

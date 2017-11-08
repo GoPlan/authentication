@@ -7,13 +7,17 @@
 
 namespace CreativeDelta\User\Application;
 
+use CreativeDelta\User\Application\Controller\AccountController;
 use CreativeDelta\User\Application\Controller\FacebookController;
+use CreativeDelta\User\Application\Controller\Factory\AccountControllerFacetory;
+use CreativeDelta\User\Application\Controller\Factory\AccountServiceInterfaceFactory;
 use CreativeDelta\User\Application\Controller\Factory\FacebookControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\GoogleControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\IndexControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\UserControllerFactory;
 use CreativeDelta\User\Application\Controller\GoogleController;
 use CreativeDelta\User\Application\Controller\UserController;
+use CreativeDelta\User\Core\Domain\AccountServiceInterface;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 
@@ -26,6 +30,26 @@ return [
                     'route'    => '/',
                     'defaults' => [
                         'controller' => Controller\IndexController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
+            'phpinfo'        => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/phpinfo',
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action'     => 'phpinfo',
+                    ],
+                ],
+            ],
+            'account'        => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/account',
+                    'defaults' => [
+                        'controller' => Controller\AccountController::class,
                         'action'     => 'index',
                     ],
                 ],
@@ -195,6 +219,12 @@ return [
             Controller\IndexController::class    => IndexControllerFactory::class,
             Controller\FacebookController::class => FacebookControllerFactory::class,
             Controller\GoogleController::class   => GoogleControllerFactory::class,
+            Controller\AccountController::class => AccountControllerFacetory::class,
+        ],
+    ],
+    'service_manager' => [
+        'factories' => [
+            AccountServiceInterface::class => AccountServiceInterfaceFactory::class,
         ],
     ],
     'view_manager' => [

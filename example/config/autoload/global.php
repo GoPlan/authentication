@@ -33,18 +33,18 @@ return [
             "appScope"  => ""
         ],
         'google'   => [
-            "clientId"     => "",
-            "clientSecret" => "",
-            "clientScope"  => "",
+            "clientId"     => "524836760491-47m4ms6usfvhjd9lssqtc2p792nf3jne.apps.googleusercontent.com",
+            "clientSecret" => "4iJsPeglVynfbH3xmWcUKmfX",
+            "clientScope"  => "public_profile",
             "apiKey"       => "",
         ]
     ],
 
     'db' => [
-        'driver'   => '',
-        'hostname' => '',
-        'database' => '',
-        'username' => '',
-        'password' => ''
+        'driver'   => 'pdo_pgsql',
+        'hostname' => 'localhost',
+        'database' => 'erp-identity',
+        'username' => 'admin',
+        'password' => 'admin'
     ],
 ];

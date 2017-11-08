@@ -55,4 +55,9 @@ class IndexController extends AbstractActionController
         $this->authService->clearIdentity();
         return $this->redirect()->toRoute(self::ROUTE_HOME_NAME);
     }
+
+    public function phpinfoAction()
+    {
+        return [];
+    }
 }
