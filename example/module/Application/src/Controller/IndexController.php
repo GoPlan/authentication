@@ -7,8 +7,8 @@
 
 namespace CreativeDelta\User\Application\Controller;
 
-use CreativeDelta\User\Core\Impl\Service\AuthenticationService;
 use CreativeDelta\User\Core\Impl\Service\UserSessionService;
+use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 

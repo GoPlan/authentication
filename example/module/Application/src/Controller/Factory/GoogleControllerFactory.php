@@ -10,9 +10,10 @@ namespace CreativeDelta\User\Application\Controller\Factory;
 
 
 use CreativeDelta\User\Application\Controller\GoogleController;
-use CreativeDelta\User\Core\Impl\Service\AuthenticationService;
+use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
+use CreativeDelta\User\Google\GoogleMethod;
 use Interop\Container\ContainerInterface;
-use Zend\Db\Adapter\Adapter;
+use Zend\Authentication\AuthenticationService;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 class GoogleControllerFactory implements FactoryInterface
@@ -20,9 +21,10 @@ class GoogleControllerFactory implements FactoryInterface
 
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $dbAdapter   = $container->get(Adapter::class);
-        $authService = $container->get(AuthenticationService::class);
-        $controller  = new GoogleController($dbAdapter, $authService);
+        $authService     = $container->get(AuthenticationService::class);
+        $identityService = $container->get(UserIdentityServiceInterface::class);
+        $googleMethod    = $container->get(GoogleMethod::class);
+        $controller      = new GoogleController($authService, $identityService, $googleMethod);
         return $controller;
     }
 }

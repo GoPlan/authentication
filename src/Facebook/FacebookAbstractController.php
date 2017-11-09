@@ -9,15 +9,14 @@
 namespace CreativeDelta\User\Facebook;
 
 
+use CreativeDelta\User\Core\Domain\OAuthAuthenticationAdapter;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use CreativeDelta\User\Core\Impl\Exception\AuthenticationException;
 use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
-use CreativeDelta\User\Core\Impl\Service\AuthenticationService;
-use CreativeDelta\User\Core\Impl\Service\UserIdentityService;
 use CreativeDelta\User\Core\Impl\Service\UserSessionService;
 use Exception;
+use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\Result;
-use Zend\Db\Adapter\Adapter;
 use Zend\Http\Request;
 use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -28,14 +27,9 @@ abstract class FacebookAbstractController extends AbstractActionController
     const RETURN_URL = 'returnUrl';
 
     /**
-     * @var array
+     * @var AuthenticationService
      */
-    protected $facebookConfig;
-
-    /**
-     * @var FacebookMethod
-     */
-    protected $facebookMethod;
+    protected $authenticationService;
 
     /**
      * @var UserIdentityServiceInterface
@@ -43,14 +37,9 @@ abstract class FacebookAbstractController extends AbstractActionController
     protected $userIdentityService;
 
     /**
-     * @var AuthenticationService
+     * @var FacebookMethod
      */
-    protected $authenticationService;
-
-    /**
-     * @var Adapter
-     */
-    protected $dbAdapter;
+    protected $facebookMethod;
 
     /**
      * @var Container
@@ -60,22 +49,26 @@ abstract class FacebookAbstractController extends AbstractActionController
 
     /**
      * FacebookAbstractController constructor.
-     * @param Adapter                           $dbAdapter
-     * @param AuthenticationService             $authenticationService
-     * @param FacebookMethod|null               $facebookMethod
-     * @param UserIdentityServiceInterface|null $userIdentityService
+     * @param AuthenticationService        $authenticationService
+     * @param UserIdentityServiceInterface $userIdentityService
+     * @param FacebookMethod               $facebookMethod
      */
     public function __construct(
-        Adapter $dbAdapter,
         AuthenticationService $authenticationService,
-        FacebookMethod $facebookMethod = null,
-        UserIdentityServiceInterface $userIdentityService = null)
+        UserIdentityServiceInterface $userIdentityService,
+        FacebookMethod $facebookMethod)
     {
-        $this->dbAdapter             = $dbAdapter;
         $this->authenticationService = $authenticationService;
-        $this->facebookConfig        = $authenticationService->getConfig()[FacebookMethod::METHOD_NAME];
         $this->facebookMethod        = $facebookMethod;
         $this->userIdentityService   = $userIdentityService;
+    }
+
+    /**
+     * @return AuthenticationService
+     */
+    public function getAuthenticationService()
+    {
+        return $this->authenticationService;
     }
 
     /**
@@ -83,15 +76,6 @@ abstract class FacebookAbstractController extends AbstractActionController
      */
     public function getFacebookMethod()
     {
-        if (!$this->facebookMethod) {
-
-            $appId     = $this->facebookConfig[FacebookMethod::METHOD_CONFIG_APP_ID];
-            $appSecret = $this->facebookConfig[FacebookMethod::METHOD_CONFIG_APP_SECRET];
-            $appScope  = $this->facebookConfig[FacebookMethod::METHOD_CONFIG_APP_SCOPE];
-
-            $this->facebookMethod = new FacebookMethod($this->dbAdapter, $appId, $appSecret, $appScope);
-        }
-
         return $this->facebookMethod;
     }
 
@@ -100,10 +84,6 @@ abstract class FacebookAbstractController extends AbstractActionController
      */
     public function getUserIdentityService()
     {
-        if (!$this->userIdentityService) {
-            $this->userIdentityService = new UserIdentityService($this->dbAdapter);
-        }
-
         return $this->userIdentityService;
     }
 
@@ -275,15 +255,15 @@ abstract class FacebookAbstractController extends AbstractActionController
 
         try {
 
-            $returnUrl = $this->getContainer()[self::RETURN_URL];
-            $profile   = $this->getFacebookMethod()->initAccessToken($this->getAuthenticationReturnUrl(), $code)->getLocalProfile();
-            $identity  = $profile ? $this->getUserIdentityService()->getIdentityById($profile->getIdentityId()) : null;
+            $this->getFacebookMethod()->initAccessToken($this->getAuthenticationReturnUrl(), $code);
+
+            $returnUrl   = $this->getContainer()[self::RETURN_URL];
+            $authService = $this->getAuthenticationService();
 
             if ($this->authenticationService instanceof AuthenticationService) {
 
-                $adapter = new FacebookAuthenticationAdapter($this->facebookConfig, $this->dbAdapter, $identity);
-                $adapter->setAccessToken($this->getFacebookMethod()->getAccessToken());
-                $result = $this->authenticationService->authenticate($adapter);
+                $adapter = new OAuthAuthenticationAdapter($this->getUserIdentityService(), $this->getFacebookMethod());
+                $result  = $authService->authenticate($adapter);
 
             } else {
 

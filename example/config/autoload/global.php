@@ -15,12 +15,15 @@ return [
 
     'service_manager' => [
         'factories' => [
-            \Zend\Db\Adapter\Adapter::class                                    => \Zend\Db\Adapter\AdapterServiceFactory::class,
-            \Zend\Session\SessionManager::class                                => \CreativeDelta\User\Core\Impl\Factory\SessionManagerFactory::class,
-            \CreativeDelta\User\Core\Impl\Service\AuthenticationService::class => \CreativeDelta\User\Core\Impl\Factory\AuthenticationServiceFactory::class
+            \Zend\Db\Adapter\Adapter::class                                     => \Zend\Db\Adapter\AdapterServiceFactory::class,
+            \Zend\Authentication\AuthenticationService::class                   => \Zend\ServiceManager\Factory\InvokableFactory::class,
+            \Zend\Session\SessionManager::class                                 => \CreativeDelta\User\Core\Impl\Factory\SessionManagerFactory::class,
+            \CreativeDelta\User\Google\GoogleMethod::class                      => \CreativeDelta\User\Core\Impl\Factory\GoogleMethodFactory::class,
+            \CreativeDelta\User\Facebook\FacebookMethod::class                  => \CreativeDelta\User\Core\Impl\Factory\FacebookMethodFactory::class,
+            \CreativeDelta\User\Core\Domain\UserIdentityServiceInterface::class => \CreativeDelta\User\Core\Impl\Factory\UserIdentityServiceFactory::class
         ],
         'aliases'   => [
-            \Zend\Authentication\AuthenticationService::class => \CreativeDelta\User\Core\Impl\Service\AuthenticationService::class
+            \Zend\Authentication\AuthenticationServiceInterface::class => \Zend\Authentication\AuthenticationService::class
         ]
     ],
 

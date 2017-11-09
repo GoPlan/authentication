@@ -9,16 +9,14 @@
 namespace CreativeDelta\User\Google;
 
 
+use CreativeDelta\User\Core\Domain\OAuthAuthenticationAdapter;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use CreativeDelta\User\Core\Impl\Exception\AuthenticationException;
 use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
-use CreativeDelta\User\Core\Impl\Service\AuthenticationService;
-use CreativeDelta\User\Core\Impl\Service\UserIdentityService;
 use CreativeDelta\User\Core\Impl\Service\UserSessionService;
 use Exception;
+use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\Result;
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Adapter\AdapterInterface;
 use Zend\Http\Request;
 use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -27,11 +25,6 @@ use Zend\Session\Container;
 abstract class GoogleAbstractController extends AbstractActionController
 {
     const RETURN_URL = 'returnUrl';
-
-    /**
-     * @var array
-     */
-    protected $googleConfig;
 
     /**
      * @var GoogleMethod
@@ -49,53 +42,24 @@ abstract class GoogleAbstractController extends AbstractActionController
     protected $authenticationService;
 
     /**
-     * @var Adapter
-     */
-    protected $dbAdapter;
-
-    /**
      * @var Container
      */
     protected $container;
 
     /**
      * GoogleAbstractController constructor.
-     * @param Adapter                      $dbAdapter
      * @param AuthenticationService        $authenticationService
-     * @param GoogleMethod                 $googleMethod
      * @param UserIdentityServiceInterface $userIdentityService
+     * @param GoogleMethod                 $googleMethod
      */
     public function __construct(
-        Adapter $dbAdapter,
         AuthenticationService $authenticationService,
-        GoogleMethod $googleMethod = null,
-        UserIdentityServiceInterface $userIdentityService = null)
+        UserIdentityServiceInterface $userIdentityService,
+        GoogleMethod $googleMethod)
     {
-        $this->dbAdapter             = $dbAdapter;
         $this->authenticationService = $authenticationService;
-        $this->googleConfig          = $authenticationService->getConfig()[GoogleMethod::METHOD_NAME];
         $this->googleMethod          = $googleMethod;
         $this->userIdentityService   = $userIdentityService;
-    }
-
-    /**
-     * @return UserIdentityServiceInterface
-     */
-    public function getUserIdentityService()
-    {
-        if (!$this->userIdentityService) {
-            $this->userIdentityService = new UserIdentityService($this->dbAdapter);
-        }
-
-        return $this->userIdentityService;
-    }
-
-    /**
-     * @return array
-     */
-    public function getGoogleConfig()
-    {
-        return $this->googleConfig;
     }
 
     /**
@@ -103,11 +67,15 @@ abstract class GoogleAbstractController extends AbstractActionController
      */
     public function getGoogleMethod()
     {
-        if (!$this->googleMethod) {
-            $this->googleMethod = new GoogleMethod($this->dbAdapter, $this->googleConfig);
-        }
-
         return $this->googleMethod;
+    }
+
+    /**
+     * @return UserIdentityServiceInterface
+     */
+    public function getUserIdentityService()
+    {
+        return $this->userIdentityService;
     }
 
     /**
@@ -116,14 +84,6 @@ abstract class GoogleAbstractController extends AbstractActionController
     public function getAuthenticationService()
     {
         return $this->authenticationService;
-    }
-
-    /**
-     * @return AdapterInterface
-     */
-    public function getDbAdapter()
-    {
-        return $this->dbAdapter;
     }
 
     /**
@@ -266,16 +226,15 @@ abstract class GoogleAbstractController extends AbstractActionController
 
         try {
 
+            $this->getGoogleMethod()->initAccessToken($this->getAuthenticationReturnPath(), $code);
+
             $returnUrl   = $this->getContainer()[self::RETURN_URL];
-            $profile     = $this->getGoogleMethod()->initAccessToken($this->getAuthenticationReturnPath(), $code)->getLocalProfile();
-            $identity    = $profile ? $this->getUserIdentityService()->getIdentityById($profile->getIdentityId()) : null;
             $authService = $this->getAuthenticationService();
 
             if ($authService instanceof AuthenticationService) {
 
-                $adapter = new GoogleAuthenticationAdapter($this->googleConfig, $this->dbAdapter, $identity);
-                $adapter->setAccessToken($this->getGoogleMethod()->getAccessToken());
-                $result = $authService->authenticate($adapter);
+                $adapter = new OAuthAuthenticationAdapter($this->getUserIdentityService(), $this->getGoogleMethod());
+                $result  = $authService->authenticate($adapter);
 
             } else {
 

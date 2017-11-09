@@ -10,15 +10,15 @@ namespace CreativeDelta\User\Application\Controller\Factory;
 
 
 use CreativeDelta\User\Application\Controller\UserController;
-use CreativeDelta\User\Core\Impl\Service\AuthenticationService;
 use Interop\Container\ContainerInterface;
+use Zend\Authentication\AuthenticationServiceInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 class UserControllerFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $authService = $container->get(AuthenticationService::class);
+        $authService = $container->get(AuthenticationServiceInterface::class);
         $controller  = new UserController($authService);
         return $controller;
     }

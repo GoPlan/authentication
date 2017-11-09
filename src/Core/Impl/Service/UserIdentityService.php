@@ -18,23 +18,19 @@ use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
 use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
 use CreativeDelta\User\Core\Impl\Row\IdentityRow;
 use CreativeDelta\User\Core\Impl\Table\UserIdentityTable;
-use Zend\Crypt\Password\Bcrypt;
-use Zend\Db\Adapter\Adapter;
 use Zend\Hydrator\ClassMethods;
 
 class UserIdentityService implements UserIdentityServiceInterface
 {
-    const AUTHENTICATION_SERVICE_NAME = \Zend\Authentication\AuthenticationService::class;
-
-    protected $bcrypt;
-    protected $dbAdapter;
+    /**
+     * @var UserIdentityTable
+     */
     protected $userIdentityTable;
 
-    function __construct(Adapter $dbAdapter)
+
+    function __construct(UserIdentityTable $identityTable)
     {
-        $this->dbAdapter         = $dbAdapter;
-        $this->bcrypt            = new Bcrypt();
-        $this->userIdentityTable = new UserIdentityTable($dbAdapter);
+        $this->userIdentityTable = $identityTable;
     }
 
     /**
@@ -88,7 +84,8 @@ class UserIdentityService implements UserIdentityServiceInterface
         if ($this->hasAccount($account) || $adapter->has($userId))
             throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST);
 
-        $dbConnection = $this->dbAdapter->getDriver()->getConnection();
+        $dbAdapter    = $this->userIdentityTable->getTableGateway()->getAdapter();
+        $dbConnection = $dbAdapter->getDriver()->getConnection();
         $dbConnection->beginTransaction();
 
         try {

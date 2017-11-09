@@ -24,8 +24,6 @@ abstract class AbstractSecuredActionController extends AbstractActionController
      */
     protected $authenticationService;
 
-    protected $sessionManager;
-
     /**
      * @return AuthenticationServiceInterface
      */
