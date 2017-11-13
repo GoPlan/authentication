@@ -44,4 +44,7 @@ interface UserIdentityServiceInterface
      * @return int Primary key of the newly created UserIdentity record
      */
     public function register(UserRegisterMethodAdapter $adapter, $account, $password = null, $userId = null, $data = null);
+
+    public function setCurrentPasswordByAccount(Identity $identity, $currentPass, $newPass, $confirmNewPass);
+
 }

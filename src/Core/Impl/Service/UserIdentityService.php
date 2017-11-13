@@ -110,4 +110,9 @@ class UserIdentityService implements UserIdentityServiceInterface
             throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_DATABASE_OPERATION_FAILED, $exception);
         }
     }
+
+    public function setCurrentPasswordByAccount(Identity $identity, $currentPass, $newPass, $confirmNewPass)
+    {
+        // TODO: Implement setCurrentPasswordByAccount() method.
+    }
 }

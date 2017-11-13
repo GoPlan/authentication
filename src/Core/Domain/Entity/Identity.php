@@ -146,6 +146,5 @@ class Identity extends \ArrayObject
             self::COLUMN_USER_NAME => $this->getAccount(),
             self::COLUMN_USER_PASSWORD => $this->getPassword()
         ];
-
     }
 }

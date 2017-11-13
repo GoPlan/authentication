@@ -20,7 +20,8 @@
     "zendframework/zend-session": "^2.7",
     "zendframework/zend-json": "^3.0",
     "zendframework/zend-form": "^2.10",
-    "zendframework/zend-i18n": "^2.7"
+    "zendframework/zend-i18n": "^2.7",
+    "zendframework/zend-validator": "^2.10"
   },
   "require-dev": {
     "zendframework/zend-mvc": "^3.1.0",
