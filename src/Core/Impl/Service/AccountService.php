@@ -13,7 +13,8 @@ use CreativeDelta\User\Account\AccountTable;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
 use Zend\Db\Adapter\AdapterInterface;
-use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
+use Zend\Json\Json;
+use CreativeDelta\User\Core\Domain\Entity\Identity;
 
 class AccountService implements UserIdentityServiceInterface
 {
@@ -22,29 +23,42 @@ class AccountService implements UserIdentityServiceInterface
     public function __construct(AdapterInterface $dbAdapter)
     {
         $this->AccountTable = new AccountTable($dbAdapter);
-//        $testAccount = new Account();
-//        $testAccount->identity = 'newUserName2';
-//        $testAccount->password = 'newPassword';
-//        $testAccount->primaryId = 'Tester';
-//        $testAccount->primaryTable = 'Tester';
-//        $testAccount->state = 1;
-//        $jsonData = Json::encode($testAccount);
-//        $this->registerAccount($jsonData);
-        $result = $this->getIdentityById(1);
 
     }
 
 #region "AccountServiceInterface"
 
-    public function register(UserRegisterMethodAdapter $adapter, $identity, $userId, $data = null)
+    public function register(UserRegisterMethodAdapter $adapter, $account, $password = null, $userId = null, $data = null)
     {
         // TODO: Implement register() method.
 
-        if ($this->hasIdentity($identity) || $adapter->has($userId)) {
-            throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST);
+        if ($this->hasAccount($account)) {
+//            throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST);
+            return false;
         }
 
-        return $adapter->register($identity, $userId, $data);
+        if($data == null)
+        {
+            $nAccount = new Identity();
+            $nAccount->setAccount($account);
+            $nAccount->setPassword($password);
+            $nAccount->setState(1);
+
+            $data = Json::encode($nAccount->getArrayCopy());
+        }
+
+        return $adapter->register($account, $userId, $data);
+    }
+
+    public function getIdentityByAccount($account)
+    {
+        $Result = $this->AccountTable->getAccountByIdentity($account);
+        return $Result;
+    }
+
+    public function hasAccount($account)
+    {
+        return $this->AccountTable->hasAccount($account);
     }
 
     public function createSessionLog($previousHash = null, $returnUrl = null, $data = null)
@@ -55,17 +69,6 @@ class AccountService implements UserIdentityServiceInterface
     public function getSessionLog($hash)
     {
         // TODO: Implement getSessionLog() method.
-    }
-
-    public function hasIdentity($identity)
-    {
-        return $this->AccountTable->hasIdentity($identity);
-    }
-
-    public function getIdentityByIdentity($identity)
-    {
-        $Result = $this->AccountTable->getAccountByIdentity($identity);
-        return $Result;
     }
 
     public function getIdentityById($id)

@@ -9,8 +9,7 @@
 namespace CreativeDelta\User\Account;
 
 
-use Zend\Db\ResultSet\ResultSet;
-use Zend\Db\TableGateway\TableGateway;
+use CreativeDelta\User\Core\Domain\Entity\Identity;
 
 interface AccountTableGatewayInterface
 {
@@ -18,13 +17,13 @@ interface AccountTableGatewayInterface
 
     public function getDbAdapter();
 
-    public function saveAccount(Account $account);
+    public function saveAccount(Identity $account);
 
     public function getAccount($id);
 
     public function getAccountByIdentity($identity);
 
-    public function hasIdentity($identity);
+    public function hasAccount($identity);
 
     public function hasAccountId($id);
 }

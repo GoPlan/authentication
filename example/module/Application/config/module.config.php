@@ -8,7 +8,7 @@
 namespace CreativeDelta\User\Application;
 
 use CreativeDelta\User\Application\Controller\FacebookController;
-use CreativeDelta\User\Application\Controller\Factory\AccountControllerFacetory;
+use CreativeDelta\User\Application\Controller\Factory\AccountControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\FacebookControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\GoogleControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\IndexControllerFactory;
@@ -44,9 +44,9 @@ return [
                 ],
             ],
             'account'        => [
-                'type'    => Literal::class,
+                'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/account',
+                    'route'    => '/account[/:action]',
                     'defaults' => [
                         'controller' => Controller\AccountController::class,
                         'action'     => 'index',
@@ -218,7 +218,7 @@ return [
             Controller\IndexController::class    => IndexControllerFactory::class,
             Controller\FacebookController::class => FacebookControllerFactory::class,
             Controller\GoogleController::class   => GoogleControllerFactory::class,
-            Controller\AccountController::class => AccountControllerFacetory::class,
+            Controller\AccountController::class => AccountControllerFactory::class,
         ],
     ],
     'service_manager' => [

@@ -1,0 +1,43 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: work
+ * Date: 10/11/2017
+ * Time: 11:08
+ */
+
+
+$mUsername = $form->get('txtUsername');
+$mUsername->setAttribute('class', 'form-control');
+$mUsername->setAttribute('Placeholder', 'User name');
+
+$mPassword = $form->get('txtPassword');
+$mPassword->setAttribute('class', 'form-control');
+$mPassword->setAttribute('Placeholder', 'Password');
+
+$mResultMessages = $form->get('ResultMessages');
+$mResultMessages->setAttribute('class', 'label-warning');
+
+$submit = $form->get('submit');
+
+echo $this->form()->openTag($form);
+?>
+
+    <div class="form-group">
+        <?= $this->formLabel($mUsername) ?>
+        <?= $this->formElement($mUsername) ?>
+        <?= $this->formElementErrors()->render($mUsername, ['class' => 'help-block']) ?>
+    </div>
+    <div class="form-group">
+        <?= $this->formLabel($mPassword) ?>
+        <?= $this->formElement($mPassword) ?>
+        <?= $this->formElementErrors()->render($mPassword, ['class' => 'help-block']) ?>
+    </div>
+    <div class="form-group">
+        <label class="label label-warning"><?= $form->get('ResultMessages')->getValue() ?></label>
+    </div>
+
+<?php
+    echo $this->formSubmit($submit);
+    echo $this->form()->closeTag();
+?>

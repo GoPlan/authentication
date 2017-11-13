@@ -13,9 +13,4 @@ use CreativeDelta\User\Account\AbstractAccountController;
 class AccountController extends AbstractAccountController
 {
 
-
-    public function indexAction()
-    {
-        return [];
-    }
 }

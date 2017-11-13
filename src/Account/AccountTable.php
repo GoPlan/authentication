@@ -8,6 +8,7 @@
 
 namespace CreativeDelta\User\Account;
 
+use CreativeDelta\User\Core\Domain\Entity\Identity;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\TableGateway\TableGateway;
 
@@ -19,7 +20,7 @@ class AccountTable implements AccountTableGatewayInterface
 
     const TABLE_NAME = 'UserIdentity';
     const ID_NAME = 'id';
-    const COLUMN_USER_NAME = 'identity';
+    const COLUMN_USER_NAME = 'account';
     const COLUMN_USER_PASSWORD = 'password';
     const COLUMN_STATE = 'state';
 
@@ -27,7 +28,7 @@ class AccountTable implements AccountTableGatewayInterface
     {
         $this->dbAdapter = $dbAdapter;
         $resultSetPrototype = new ResultSet();
-        $resultSetPrototype->setArrayObjectPrototype(new Account());
+        $resultSetPrototype->setArrayObjectPrototype(new Identity());
         $this->accountTableGateway = new TableGateway(self::TABLE_NAME, $this->dbAdapter, null, $resultSetPrototype);
     }
 
@@ -47,7 +48,7 @@ class AccountTable implements AccountTableGatewayInterface
         return $this->dbAdapter;
     }
 
-    public function saveAccount(Account $account)
+    public function saveAccount(Identity $account)
     {
         $data = $account->getArrayCopy();
 
@@ -85,14 +86,14 @@ class AccountTable implements AccountTableGatewayInterface
         return $rowset->current();
     }
 
-    public function hasIdentity($identity)
+    public function hasAccount($identity)
     {
         $rowset = $this->accountTableGateway->select(
         [
             self::COLUMN_USER_NAME => $identity
         ]
         );
-        $rowset.count() != 0 ? true : false;
+        return $rowset->count() != 0 ? true : false;
     }
 
     public function hasAccountId($id)
@@ -103,7 +104,8 @@ class AccountTable implements AccountTableGatewayInterface
             self::ID_NAME => $id,
         ]
         );
-        $rowset.count() != 0 ? true : false;
+
+        return $rowset->count() != 0 ? true : false;
     }
 
     public function getTableName()

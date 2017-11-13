@@ -13,8 +13,10 @@ namespace CreativeDelta\User\Core\Domain\Entity;
 
 
 use Zend\Authentication\Result;
+use Zend\Hydrator\ClassMethods;
 
-class Identity
+
+class Identity extends \ArrayObject
 {
     const STATE_NEW      = 0;
     const STATE_ACTIVE   = 1;
@@ -38,8 +40,14 @@ class Identity
     protected $id;
     protected $account;
     protected $state;
-    protected $profile;
+    protected $password;
     protected $adapterClassName;
+
+    const TABLE_NAME = 'UserIdentity';
+    const ID_NAME = 'id';
+    const COLUMN_USER_NAME = 'account';
+    const COLUMN_USER_PASSWORD = 'password';
+    const COLUMN_STATE = 'state';
 
     /**
      * @return int
@@ -92,17 +100,17 @@ class Identity
     /**
      * @return mixed
      */
-    public function getProfile()
+    public function getPassword()
     {
-        return $this->profile;
+        return $this->password;
     }
 
     /**
-     * @param mixed $profile
+     * @param mixed $password
      */
-    public function setProfile($profile)
+    public function setPassword($password)
     {
-        $this->profile = $profile;
+        $this->password = $password;
     }
 
     /**
@@ -119,5 +127,25 @@ class Identity
     public function setAdapterClassName($adapterClassName)
     {
         $this->adapterClassName = $adapterClassName;
+    }
+
+    public function exchangeArray($data)
+    {
+        $hydrator = new ClassMethods(false);
+        $hydrator->hydrate($data,$this);
+    }
+
+    /**
+     * @return array
+     */
+    public function getArrayCopy()
+    {
+        return [
+            self::ID_NAME => $this->getId(),
+            self::COLUMN_STATE => $this->getState(),
+            self::COLUMN_USER_NAME => $this->getAccount(),
+            self::COLUMN_USER_PASSWORD => $this->getPassword()
+        ];
+
     }
 }

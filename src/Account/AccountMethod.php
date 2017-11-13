@@ -12,6 +12,7 @@ namespace CreativeDelta\User\Account;
 use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
 use Zend\Db\Adapter\Adapter;
 use Zend\Json\Json;
+use CreativeDelta\User\Core\Domain\Entity\Identity;
 
 class AccountMethod implements UserRegisterMethodAdapter
 {
@@ -43,8 +44,8 @@ class AccountMethod implements UserRegisterMethodAdapter
     public function register($identityId, $userId, $dataJson)
     {
         $data = Json::decode($dataJson, Json::TYPE_ARRAY);
-        /** @var Account $nAccount */
-        $nAccount = new Account();
+        /** @var Identity $nAccount */
+        $nAccount = new Identity();
         $nAccount->exchangeArray($data);
         return $this->AccountTable->saveAccount($nAccount);
     }

@@ -44,7 +44,8 @@ abstract class AbstractSecuredActionController extends AbstractActionController
 
     public function onDispatch(MvcEvent $e)
     {
-        return $this->getAuthenticationService()->hasIdentity() ? parent::onDispatch($e) : $this->noIdentityDispatch($e);
+        $response = $this->getAuthenticationService()->hasIdentity() ? parent::onDispatch($e) : $this->noIdentityDispatch($e);
+        return $response;
     }
 
     abstract function noIdentityDispatch(MvcEvent $e);

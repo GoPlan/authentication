@@ -1,0 +1,51 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: work
+ * Date: 10/11/2017
+ * Time: 14:49
+ */
+
+$mUsername = $form->get('txtUsername');
+$mUsername->setAttribute('class', 'form-control');
+$mUsername->setAttribute('Placeholder', 'User name');
+
+$mPassword = $form->get('txtPassword');
+$mPassword->setAttribute('class', 'form-control');
+$mPassword->setAttribute('Placeholder', 'Password');
+
+$mConfirmPassword = $form->get('txtConfirmPassword');
+$mConfirmPassword->setAttribute('class', 'form-control');
+$mConfirmPassword->setAttribute('Placeholder', 'Password');
+
+$mResultMessages = $form->get('ResultMessages');
+$mResultMessages->setAttribute('class', 'label-warning');
+
+$submit = $form->get('submit');
+
+echo $this->form()->openTag($form);
+?>
+
+    <div class="form-group">
+        <?= $this->formLabel($mUsername) ?>
+        <?= $this->formElement($mUsername) ?>
+        <?= $this->formElementErrors()->render($mUsername, ['class' => 'help-block']) ?>
+    </div>
+    <div class="form-group">
+        <?= $this->formLabel($mPassword) ?>
+        <?= $this->formElement($mPassword) ?>
+        <?= $this->formElementErrors()->render($mPassword, ['class' => 'help-block']) ?>
+    </div>
+    <div class="form-group">
+        <?= $this->formLabel($mConfirmPassword) ?>
+        <?= $this->formElement($mConfirmPassword) ?>
+        <?= $this->formElementErrors()->render($mConfirmPassword, ['class' => 'help-block']) ?>
+    </div>
+    <div class="form-group">
+        <label class="label label-warning"><?= $form->get('ResultMessages')->getValue() ?></label>
+    </div>
+
+<?php
+echo $this->formSubmit($submit);
+echo $this->form()->closeTag();
+?>
