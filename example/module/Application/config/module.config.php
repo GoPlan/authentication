@@ -12,9 +12,11 @@ use CreativeDelta\User\Application\Controller\Factory\AccountControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\FacebookControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\GoogleControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\IndexControllerFactory;
+use CreativeDelta\User\Application\Controller\Factory\ResetPasswordControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\UserControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\UserIdentityServiceInterfaceFactory;
 use CreativeDelta\User\Application\Controller\GoogleController;
+use CreativeDelta\User\Application\Controller\ResetPasswordController;
 use CreativeDelta\User\Application\Controller\UserController;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use Zend\Router\Http\Literal;
@@ -219,6 +221,7 @@ return [
             Controller\FacebookController::class => FacebookControllerFactory::class,
             Controller\GoogleController::class   => GoogleControllerFactory::class,
             Controller\AccountController::class => AccountControllerFactory::class,
+            Controller\ResetPasswordController::class => ResetPasswordControllerFactory::class,
         ],
     ],
     'service_manager' => [
@@ -240,6 +243,21 @@ return [
         ],
         'template_path_stack'      => [
             __DIR__ . '/../view',
+        ],
+    ],
+    'console' => [
+        'router' => [
+            'routes' => [
+                'user-reset-password' => [
+                    'options' => [
+                        'route'    => 'user resetpassword <account> <newPass> <confirmNewPass>',
+                        'defaults' => [
+                            'controller' => ResetPasswordController::class,
+                            'action'     => 'resetpassword',
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 ];

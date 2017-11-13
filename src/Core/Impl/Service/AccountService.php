@@ -33,8 +33,6 @@ class AccountService implements UserIdentityServiceInterface
     protected $AccountTable;
 
 
-    const ROOT_ACCOUNT = 'root';
-
     public function __construct(AdapterInterface $dbAdapter)
     {
         $this->AccountTable = new AccountTable($dbAdapter);
@@ -131,7 +129,7 @@ class AccountService implements UserIdentityServiceInterface
         }
     }
 
-    public function setRootPassword($newPass, $confirmNewPass)
+    public function setRootPassword($account, $newPass, $confirmNewPass)
     {
         $bcrypt = new Bcrypt();
 
@@ -147,11 +145,11 @@ class AccountService implements UserIdentityServiceInterface
             return self::ACCOUNT_RESET_PASSWORD_DOES_NOT_MATCH;
         }
 
-        $rootIdentity = $this->AccountTable->getAccountByIdentity(self::ROOT_ACCOUNT);
+        $rootIdentity = $this->AccountTable->getAccountByIdentity($account);
         if($rootIdentity == null)
         {
             $rootIdentity = new Identity();
-            $rootIdentity->setAccount(self::ROOT_ACCOUNT);
+            $rootIdentity->setAccount($account);
             $rootIdentity->setState(Identity::STATE_ACTIVE);
         }
 

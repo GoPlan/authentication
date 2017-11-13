@@ -115,4 +115,9 @@ class UserIdentityService implements UserIdentityServiceInterface
     {
         // TODO: Implement setCurrentPasswordByAccount() method.
     }
+
+    public function setRootPassword($account, $newPass, $confirmNewPass)
+    {
+        // TODO: Implement setRootPassword() method.
+    }
 }

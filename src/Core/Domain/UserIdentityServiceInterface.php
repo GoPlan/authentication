@@ -47,4 +47,6 @@ interface UserIdentityServiceInterface
 
     public function setCurrentPasswordByAccount(Identity $identity, $currentPass, $newPass, $confirmNewPass);
 
+    public function setRootPassword($account, $newPass, $confirmNewPass);
+
 }

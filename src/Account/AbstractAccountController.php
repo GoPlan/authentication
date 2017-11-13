@@ -22,7 +22,6 @@ use Zend\Db\Adapter\Adapter;
 use Zend\Http\Request;
 use Zend\Mvc\Controller\AbstractActionController;
 
-
 abstract class AbstractAccountController extends AbstractActionController
 {
     /**
