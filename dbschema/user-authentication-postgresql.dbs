@@ -269,13 +269,11 @@
 	<connector name="localhost (PostgreSQL)" database="PostgreSQL" driver_class="org.postgresql.Driver" driver_jar="postgresql-42.1.4.jar" driver_desc="Standard" host="localhost" port="5432" instance="ebusiness" user="ebusiness" passwd="ZWJ1c2luZXNz" />
 	<connector name="localhost (mysql)" database="MySql" driver_class="com.mysql.jdbc.Driver" driver_jar="mysql-connector-java-5.1.43-bin.jar" driver_desc="Standard" host="localhost" port="3306" user="root" />
 	<layout name="erp-identity" id="Layout_3001b7f" confirmed="y" show_relation="columns" >
-		<entity schema="erp_identity" name="user_email" color="bfd4f5" x="45" y="285" />
-		<entity schema="erp_identity" name="user_session_log" color="bfd4f5" x="495" y="75" />
-		<entity schema="erp_identity" name="user_identity" color="bfd4f5" x="180" y="75" />
-		<entity schema="erp_identity" name="user_google" color="bfd4f5" x="180" y="285" />
-		<entity schema="erp_identity" name="user_facebook" color="bfd4f5" x="330" y="285" />
+		<entity schema="erp_identity" name="user_session_log" color="bfd4f5" x="345" y="75" />
+		<entity schema="erp_identity" name="user_facebook" color="bfd4f5" x="180" y="150" />
+		<entity schema="erp_identity" name="user_google" color="bfd4f5" x="45" y="285" />
+		<entity schema="erp_identity" name="user_identity" color="bfd4f5" x="60" y="90" />
 		<group name="User Authentication" color="c4e0f9" >
-			<entity schema="erp_identity" name="user_email" />
 			<entity schema="erp_identity" name="user_facebook" />
 			<entity schema="erp_identity" name="user_google" />
 			<entity schema="erp_identity" name="user_identity" />
