@@ -8,7 +8,7 @@
 
 namespace CreativeDelta\User\Facebook;
 
-
+use CreativeDelta\User\Core\Domain\Entity\Identity;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use CreativeDelta\User\Core\Impl\Exception\AuthenticationException;
 use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
@@ -127,6 +127,8 @@ abstract class FacebookAbstractController extends AbstractActionController
      */
     abstract function getAuthenticationReturnPath();
 
+    abstract function getAttachReturnPath();
+
     /**
      * Because you will have a different route configuration for the authentication pages.
      * Implement this method to return the correct url of returning url.
@@ -188,6 +190,19 @@ abstract class FacebookAbstractController extends AbstractActionController
         return $url;
     }
 
+    public function getAttachReturnUrl()
+    {
+        /** @var Request $request */
+        $request = $this->getRequest();
+        $scheme  = $request->getUri()->getScheme();
+        $host    = $request->getUri()->getHost() . ':' . $request->getUri()->getPort();
+        $path    = $this->getAttachReturnPath();
+
+        $url = "{$scheme}://{$host}{$path}";
+
+        return $url;
+    }
+
     public function getRegisterReturnUrl()
     {
         /** @var Request $request */
@@ -199,6 +214,60 @@ abstract class FacebookAbstractController extends AbstractActionController
         $url = "{$scheme}://{$host}{$path}";
 
         return $url;
+    }
+
+    public function attachAccountAction()
+    {
+        /** @var Request $request */
+        $request   = $this->getRequest();
+        $returnUrl = $request->getQuery(UserSessionService::QUERY_RETURN_URL_NAME);
+
+        if (!$returnUrl)
+            throw AuthenticationException::ReturnUrlIsNotProvided();
+
+        $this->getContainer()[self::RETURN_URL] = $returnUrl;
+
+        $oauthUrl = $this->getFacebookMethod()->makeAuthenticationUrl($this->getAttachReturnUrl(), null);
+
+        return $this->redirect()->toUrl($oauthUrl);
+    }
+
+    public function attachAccountReturnAction()
+    {
+        /** @var Request $req */
+        $req  = $this->getRequest();
+        $data = $req->getQuery()->toArray();
+        $code = $data[FacebookMethod::RESULT_QUERY_CODE];
+
+        try {
+
+            $this->getFacebookMethod()->initAccessToken($this->getAttachReturnUrl(), $code);
+            $facebookData = $this->getFacebookMethod()->getOAuthProfile();
+            $facebookId   = $facebookData[FacebookMethod::PROFILE_FIELD_ID];
+
+            $registerAdapter = $this->getFacebookMethod();
+
+            if($this->authenticationService->hasIdentity()) {
+                /** @var Identity $getIdentity */
+                $getIdentity = $this->authenticationService->getIdentity();
+
+                $this->getUserIdentityService()->attach($registerAdapter, $getIdentity->getId(), $facebookId, $facebookData);
+
+                $this->createUserInLocalDatabase($getIdentity->getId(), $facebookData);
+            }
+
+            return $this->getReturnResponseForNewUserCreated();
+
+        } catch (UserIdentityException $exception) {
+            switch ($exception->getCode()) {
+                case UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST:
+                    return $this->getReturnResponseForUserAlreadyExisted();
+                default:
+                    throw $exception;
+            }
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 
     public function registerAction()

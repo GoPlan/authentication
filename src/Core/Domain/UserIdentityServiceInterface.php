@@ -13,6 +13,7 @@ namespace CreativeDelta\User\Core\Domain;
 
 
 use CreativeDelta\User\Core\Domain\Entity\Identity;
+use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
 
 interface UserIdentityServiceInterface
 {
@@ -48,5 +49,7 @@ interface UserIdentityServiceInterface
     public function setCurrentPasswordByAccount(Identity $identity, $currentPass, $newPass, $confirmNewPass);
 
     public function setRootPassword($account, $newPass, $confirmNewPass);
+
+    public function attach(UserRegisterMethodAdapter $adapter, $identityId, $userId, $data);
 
 }

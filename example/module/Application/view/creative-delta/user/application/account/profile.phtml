@@ -35,6 +35,13 @@ echo $this->form()->openTag($form);
     <label>User name:</label>
         <label class="label label-warning"><?= $form->get('Identity')->getValue() ?></label>
 </div>
+
+<div class="form-group">
+    <label>Login by social account</label>
+    <a class="btn btn-default" href="/application/index/register/google/attach?return=/">Google</a>
+    <a class="btn btn-default" href="/application/index/register/facebook/attach?return=/">Facebook</a>
+</div>
+
 <div class="form-group">
     <?= $this->formLabel($mCurrentPassword) ?>
     <?= $this->formElement($mCurrentPassword) ?>
@@ -53,6 +60,8 @@ echo $this->form()->openTag($form);
 <div class="form-group">
     <label class="label label-warning"><?= $form->get('ResultMessages')->getValue() ?></label>
 </div>
+
+
 
 <?php
 echo $this->formSubmit($submit);

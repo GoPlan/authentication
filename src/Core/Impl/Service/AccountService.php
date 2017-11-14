@@ -164,6 +164,11 @@ class AccountService implements UserIdentityServiceInterface
 
     }
 
+    public function attach(UserRegisterMethodAdapter $adapter, $identityId, $userId, $data)
+    {
+
+    }
+
 #endregion
 
 

@@ -111,6 +111,25 @@ class UserIdentityService implements UserIdentityServiceInterface
         }
     }
 
+    public function attach(UserRegisterMethodAdapter $adapter, $identityId, $userId, $data)
+    {
+        $dbConnection = $this->dbAdapter->getDriver()->getConnection();
+        $dbConnection->beginTransaction();
+
+        try {
+            $adapter->register($identityId, $userId, $data);
+            $dbConnection->commit();
+
+            return $identityId;
+
+        }
+        catch (\Exception $exception)
+        {
+            $dbConnection->rollback();
+            throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_DATABASE_OPERATION_FAILED, $exception);
+        }
+    }
+
     public function setCurrentPasswordByAccount(Identity $identity, $currentPass, $newPass, $confirmNewPass)
     {
         // TODO: Implement setCurrentPasswordByAccount() method.

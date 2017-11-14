@@ -80,6 +80,26 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [
+                                    'attach'        => [
+                                        'type'    => Literal::class,
+                                        'options' => [
+                                            'route'    => '/attach',
+                                            'defaults' => [
+                                                'controller' => FacebookController::class,
+                                                'action'     => 'attach-account'
+                                            ]
+                                        ]
+                                    ],
+                                    'attach-account-return' => [
+                                        'type'    => Literal::class,
+                                        'options' => [
+                                            'route'    => '/attach-account-return',
+                                            'defaults' => [
+                                                'controller' => FacebookController::class,
+                                                'action'     => 'attach-account-return'
+                                            ]
+                                        ]
+                                    ],
                                     'register'        => [
                                         'type'    => Literal::class,
                                         'options' => [
@@ -109,6 +129,26 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [
+                                    'attach'        => [
+                                        'type'    => Literal::class,
+                                        'options' => [
+                                            'route'    => '/attach',
+                                            'defaults' => [
+                                                'controller' => GoogleController::class,
+                                                'action'     => 'attach-account'
+                                            ]
+                                        ]
+                                    ],
+                                    'attach-account-return' => [
+                                        'type'    => Literal::class,
+                                        'options' => [
+                                            'route'    => '/attach-account-return',
+                                            'defaults' => [
+                                                'controller' => GoogleController::class,
+                                                'action'     => 'attach-account-return'
+                                            ]
+                                        ]
+                                    ],
                                     'register'        => [
                                         'type'    => Literal::class,
                                         'options' => [

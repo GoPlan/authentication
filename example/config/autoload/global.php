@@ -29,8 +29,8 @@ return [
 
     'authConfig' => [
         'facebook' => [
-            'appId'     => "",
-            "appSecret" => "",
+            'appId'     => "1442542719380071",
+            "appSecret" => "21db879762856c2639ce0ba2a9076a9b",
             "appScope"  => ""
         ],
         'google'   => [

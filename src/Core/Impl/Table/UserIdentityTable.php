@@ -17,8 +17,8 @@ use Zend\Db\TableGateway\TableGateway;
 
 class UserIdentityTable
 {
-    const AUTO_SEQUENCE   = "erp_identity.user_identity_id_seq";
-    const TABLE_NAME      = "user_identity";
+    const AUTO_SEQUENCE   = "public.useridentity_id_seq";
+    const TABLE_NAME      = "UserIdentity";
     const ID_NAME         = "id";
     const COLUMN_ACCOUNT  = "account";
     const COLUMN_PASSWORD = "password";

@@ -41,6 +41,7 @@ class Identity extends \ArrayObject
     protected $account;
     protected $state;
     protected $password;
+    protected $profile;
     protected $adapterClassName;
 
     const TABLE_NAME = 'UserIdentity';
@@ -146,5 +147,21 @@ class Identity extends \ArrayObject
             self::COLUMN_USER_NAME => $this->getAccount(),
             self::COLUMN_USER_PASSWORD => $this->getPassword()
         ];
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProfile()
+    {
+        return $this->profile;
+    }
+
+    /**
+     * @param mixed $profile
+     */
+    public function setProfile($profile)
+    {
+        $this->profile = $profile;
     }
 }
