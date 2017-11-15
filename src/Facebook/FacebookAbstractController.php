@@ -9,8 +9,8 @@
 namespace CreativeDelta\User\Facebook;
 
 
-use CreativeDelta\User\Core\Domain\OAuthAuthenticationAdapter;
 use CreativeDelta\User\Core\Domain\Entity\Identity;
+use CreativeDelta\User\Core\Domain\OAuthAuthenticationAdapter;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use CreativeDelta\User\Core\Impl\Exception\AuthenticationException;
 use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
@@ -228,7 +228,7 @@ abstract class FacebookAbstractController extends AbstractActionController
 
             $registerAdapter = $this->getFacebookMethod();
 
-            if($this->authenticationService->hasIdentity()) {
+            if ($this->authenticationService->hasIdentity()) {
                 /** @var Identity $getIdentity */
                 $getIdentity = $this->authenticationService->getIdentity();
 

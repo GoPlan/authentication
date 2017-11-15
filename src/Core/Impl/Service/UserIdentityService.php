@@ -110,7 +110,7 @@ class UserIdentityService implements UserIdentityServiceInterface
 
     public function attach(UserRegisterMethodAdapter $adapter, $identityId, $userId, $data)
     {
-        $dbConnection = $this->dbAdapter->getDriver()->getConnection();
+        $dbConnection = $this->userIdentityTable->getTableGateway()->getAdapter()->getDriver()->getConnection();
         $dbConnection->beginTransaction();
 
         try {
