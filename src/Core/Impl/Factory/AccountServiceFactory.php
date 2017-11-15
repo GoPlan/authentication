@@ -6,21 +6,20 @@
  * Time: 16:41
  */
 
-namespace CreativeDelta\User\Application\Controller\Factory;
+namespace CreativeDelta\User\Core\Impl\Factory;
 
 
+use CreativeDelta\User\Core\Impl\Service\AccountService;
 use Interop\Container\ContainerInterface;
 use Zend\Db\Adapter\Adapter;
 use Zend\ServiceManager\Factory\FactoryInterface;
-use CreativeDelta\User\Core\Impl\Service\AccountService;
 
-class UserIdentityServiceInterfaceFactory implements FactoryInterface
+class AccountServiceFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        // TODO: Implement __invoke() method.
-        $dbAdapter   = $container->get(Adapter::class);
-        $service = new AccountService($dbAdapter);
+        $dbAdapter = $container->get(Adapter::class);
+        $service   = new AccountService($dbAdapter);
         return $service;
     }
 }

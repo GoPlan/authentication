@@ -53,7 +53,7 @@ class IdentityRow implements RowGatewayInterface
     {
         $this->setId($data[UserIdentityTable::ID_NAME]);
         $this->setAccount($data[UserIdentityTable::COLUMN_ACCOUNT]);
-        $this->setSecret($data[UserIdentityTable::COLUMN_PASSWORD]);
+        $this->setPassword($data[UserIdentityTable::COLUMN_PASSWORD]);
         $this->setState($data[UserIdentityTable::COLUMN_STATE]);
     }
 
@@ -99,12 +99,12 @@ class IdentityRow implements RowGatewayInterface
         $this->data[UserIdentityTable::COLUMN_ACCOUNT] = $account;
     }
 
-    public function setSecret($secret)
+    public function setPassword($password)
     {
-        return $this->data[UserIdentityTable::COLUMN_PASSWORD] = $secret;
+        return $this->data[UserIdentityTable::COLUMN_PASSWORD] = $password;
     }
 
-    public function getSecret()
+    public function getPassword()
     {
         $this->data[UserIdentityTable::COLUMN_PASSWORD];
     }

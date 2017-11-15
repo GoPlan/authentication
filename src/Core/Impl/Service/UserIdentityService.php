@@ -81,7 +81,7 @@ class UserIdentityService implements UserIdentityServiceInterface
      */
     public function register(UserRegisterMethodAdapter $adapter, $account, $password = null, $userId = null, $data = null)
     {
-        if ($this->hasAccount($account) || $adapter->has($userId))
+        if ($this->hasAccount($account))
             throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST);
 
         $dbAdapter    = $this->userIdentityTable->getTableGateway()->getAdapter();
@@ -93,6 +93,7 @@ class UserIdentityService implements UserIdentityServiceInterface
             $identity = new IdentityRow($this->userIdentityTable);
             $identity->setAutoSequence(UserIdentityTable::AUTO_SEQUENCE);
             $identity->setAccount($account);
+            $identity->setPassword($password);
             $identity->setState(Identity::STATE_ACTIVE);
             $identity->save();
 

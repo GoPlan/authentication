@@ -14,16 +14,14 @@ use CreativeDelta\User\Application\Controller\Factory\GoogleControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\IndexControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\ResetPasswordControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\UserControllerFactory;
-use CreativeDelta\User\Application\Controller\Factory\UserIdentityServiceInterfaceFactory;
 use CreativeDelta\User\Application\Controller\GoogleController;
 use CreativeDelta\User\Application\Controller\ResetPasswordController;
 use CreativeDelta\User\Application\Controller\UserController;
-use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 
 return [
-    'router'       => [
+    'router'          => [
         'routes' => [
             'home'        => [
                 'type'    => Literal::class,
@@ -35,7 +33,7 @@ return [
                     ],
                 ],
             ],
-            'phpinfo'        => [
+            'phpinfo'     => [
                 'type'    => Literal::class,
                 'options' => [
                     'route'    => '/phpinfo',
@@ -45,7 +43,7 @@ return [
                     ],
                 ],
             ],
-            'account'        => [
+            'account'     => [
                 'type'    => Segment::class,
                 'options' => [
                     'route'    => '/account[/:action]',
@@ -80,7 +78,7 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [
-                                    'attach'        => [
+                                    'attach'                => [
                                         'type'    => Literal::class,
                                         'options' => [
                                             'route'    => '/attach',
@@ -100,7 +98,7 @@ return [
                                             ]
                                         ]
                                     ],
-                                    'register'        => [
+                                    'register'              => [
                                         'type'    => Literal::class,
                                         'options' => [
                                             'route'    => '/register',
@@ -110,7 +108,7 @@ return [
                                             ]
                                         ]
                                     ],
-                                    'register-return' => [
+                                    'register-return'       => [
                                         'type'    => Literal::class,
                                         'options' => [
                                             'route'    => '/register-return',
@@ -129,7 +127,7 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [
-                                    'attach'        => [
+                                    'attach'                => [
                                         'type'    => Literal::class,
                                         'options' => [
                                             'route'    => '/attach',
@@ -149,7 +147,7 @@ return [
                                             ]
                                         ]
                                     ],
-                                    'register'        => [
+                                    'register'              => [
                                         'type'    => Literal::class,
                                         'options' => [
                                             'route'    => '/register',
@@ -159,7 +157,7 @@ return [
                                             ]
                                         ]
                                     ],
-                                    'register-return' => [
+                                    'register-return'       => [
                                         'type'    => Literal::class,
                                         'options' => [
                                             'route'    => '/register-return',
@@ -254,22 +252,22 @@ return [
             ]
         ],
     ],
-    'controllers'  => [
+    'controllers'     => [
         'factories' => [
-            Controller\UserController::class     => UserControllerFactory::class,
-            Controller\IndexController::class    => IndexControllerFactory::class,
-            Controller\FacebookController::class => FacebookControllerFactory::class,
-            Controller\GoogleController::class   => GoogleControllerFactory::class,
-            Controller\AccountController::class => AccountControllerFactory::class,
+            Controller\UserController::class          => UserControllerFactory::class,
+            Controller\IndexController::class         => IndexControllerFactory::class,
+            Controller\FacebookController::class      => FacebookControllerFactory::class,
+            Controller\GoogleController::class        => GoogleControllerFactory::class,
+            Controller\AccountController::class       => AccountControllerFactory::class,
             Controller\ResetPasswordController::class => ResetPasswordControllerFactory::class,
         ],
     ],
     'service_manager' => [
         'factories' => [
-            UserIdentityServiceInterface::class => UserIdentityServiceInterfaceFactory::class,
+//            UserIdentityServiceInterface::class => UserIdentityServiceInterfaceFactory::class,
         ],
     ],
-    'view_manager' => [
+    'view_manager'    => [
         'display_not_found_reason' => true,
         'display_exceptions'       => true,
         'doctype'                  => 'HTML5',
@@ -285,7 +283,7 @@ return [
             __DIR__ . '/../view',
         ],
     ],
-    'console' => [
+    'console'         => [
         'router' => [
             'routes' => [
                 'user-reset-password' => [

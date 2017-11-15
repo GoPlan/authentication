@@ -49,6 +49,10 @@ class AccountAuthenticationAdapter implements AdapterInterface
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, ['Account disabled.']);
         }
 
+        if (!$this->password || strlen($this->password) == 0) {
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, ['Wrong password.']);
+        }
+
         if (!$bcrypt->verify($this->password, $account->getPassword())) {
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, ['Wrong password.']);
         }

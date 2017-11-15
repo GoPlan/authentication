@@ -20,9 +20,9 @@ class ResetPasswordController extends AbstractActionController
     protected $dbAdapter;
     protected $AccountService;
 
-    public function __construct(Adapter $dbAdapter,UserIdentityServiceInterface $AccountService)
+    public function __construct(Adapter $dbAdapter, UserIdentityServiceInterface $AccountService)
     {
-        $this->dbAdapter = $dbAdapter;
+        $this->dbAdapter      = $dbAdapter;
         $this->AccountService = $AccountService;
     }
 
@@ -35,17 +35,15 @@ class ResetPasswordController extends AbstractActionController
     {
         $request = $this->getRequest();
 
-        if(!$request instanceof ConsoleRequest)
-        {
+        if (!$request instanceof ConsoleRequest) {
             return 'this function only call at command line.';
         }
 
-        $account = $request->getParam('account');
-        $newPass = $request->getParam('newPass');
+        $account        = $request->getParam('account');
+        $newPass        = $request->getParam('newPass');
         $confirmNewPass = $request->getParam('confirmNewPass');
 
-        switch ($this->AccountService->setAccountPassword($account, $newPass, $confirmNewPass))
-        {
+        switch ($this->AccountService->setAccountPassword($account, $newPass, $confirmNewPass)) {
             case AccountService::ACCOUNT_RESET_SUCCESS:
                 return "Success!!!\r\nNew password: $newPass \r\nConfirm new password: $confirmNewPass \r\n";
             default:

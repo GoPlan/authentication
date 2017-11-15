@@ -15,15 +15,17 @@ return [
 
     'service_manager' => [
         'factories' => [
-            \Zend\Db\Adapter\Adapter::class                                     => \Zend\Db\Adapter\AdapterServiceFactory::class,
-            \Zend\Authentication\AuthenticationService::class                   => \Zend\ServiceManager\Factory\InvokableFactory::class,
-            \Zend\Session\SessionManager::class                                 => \CreativeDelta\User\Core\Impl\Factory\SessionManagerFactory::class,
-            \CreativeDelta\User\Google\GoogleMethod::class                      => \CreativeDelta\User\Core\Impl\Factory\GoogleMethodFactory::class,
-            \CreativeDelta\User\Facebook\FacebookMethod::class                  => \CreativeDelta\User\Core\Impl\Factory\FacebookMethodFactory::class,
-            \CreativeDelta\User\Core\Domain\UserIdentityServiceInterface::class => \CreativeDelta\User\Core\Impl\Factory\UserIdentityServiceFactory::class
+            \Zend\Db\Adapter\Adapter::class                                  => \Zend\Db\Adapter\AdapterServiceFactory::class,
+            \Zend\Session\SessionManager::class                              => \CreativeDelta\User\Core\Impl\Factory\SessionManagerFactory::class,
+            \Zend\Authentication\AuthenticationService::class                => \Zend\ServiceManager\Factory\InvokableFactory::class,
+            \CreativeDelta\User\Google\GoogleMethod::class                   => \CreativeDelta\User\Core\Impl\Factory\GoogleMethodFactory::class,
+            \CreativeDelta\User\Facebook\FacebookMethod::class               => \CreativeDelta\User\Core\Impl\Factory\FacebookMethodFactory::class,
+            \CreativeDelta\User\Core\Impl\Service\UserIdentityService::class => \CreativeDelta\User\Core\Impl\Factory\UserIdentityServiceFactory::class,
+            \CreativeDelta\User\Core\Impl\Service\AccountService::class      => \CreativeDelta\User\Core\Impl\Factory\AccountServiceFactory::class
         ],
         'aliases'   => [
-            \Zend\Authentication\AuthenticationServiceInterface::class => \Zend\Authentication\AuthenticationService::class
+            \Zend\Authentication\AuthenticationServiceInterface::class          => \Zend\Authentication\AuthenticationService::class,
+            \CreativeDelta\User\Core\Domain\UserIdentityServiceInterface::class => \CreativeDelta\User\Core\Impl\Service\UserIdentityService::class
         ]
     ],
 

@@ -17,13 +17,13 @@ interface AccountTableGatewayInterface
 
     public function getDbAdapter();
 
-    public function saveAccount(Identity $account);
+    public function saveIdentity(Identity $identity);
 
-    public function getAccount($id);
+    public function getIdentityById($id);
 
-    public function getAccountByIdentity($identity);
+    public function getIdentityByAccount($account);
 
-    public function hasAccount($identity);
+    public function hasAccount($account);
 
-    public function hasAccountId($id);
+    public function hasId($id);
 }

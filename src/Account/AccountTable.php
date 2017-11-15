@@ -14,19 +14,18 @@ use Zend\Db\TableGateway\TableGateway;
 
 class AccountTable implements AccountTableGatewayInterface
 {
-
     protected $dbAdapter;
     protected $accountTableGateway;
 
-    const TABLE_NAME = 'UserIdentity';
-    const ID_NAME = 'id';
-    const COLUMN_USER_NAME = 'account';
+    const TABLE_NAME           = 'UserIdentity';
+    const ID_NAME              = 'id';
+    const COLUMN_USER_ACCOUNT  = 'account';
     const COLUMN_USER_PASSWORD = 'password';
-    const COLUMN_STATE = 'state';
+    const COLUMN_STATE         = 'state';
 
     public function __construct($dbAdapter)
     {
-        $this->dbAdapter = $dbAdapter;
+        $this->dbAdapter    = $dbAdapter;
         $resultSetPrototype = new ResultSet();
         $resultSetPrototype->setArrayObjectPrototype(new Identity());
         $this->accountTableGateway = new TableGateway(self::TABLE_NAME, $this->dbAdapter, null, $resultSetPrototype);
@@ -48,29 +47,28 @@ class AccountTable implements AccountTableGatewayInterface
         return $this->dbAdapter;
     }
 
-    public function saveAccount(Identity $account)
+    public function saveIdentity(Identity $identity)
     {
-        $data = $account->getArrayCopy();
+        $data = $identity->getArrayCopy();
 
-        $id = $account->getId();
+        $id = $identity->getId();
         if ($id == 0) {
             unset($data[self::ID_NAME]);
             $this->accountTableGateway->insert($data);
             return true;
         } else {
-            if($this->getAccount($id)){
+            if ($this->getIdentityById($id)) {
                 $this->accountTableGateway->update($data, [self::ID_NAME => $id]);
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
         }
     }
 
-    public function getAccount($id)
+    public function getIdentityById($id)
     {
-        $id = (int)$id;
+        $id     = (int)$id;
         $rowset = $this->accountTableGateway->select([
                 self::ID_NAME => $id
             ]
@@ -78,31 +76,31 @@ class AccountTable implements AccountTableGatewayInterface
         return $rowset->current();
     }
 
-    public function getAccountByIdentity($identity)
+    public function getIdentityByAccount($account)
     {
         $rowset = $this->accountTableGateway->select(
-            [self::COLUMN_USER_NAME => $identity]
+            [self::COLUMN_USER_ACCOUNT => $account]
         );
         return $rowset->current();
     }
 
-    public function hasAccount($identity)
+    public function hasAccount($account)
     {
         $rowset = $this->accountTableGateway->select(
-        [
-            self::COLUMN_USER_NAME => $identity
-        ]
+            [
+                self::COLUMN_USER_ACCOUNT => $account
+            ]
         );
         return $rowset->count() != 0 ? true : false;
     }
 
-    public function hasAccountId($id)
+    public function hasId($id)
     {
-        $id = (int)$id;
+        $id     = (int)$id;
         $rowset = $this->accountTableGateway->select(
-        [
-            self::ID_NAME => $id,
-        ]
+            [
+                self::ID_NAME => $id,
+            ]
         );
 
         return $rowset->count() != 0 ? true : false;

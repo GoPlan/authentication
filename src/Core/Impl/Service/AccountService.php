@@ -61,7 +61,7 @@ class AccountService implements UserIdentityServiceInterface
 
     public function getIdentityByAccount($account)
     {
-        $Result = $this->AccountTable->getAccountByIdentity($account);
+        $Result = $this->AccountTable->getIdentityByAccount($account);
         return $Result;
     }
 
@@ -83,7 +83,7 @@ class AccountService implements UserIdentityServiceInterface
     public function getIdentityById($id)
     {
         $id     = (int)$id;
-        $Result = $this->AccountTable->getAccount($id);
+        $Result = $this->AccountTable->getIdentityById($id);
         return $Result;
     }
 
@@ -114,7 +114,7 @@ class AccountService implements UserIdentityServiceInterface
         $identity->setPassword($bcrypt->create($newPass));
 
         //save new pass
-        if ($this->AccountTable->saveAccount($identity)) {
+        if ($this->AccountTable->saveIdentity($identity)) {
             return self::ACCOUNT_RESET_SUCCESS;
         } else {
             return self::ACCOUNT_RESET_FAILED;
@@ -135,7 +135,7 @@ class AccountService implements UserIdentityServiceInterface
             return self::ACCOUNT_RESET_PASSWORD_DOES_NOT_MATCH;
         }
 
-        $rootIdentity = $this->AccountTable->getAccountByIdentity($account);
+        $rootIdentity = $this->AccountTable->getIdentityByAccount($account);
 
         if ($rootIdentity == null) {
             $rootIdentity = new Identity();
@@ -145,7 +145,7 @@ class AccountService implements UserIdentityServiceInterface
 
         $rootIdentity->setPassword($bcrypt->create($newPass));
 
-        if ($this->AccountTable->saveAccount($rootIdentity)) {
+        if ($this->AccountTable->saveIdentity($rootIdentity)) {
             return self::ACCOUNT_RESET_SUCCESS;
         } else {
             return self::ACCOUNT_RESET_FAILED;
