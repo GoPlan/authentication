@@ -19,8 +19,8 @@ class RegisterForm extends Form
 
         $this->add(
             [
-                'name' => 'txtUsername',
-                'type' => 'Text',
+                'name'    => 'txtUsername',
+                'type'    => 'Text',
                 'options' => [
                     'label' => 'User name:'
                 ]
@@ -28,8 +28,8 @@ class RegisterForm extends Form
 
         $this->add(
             [
-                'name' => 'txtPassword',
-                'type' => 'Password',
+                'name'    => 'txtPassword',
+                'type'    => 'Password',
                 'options' => [
                     'label' => 'Password:'
                 ]
@@ -37,8 +37,8 @@ class RegisterForm extends Form
 
         $this->add(
             [
-                'name' => 'txtConfirmPassword',
-                'type' => 'Password',
+                'name'    => 'txtConfirmPassword',
+                'type'    => 'Password',
                 'options' => [
                     'label' => 'Confirm password:'
                 ]
@@ -53,11 +53,11 @@ class RegisterForm extends Form
 
         $this->add(
             [
-                'name' => 'submit',
-                'type' => 'submit',
+                'name'    => 'submit',
+                'type'    => 'submit',
                 'options' => [
                     'value' => 'Sign In',
-                    'id' => 'btnsubmit',
+                    'id'    => 'btnsubmit',
                 ]
             ]
         );

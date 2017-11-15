@@ -12,9 +12,7 @@
 namespace CreativeDelta\User\Core\Impl\Service;
 
 
-use CreativeDelta\User\Core\Domain\AbstractAuthenticationAdapter;
 use CreativeDelta\User\Core\Domain\Entity\Identity;
-use CreativeDelta\User\Core\Impl\Exception\AuthenticationException;
 use Zend\Db\Adapter\AdapterInterface;
 
 class AuthenticationService extends \Zend\Authentication\AuthenticationService

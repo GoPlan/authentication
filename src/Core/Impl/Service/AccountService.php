@@ -10,24 +10,24 @@ namespace CreativeDelta\User\Core\Impl\Service;
 
 
 use CreativeDelta\User\Account\AccountTable;
+use CreativeDelta\User\Core\Domain\Entity\Identity;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Json\Json;
-use CreativeDelta\User\Core\Domain\Entity\Identity;
 use Zend\Validator\StringLength;
 use Zend\Validator\ValidatorChain;
 
 class AccountService implements UserIdentityServiceInterface
 {
 
-    const ACCOUNT_RESET_SUCCESS = 1;
+    const ACCOUNT_RESET_SUCCESS                       = 1;
     const ACCOUNT_RESET_CURRENT_PASSWORD_IS_INCORRECT = -1;
-    const ACCOUNT_RESET_PASSWORD_DOES_NOT_MATCH = -2;
-    const ACCOUNT_RESET_CURRENT_PASSWORD_INVALID = -3;
-    const ACCOUNT_RESET_NEW_PASSWORD_INVALID = -4;
-    const ACCOUNT_RESET_FAILED = -5;
+    const ACCOUNT_RESET_PASSWORD_DOES_NOT_MATCH       = -2;
+    const ACCOUNT_RESET_CURRENT_PASSWORD_INVALID      = -3;
+    const ACCOUNT_RESET_NEW_PASSWORD_INVALID          = -4;
+    const ACCOUNT_RESET_FAILED                        = -5;
 
 
     protected $AccountTable;
@@ -42,15 +42,12 @@ class AccountService implements UserIdentityServiceInterface
 
     public function register(UserRegisterMethodAdapter $adapter, $account, $password = null, $userId = null, $data = null)
     {
-        // TODO: Implement register() method.
-
         if ($this->hasAccount($account)) {
 //            throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST);
             return false;
         }
 
-        if($data == null)
-        {
+        if ($data == null) {
             $nAccount = new Identity();
             $nAccount->setAccount($account);
             $nAccount->setPassword($password);
@@ -75,45 +72,41 @@ class AccountService implements UserIdentityServiceInterface
 
     public function createSessionLog($previousHash = null, $returnUrl = null, $data = null)
     {
-        // TODO: Implement createSessionLog() method.
+        //
     }
 
     public function getSessionLog($hash)
     {
-        // TODO: Implement getSessionLog() method.
+        //
     }
 
     public function getIdentityById($id)
     {
-        $id = (int)$id;
+        $id     = (int)$id;
         $Result = $this->AccountTable->getAccount($id);
         return $Result;
     }
 
-    public function setCurrentPasswordByAccount(Identity $identity,$currentPass, $newPass, $confirmNewPass)
+    public function setCurrentPasswordByAccount(Identity $identity, $currentPass, $newPass, $confirmNewPass)
     {
         $bcrypt = new Bcrypt();
 
         $mValidator = new ValidatorChain();
         $mValidator->attach(new StringLength(['min' => 8, 'max' => 32]));
 
-        if(!$mValidator->isValid($currentPass))
-        {
+        if (!$mValidator->isValid($currentPass)) {
             return self::ACCOUNT_RESET_CURRENT_PASSWORD_INVALID;
         }
 
-        if(!$mValidator->isValid($newPass))
-        {
+        if (!$mValidator->isValid($newPass)) {
             return self::ACCOUNT_RESET_NEW_PASSWORD_INVALID;
         }
 
-        if(!$bcrypt->verify($currentPass,$identity->getPassword()))
-        {
+        if (!$bcrypt->verify($currentPass, $identity->getPassword())) {
             return self::ACCOUNT_RESET_CURRENT_PASSWORD_IS_INCORRECT;
         }
 
-        if($newPass != $confirmNewPass)
-        {
+        if ($newPass != $confirmNewPass) {
             return self::ACCOUNT_RESET_PASSWORD_DOES_NOT_MATCH;
         }
 
@@ -121,10 +114,9 @@ class AccountService implements UserIdentityServiceInterface
         $identity->setPassword($bcrypt->create($newPass));
 
         //save new pass
-        if($this->AccountTable->saveAccount($identity)){
+        if ($this->AccountTable->saveAccount($identity)) {
             return self::ACCOUNT_RESET_SUCCESS;
-        }
-        else{
+        } else {
             return self::ACCOUNT_RESET_FAILED;
         }
     }
@@ -136,18 +128,15 @@ class AccountService implements UserIdentityServiceInterface
         $mValidator = new ValidatorChain();
         $mValidator->attach(new StringLength(['min' => 8, 'max' => 32]));
 
-        if(!$mValidator->isValid($newPass))
-        {
+        if (!$mValidator->isValid($newPass)) {
             return self::ACCOUNT_RESET_NEW_PASSWORD_INVALID;
         }
-        if($newPass != $confirmNewPass)
-        {
+        if ($newPass != $confirmNewPass) {
             return self::ACCOUNT_RESET_PASSWORD_DOES_NOT_MATCH;
         }
 
         $rootIdentity = $this->AccountTable->getAccountByIdentity($account);
-        if($rootIdentity == null)
-        {
+        if ($rootIdentity == null) {
             $rootIdentity = new Identity();
             $rootIdentity->setAccount($account);
             $rootIdentity->setState(Identity::STATE_ACTIVE);
@@ -155,10 +144,9 @@ class AccountService implements UserIdentityServiceInterface
 
         $rootIdentity->setPassword($bcrypt->create($newPass));
 
-        if($this->AccountTable->saveAccount($rootIdentity)){
+        if ($this->AccountTable->saveAccount($rootIdentity)) {
             return self::ACCOUNT_RESET_SUCCESS;
-        }
-        else{
+        } else {
             return self::ACCOUNT_RESET_FAILED;
         }
 
@@ -170,6 +158,5 @@ class AccountService implements UserIdentityServiceInterface
     }
 
 #endregion
-
 
 }

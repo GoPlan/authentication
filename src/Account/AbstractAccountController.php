@@ -35,12 +35,14 @@ abstract class AbstractAccountController extends AbstractActionController
 
     /**
      * IndexController constructor.
-     * @param AuthenticationService $authService
+     * @param Adapter                           $dbAdapter
+     * @param AuthenticationService             $authService
+     * @param UserIdentityServiceInterface|null $accountService
      */
     public function __construct(Adapter $dbAdapter, AuthenticationService $authService = null, UserIdentityServiceInterface $accountService = null)
     {
-        $this->dbAdapter = $dbAdapter;
-        $this->authService = $authService;
+        $this->dbAdapter      = $dbAdapter;
+        $this->authService    = $authService;
         $this->AccountService = $accountService;
     }
 
@@ -53,7 +55,7 @@ abstract class AbstractAccountController extends AbstractActionController
     {
         /** @var Request $request */
         $request = $this->getRequest();
-        $mForm = new SignInForm();
+        $mForm   = new SignInForm();
         $mForm->get('submit')->setValue('Sign In');
 
         $mAuthService = new AuthenticationService();
@@ -71,7 +73,7 @@ abstract class AbstractAccountController extends AbstractActionController
                 $mPassword = $mForm->get('txtPassword')->getValue();
 
                 $mAuthAdapter = new AccountAuthenticationAdapter($this->AccountService, $mUsername, $mPassword);
-                $mResult = $mAuthService->authenticate($mAuthAdapter);
+                $mResult      = $mAuthService->authenticate($mAuthAdapter);
                 if ($mResult->getCode() == Result::SUCCESS) {
                     return $this->redirect()->toRoute('application', ['action' => 'index']);
                 } else {
@@ -89,7 +91,7 @@ abstract class AbstractAccountController extends AbstractActionController
     {
         /** @var Request $request */
         $request = $this->getRequest();
-        $mForm = new RegisterForm();
+        $mForm   = new RegisterForm();
         $mForm->get('submit')->setValue('Sign In');
 
         $mAuthService = new AuthenticationService();
@@ -101,20 +103,20 @@ abstract class AbstractAccountController extends AbstractActionController
             $mForm->setData($request->getPost());
 
             if ($mForm->isValid()) {
-                $mUsername = $mForm->get('txtUsername')->getValue();
-                $mPassword = $mForm->get('txtPassword')->getValue();
+                $mUsername        = $mForm->get('txtUsername')->getValue();
+                $mPassword        = $mForm->get('txtPassword')->getValue();
                 $mConfirmPassword = $mForm->get('txtConfirmPassword')->getValue();
 
                 $loadidentity = $this->AccountService->getIdentityByAccount($mUsername);
                 if ($loadidentity == null) {
                     if (($mPassword == $mConfirmPassword) && !empty($mUsername) && !empty($mPassword)) {
 
-                        $bcrypt = new Bcrypt();
+                        $bcrypt      = new Bcrypt();
                         $encryptPass = $bcrypt->create($mPassword);
 
                         if ($this->AccountService->register($this->getAccountMethod(), $mUsername, $encryptPass)) {
                             $mAuthAdapter = new AccountAuthenticationAdapter($this->AccountService, $mUsername, $mPassword);
-                            $mResult = $mAuthService->authenticate($mAuthAdapter);
+                            $mResult      = $mAuthService->authenticate($mAuthAdapter);
                             if ($mResult->getCode() == Result::SUCCESS) {
                                 return $this->redirect()->toRoute('application', ['action' => 'index']);
                             } else {
@@ -146,7 +148,7 @@ abstract class AbstractAccountController extends AbstractActionController
     {
         /** @var Request $request */
         $request = $this->getRequest();
-        $mForm = new ProfileForm();
+        $mForm   = new ProfileForm();
         $mForm->get('submit')->setValue('Update');
 
         $mAuthService = new AuthenticationService();
@@ -160,7 +162,7 @@ abstract class AbstractAccountController extends AbstractActionController
 
                 if ($mForm->isValid()) {
                     $mCurrentPassword = $mForm->get('txtCurrentPassword')->getValue();
-                    $mPassword = $mForm->get('txtPassword')->getValue();
+                    $mPassword        = $mForm->get('txtPassword')->getValue();
                     $mConfirmPassword = $mForm->get('txtConfirmPassword')->getValue();
 
                     switch ($this->AccountService->setCurrentPasswordByAccount($account, $mCurrentPassword, $mPassword, $mConfirmPassword)) {

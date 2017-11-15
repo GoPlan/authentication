@@ -9,20 +9,20 @@
 namespace CreativeDelta\User\Account;
 
 
+use CreativeDelta\User\Core\Domain\Entity\Identity;
 use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
 use Zend\Db\Adapter\Adapter;
 use Zend\Json\Json;
-use CreativeDelta\User\Core\Domain\Entity\Identity;
 
 class AccountMethod implements UserRegisterMethodAdapter
 {
-    const METHOD_NAME       = "account";
+    const METHOD_NAME = "account";
     protected $dbAdapter;
     protected $AccountTable;
 
     public function __construct(Adapter $dbAdapter)
     {
-        $this->dbAdapter = $dbAdapter;
+        $this->dbAdapter    = $dbAdapter;
         $this->AccountTable = new AccountTable($dbAdapter);
     }
 

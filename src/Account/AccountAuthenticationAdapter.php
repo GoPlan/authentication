@@ -11,11 +11,11 @@ namespace CreativeDelta\User\Account;
 
 use CreativeDelta\User\Core\Domain\Entity\Identity;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
-use function GuzzleHttp\Promise\is_fulfilled;
+use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 use Zend\Crypt\Password\Bcrypt;
 
-class AccountAuthenticationAdapter implements \Zend\Authentication\Adapter\AdapterInterface
+class AccountAuthenticationAdapter implements AdapterInterface
 {
     protected $AccountService;
     protected $account;
@@ -24,8 +24,8 @@ class AccountAuthenticationAdapter implements \Zend\Authentication\Adapter\Adapt
     public function __construct(UserIdentityServiceInterface $AccountService, $account, $password)
     {
         $this->AccountService = $AccountService;
-        $this->account = $account;
-        $this->password = $password;
+        $this->account        = $account;
+        $this->password       = $password;
     }
 
     /**
@@ -41,20 +41,16 @@ class AccountAuthenticationAdapter implements \Zend\Authentication\Adapter\Adapt
         $account = $this->AccountService->getIdentityByAccount($this->account);
 
 
-
-        if(!$account)
-        {
-            return new Result( Result::FAILURE, null, [ 'Login failed.' ] );
+        if (!$account) {
+            return new Result(Result::FAILURE, null, ['Login failed.']);
         }
 
-        if($account->getState() != 1)
-        {
-            return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, [ 'Account disabled.' ]);
+        if ($account->getState() != 1) {
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, ['Account disabled.']);
         }
 
-        if(!$bcrypt->verify($this->password,$account->getPassword()))
-        {
-            return new Result( Result::FAILURE_CREDENTIAL_INVALID, null, [ 'Wrong password.' ]);
+        if (!$bcrypt->verify($this->password, $account->getPassword())) {
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, ['Wrong password.']);
         }
 
         $identity = new Identity();
