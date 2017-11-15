@@ -87,7 +87,7 @@ class AccountService implements UserIdentityServiceInterface
         return $Result;
     }
 
-    public function setCurrentPasswordByAccount(Identity $identity, $currentPass, $newPass, $confirmNewPass)
+    public function setCurrentIdentityPassword(Identity $identity, $currentPass, $newPass, $confirmNewPass)
     {
         $bcrypt = new Bcrypt();
 
@@ -121,7 +121,7 @@ class AccountService implements UserIdentityServiceInterface
         }
     }
 
-    public function setRootPassword($account, $newPass, $confirmNewPass)
+    public function setAccountPassword($account, $newPass, $confirmNewPass)
     {
         $bcrypt = new Bcrypt();
 
@@ -136,6 +136,7 @@ class AccountService implements UserIdentityServiceInterface
         }
 
         $rootIdentity = $this->AccountTable->getAccountByIdentity($account);
+
         if ($rootIdentity == null) {
             $rootIdentity = new Identity();
             $rootIdentity->setAccount($account);

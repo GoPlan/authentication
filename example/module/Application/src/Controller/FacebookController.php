@@ -17,8 +17,8 @@ class FacebookController extends FacebookAbstractController
     const ROUTE_SIGN_IN_RETURN_NAME  = "application/sign-in/facebook/sign-in-return";
     const ROUTE_REGISTER_NAME        = "application/register/facebook/register";
     const ROUTE_REGISTER_RETURN_NAME = "application/register/facebook/register-return";
-    const ROUTE_ATTACH_NAME        = "application/register/facebook/attach";
-    const ROUTE_ATTACH_RETURN_NAME = "application/register/facebook/attach-account-return";
+    const ROUTE_ATTACH_NAME          = "application/register/facebook/attach";
+    const ROUTE_ATTACH_RETURN_NAME   = "application/register/facebook/attach-account-return";
 
     function getAuthenticationReturnPath()
     {

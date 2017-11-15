@@ -46,8 +46,8 @@ interface UserIdentityServiceInterface
 
     public function attach(UserRegisterMethodAdapter $adapter, $identityId, $userId, $data);
 
-    public function setCurrentPasswordByAccount(Identity $identity, $currentPass, $newPass, $confirmNewPass);
+    public function setCurrentIdentityPassword(Identity $identity, $currentPass, $newPass, $confirmNewPass);
 
-    public function setRootPassword($account, $newPass, $confirmNewPass);
+    public function setAccountPassword($account, $newPass, $confirmNewPass);
 
 }

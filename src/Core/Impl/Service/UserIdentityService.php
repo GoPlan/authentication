@@ -117,25 +117,23 @@ class UserIdentityService implements UserIdentityServiceInterface
         $dbConnection->beginTransaction();
 
         try {
+
             $adapter->register($identityId, $userId, $data);
             $dbConnection->commit();
-
             return $identityId;
 
-        }
-        catch (\Exception $exception)
-        {
+        } catch (\Exception $exception) {
             $dbConnection->rollback();
             throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_DATABASE_OPERATION_FAILED, $exception);
         }
     }
 
-    public function setCurrentPasswordByAccount(Identity $identity, $currentPass, $newPass, $confirmNewPass)
+    public function setCurrentIdentityPassword(Identity $identity, $currentPass, $newPass, $confirmNewPass)
     {
         // TODO: Implement setCurrentPasswordByAccount() method.
     }
 
-    public function setRootPassword($account, $newPass, $confirmNewPass)
+    public function setAccountPassword($account, $newPass, $confirmNewPass)
     {
         // TODO: Implement setRootPassword() method.
     }

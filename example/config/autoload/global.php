@@ -29,23 +29,23 @@ return [
 
     'authConfig' => [
         'facebook' => [
-            'appId'     => "1442542719380071",
-            "appSecret" => "21db879762856c2639ce0ba2a9076a9b",
+            'appId'     => "",
+            "appSecret" => "",
             "appScope"  => ""
         ],
         'google'   => [
-            "clientId"     => "524836760491-47m4ms6usfvhjd9lssqtc2p792nf3jne.apps.googleusercontent.com",
-            "clientSecret" => "4iJsPeglVynfbH3xmWcUKmfX",
-            "clientScope"  => "public_profile",
+            "clientId"     => "",
+            "clientSecret" => "",
+            "clientScope"  => "",
             "apiKey"       => "",
         ]
     ],
 
     'db' => [
-        'driver'   => 'pdo_pgsql',
-        'hostname' => 'localhost',
-        'database' => 'erp-identity',
-        'username' => 'admin',
-        'password' => 'admin'
+        'driver'   => "",
+        'hostname' => "",
+        'database' => "",
+        'username' => "",
+        'password' => ""
     ],
 ];

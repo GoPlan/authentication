@@ -28,9 +28,20 @@ abstract class AbstractAccountController extends AbstractActionController
      * @var AuthenticationService;
      */
     protected $authService;
-    /** @var UserIdentityServiceInterface $AccountService */
+
+    /**
+     * @var UserIdentityServiceInterface
+     */
     protected $AccountService;
+
+    /**
+     * @var Adapter
+     */
     protected $dbAdapter;
+
+    /**
+     * @var AccountMethod
+     */
     protected $AccountMethod;
 
     /**
@@ -60,7 +71,6 @@ abstract class AbstractAccountController extends AbstractActionController
 
         $mAuthService = new AuthenticationService();
 
-
         if ($request->isPost()) {
 
             if ($mAuthService->hasIdentity())
@@ -79,11 +89,9 @@ abstract class AbstractAccountController extends AbstractActionController
                 } else {
                     $mForm->get('ResultMessages')->setValue($mResult->getMessages()[0]);
                 }
-
             }
-
-
         }
+
         return ['form' => $mForm];
     }
 
@@ -103,11 +111,13 @@ abstract class AbstractAccountController extends AbstractActionController
             $mForm->setData($request->getPost());
 
             if ($mForm->isValid()) {
+
                 $mUsername        = $mForm->get('txtUsername')->getValue();
                 $mPassword        = $mForm->get('txtPassword')->getValue();
                 $mConfirmPassword = $mForm->get('txtConfirmPassword')->getValue();
 
                 $loadidentity = $this->AccountService->getIdentityByAccount($mUsername);
+
                 if ($loadidentity == null) {
                     if (($mPassword == $mConfirmPassword) && !empty($mUsername) && !empty($mPassword)) {
 
@@ -130,7 +140,6 @@ abstract class AbstractAccountController extends AbstractActionController
                     $mForm->get('ResultMessages')->setValue('Account already exists.');
                 }
             }
-
         }
 
         return ['form' => $mForm];
@@ -141,6 +150,7 @@ abstract class AbstractAccountController extends AbstractActionController
         if ($this->AccountMethod == null) {
             $this->AccountMethod = new AccountMethod($this->dbAdapter);
         }
+
         return $this->AccountMethod;
     }
 
@@ -154,9 +164,11 @@ abstract class AbstractAccountController extends AbstractActionController
         $mAuthService = new AuthenticationService();
 
         if ($mAuthService->hasIdentity()) {
+
             /** @var Identity $account */
             $account = $mAuthService->getIdentity();
             $mForm->get('Identity')->setValue($account->getAccount());
+
             if ($request->isPost()) {
                 $mForm->setData($request->getPost());
 
@@ -165,7 +177,7 @@ abstract class AbstractAccountController extends AbstractActionController
                     $mPassword        = $mForm->get('txtPassword')->getValue();
                     $mConfirmPassword = $mForm->get('txtConfirmPassword')->getValue();
 
-                    switch ($this->AccountService->setCurrentPasswordByAccount($account, $mCurrentPassword, $mPassword, $mConfirmPassword)) {
+                    switch ($this->AccountService->setCurrentIdentityPassword($account, $mCurrentPassword, $mPassword, $mConfirmPassword)) {
 
                         case AccountService::ACCOUNT_RESET_SUCCESS:
                             $mForm->get('ResultMessages')->setValue('Change password success.');
@@ -196,5 +208,4 @@ abstract class AbstractAccountController extends AbstractActionController
 
         return ['form' => $mForm];
     }
-
 }

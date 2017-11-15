@@ -18,8 +18,8 @@ class GoogleController extends GoogleAbstractController
     const ROUTE_SIGN_IN_RETURN_NAME  = "application/sign-in/google/sign-in-return";
     const ROUTE_REGISTER_NAME        = "application/register/google/register";
     const ROUTE_REGISTER_RETURN_NAME = "application/register/google/register-return";
-    const ROUTE_ATTACH_NAME        = "application/register/google/attach-account";
-    const ROUTE_ATTACH_RETURN_NAME = "application/register/google/attach-account-return";
+    const ROUTE_ATTACH_NAME          = "application/register/google/attach-account";
+    const ROUTE_ATTACH_RETURN_NAME   = "application/register/google/attach-account-return";
 
     function getAuthenticationReturnPath()
     {

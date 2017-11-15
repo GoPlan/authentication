@@ -44,7 +44,7 @@ class ResetPasswordController extends AbstractActionController
         $newPass = $request->getParam('newPass');
         $confirmNewPass = $request->getParam('confirmNewPass');
 
-        switch ($this->AccountService->setRootPassword($account, $newPass, $confirmNewPass))
+        switch ($this->AccountService->setAccountPassword($account, $newPass, $confirmNewPass))
         {
             case AccountService::ACCOUNT_RESET_SUCCESS:
                 return "Success!!!\r\nNew password: $newPass \r\nConfirm new password: $confirmNewPass \r\n";
