@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="localhost" id="Project_586dbf8" template="Default" database="PostgreSQL" >
+	<schema name="erp_identity" catalogname="erp_identity" >
+		<table name="user_email" >
+			<column name="id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="identity_id" type="integer" length="0" decimal="0" jt="4" mandatory="y" />
+			<column name="email" type="varchar" length="255" decimal="0" jt="12" mandatory="y" />
+			<column name="password" type="varchar" length="255" decimal="0" jt="12" mandatory="y" />
+			<column name="salt" type="varchar" length="255" decimal="0" jt="12" mandatory="y" />
+			<column name="authenticable" type="bool" length="0" decimal="0" jt="-7" />
+			<column name="state" type="smallint" length="0" decimal="0" jt="5" />
+			<index name="pk_useremail" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="email_unique" unique="UNIQUE" >
+				<column name="email" />
+			</index>
+			<index name="user_index" unique="NORMAL" >
+				<column name="identity_id" />
+			</index>
+			<fk name="fk_user_email" to_schema="erp_identity" to_table="user_identity" delete_action="cascade" >
+				<fk_column name="identity_id" pk="id" />
+			</fk>
+		</table>
+		<table name="user_facebook" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" sequence="user_facebook_id_seq" />
+			<column name="identity_id" type="integer" length="0" decimal="0" jt="4" mandatory="y" />
+			<column name="user_id" type="varchar" length="255" decimal="0" jt="12" mandatory="y" />
+			<column name="access_token" type="varchar" length="255" decimal="0" jt="12" />
+			<index name="pk_userfacebook" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="facebookId_UNIQUE" unique="UNIQUE" >
+				<column name="user_id" />
+			</index>
+			<index name="identityId_INDEX" unique="NORMAL" >
+				<column name="identity_id" />
+			</index>
+			<fk name="fk_user_facebook" to_schema="erp_identity" to_table="user_identity" delete_action="cascade" >
+				<fk_column name="identity_id" pk="id" />
+			</fk>
+		</table>
+		<table name="user_google" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" sequence="user_google_id_seq" />
+			<column name="identity_id" type="integer" length="0" decimal="0" jt="4" mandatory="y" />
+			<column name="user_id" type="varchar" length="255" decimal="0" jt="12" mandatory="y" />
+			<column name="access_token" type="varchar" length="255" decimal="0" jt="12" />
+			<index name="pk_usergoogle" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="userid_unique" unique="UNIQUE" >
+				<column name="user_id" />
+			</index>
+			<index name="identity_index" unique="NORMAL" >
+				<column name="identity_id" />
+			</index>
+			<fk name="fk_user_google" to_schema="erp_identity" to_table="user_identity" delete_action="cascade" >
+				<fk_column name="identity_id" pk="id" />
+			</fk>
+		</table>
+		<table name="user_identity" >
+			<column name="id" type="serial" length="10" decimal="0" jt="4" mandatory="y" sequence="user_identity_id_seq" />
+			<column name="account" type="varchar" length="255" decimal="0" jt="12" />
+			<column name="password" type="varchar" length="255" jt="12" />
+			<column name="state" type="smallint" jt="5" />
+			<index name="user_identity_pkey" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+		<table name="user_session_log" >
+			<column name="id" type="integer" length="10" decimal="0" jt="4" mandatory="y" sequence="user_session_id_seq" />
+			<column name="hash" type="varchar" length="255" decimal="0" jt="12" mandatory="y" />
+			<column name="salt" type="varchar" length="255" decimal="0" jt="12" />
+			<column name="random" type="varchar" length="255" decimal="0" jt="12" />
+			<column name="previous_hash" type="varchar" length="255" decimal="0" jt="12" />
+			<column name="return_url" type="text" length="0" decimal="0" jt="12" />
+			<column name="data_json" type="text" length="0" decimal="0" jt="12" />
+			<column name="datetime" type="timestamp" length="0" decimal="0" jt="93" />
+			<column name="address" type="varchar" length="45" decimal="0" jt="12" />
+			<column name="repetition" type="integer" length="0" decimal="0" jt="4" />
+			<index name="pk_usersessionlog" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="hashkey_unique" unique="UNIQUE" >
+				<column name="hash" />
+			</index>
+		</table>
+		<table name="user_session_savehandler" >
+			<column name="id" type="varchar" length="32" jt="12" mandatory="y" />
+			<column name="name" type="varchar" length="32" jt="12" mandatory="y" />
+			<column name="modified" type="integer" jt="4" />
+			<column name="lifetime" type="integer" jt="4" />
+			<column name="data" type="text" decimal="0" jt="12" />
+			<index name="pk_user_session_savehandler" unique="PRIMARY_KEY" >
+				<column name="id" />
+				<column name="name" />
+			</index>
+		</table>
+		<sequence name="user_facebook_id_seq" start="1" />
+		<sequence name="user_google_id_seq" start="1" />
+		<sequence name="user_identity_id_seq" start="1" />
+		<sequence name="user_session_id_seq" start="1" />
+	</schema>
+	<schema name="erp_supply" catalogname="erp_supply" >
+		<table name="item" >
+			<column name="id" type="integer" jt="4" mandatory="y" />
+			<column name="name" type="varchar" length="255" jt="12" />
+			<column name="class_type" type="varchar" jt="12" >
+				<comment><![CDATA[Class, Specficiation]]></comment>
+			</column>
+			<index name="pk_item" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+		<table name="item_brand" >
+			<column name="id" type="integer" length="10" decimal="0" jt="4" mandatory="y" sequence="item_brand_id_seq" />
+			<column name="code" type="varchar" length="45" decimal="0" jt="12" mandatory="y" />
+			<index name="pk_itembrand" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="code_UNIQUE" unique="UNIQUE" >
+				<column name="code" />
+			</index>
+		</table>
+		<table name="item_class" >
+			<column name="id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="asset_type" type="varchar" length="45" decimal="0" jt="12" mandatory="y" />
+			<column name="parent_id" type="integer" length="0" decimal="0" jt="4" />
+			<index name="pk_itemclass" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="fk_itemclass_itemclass1_idx" unique="NORMAL" >
+				<column name="parent_id" />
+			</index>
+			<fk name="fk_item_class" to_schema="erp_supply" to_table="item_class" delete_action="setNull" >
+				<fk_column name="parent_id" pk="id" />
+			</fk>
+			<fk name="fk_item_class_0" to_schema="erp_supply" to_table="item" delete_action="cascade" >
+				<fk_column name="id" pk="id" />
+			</fk>
+		</table>
+		<table name="item_class_property" >
+			<column name="id" type="integer" length="10" decimal="0" jt="4" mandatory="y" sequence="item_class_property_id_seq" />
+			<column name="class_id" type="integer" length="0" decimal="0" jt="4" mandatory="y" />
+			<column name="property_id" type="integer" length="0" decimal="0" jt="4" mandatory="y" />
+			<column name="default_value" type="varchar" length="45" decimal="0" jt="12" />
+			<index name="pk_itempropertyassignment" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="classcharacteristic_unique" unique="NORMAL" >
+				<column name="class_id" />
+				<column name="property_id" />
+			</index>
+			<index name="idx_itempropertyassignment" unique="NORMAL" >
+				<column name="property_id" />
+			</index>
+			<fk name="fk_itempropertyassignment" virtual="y" to_schema="erp_supply" to_table="item_class" >
+				<fk_column name="class_id" pk="id" />
+			</fk>
+			<fk name="fk_itempropertyassignment_0" virtual="y" to_schema="erp_supply" to_table="item_property" delete_action="cascade" >
+				<fk_column name="property_id" pk="id" />
+			</fk>
+		</table>
+		<table name="item_property" >
+			<column name="id" type="integer" length="10" decimal="0" jt="4" mandatory="y" sequence="item_property_id_seq" />
+			<column name="name" type="varchar" length="45" decimal="0" jt="12" mandatory="y" />
+			<column name="enum" type="varchar" length="255" decimal="0" jt="12" />
+			<index name="pk_itemproperty" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="name_UNIQUE" unique="UNIQUE" >
+				<column name="name" />
+			</index>
+		</table>
+		<table name="item_specification" >
+			<column name="id" type="integer" length="0" decimal="0" jt="4" mandatory="y" />
+			<column name="class_id" type="integer" jt="4" />
+			<column name="brand_id" type="integer" length="0" decimal="0" jt="4" mandatory="y" />
+			<column name="date" type="date" length="0" decimal="0" jt="91" mandatory="y" />
+			<column name="price" type="real" length="0" decimal="0" jt="7" mandatory="y" />
+			<index name="pk_itemspecification" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="Date_INDEX" unique="NORMAL" >
+				<column name="date" />
+			</index>
+			<index name="idx_item_specification" unique="NORMAL" >
+				<column name="brand_id" />
+			</index>
+			<index name="idx_item_specification_0" unique="NORMAL" >
+				<column name="class_id" />
+			</index>
+			<fk name="fk_item_specification" to_schema="erp_supply" to_table="item_brand" delete_action="cascade" >
+				<fk_column name="brand_id" pk="id" />
+			</fk>
+			<fk name="fk_item_specification_0" to_schema="erp_supply" to_table="item" delete_action="cascade" >
+				<fk_column name="id" pk="id" />
+			</fk>
+			<fk name="fk_item_specification_1" to_schema="erp_supply" to_table="item_class" delete_action="setNull" >
+				<fk_column name="class_id" pk="id" />
+			</fk>
+		</table>
+		<table name="item_specification_property" >
+			<column name="id" type="integer" jt="4" mandatory="y" />
+			<column name="specification_id" type="integer" jt="4" />
+			<column name="property_id" type="integer" jt="4" />
+			<column name="configured_value" type="integer" jt="4" />
+			<index name="pk_item_specification_properties" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_item_specification_property_configuration" unique="NORMAL" >
+				<column name="specification_id" />
+			</index>
+			<index name="idx_item_specification_property_configuration_0" unique="NORMAL" >
+				<column name="property_id" />
+			</index>
+			<fk name="fk_item_specification_property_configuration" to_schema="erp_supply" to_table="item_specification" >
+				<fk_column name="specification_id" pk="id" />
+			</fk>
+			<fk name="fk_item_specification_property_configuration_0" to_schema="erp_supply" to_table="item_property" >
+				<fk_column name="property_id" pk="id" />
+			</fk>
+		</table>
+		<table name="item_structure" >
+			<column name="id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="specification_id" type="integer" length="0" decimal="0" jt="4" mandatory="y" />
+			<column name="effective_date" type="timestamp" length="0" decimal="0" jt="93" mandatory="y" />
+			<column name="description" type="text" length="0" decimal="0" jt="12" />
+			<index name="pk_itemstructure" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="itemdate_unique" unique="NORMAL" >
+				<column name="specification_id" />
+				<column name="effective_date" />
+			</index>
+			<index name="idx_item_structure" unique="NORMAL" >
+				<column name="specification_id" />
+			</index>
+			<fk name="fk_item_structure" to_schema="erp_supply" to_table="item_specification" delete_action="cascade" >
+				<fk_column name="specification_id" pk="id" />
+			</fk>
+		</table>
+		<table name="item_structure_line" >
+			<column name="id" type="integer" length="10" decimal="0" jt="4" mandatory="y" />
+			<column name="structure_id" type="integer" length="0" decimal="0" jt="4" mandatory="y" />
+			<column name="specification_id" type="integer" length="0" decimal="0" jt="4" mandatory="y" />
+			<column name="quantity_per" type="real" length="0" decimal="0" jt="7" mandatory="y" />
+			<index name="pk_itemstructureline" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="Specification_INDEX" unique="NORMAL" >
+				<column name="specification_id" />
+			</index>
+			<index name="Structure_INDEX" unique="NORMAL" >
+				<column name="structure_id" />
+			</index>
+			<fk name="fk_itemstructureline" virtual="y" to_schema="erp_supply" to_table="item_structure" >
+				<fk_column name="structure_id" pk="id" />
+			</fk>
+			<fk name="fk_item_structure_line" to_schema="erp_supply" to_table="item_specification" delete_action="cascade" >
+				<fk_column name="specification_id" pk="id" />
+			</fk>
+		</table>
+		<sequence name="item_brand_id_seq" start="1" />
+		<sequence name="item_class_property_id_seq" start="1" />
+		<sequence name="item_id_seq" start="1" />
+		<sequence name="item_property_id_seq" start="1" />
+	</schema>
+	<connector name="localhost (PostgreSQL)" database="PostgreSQL" driver_class="org.postgresql.Driver" driver_jar="postgresql-42.1.4.jar" driver_desc="Standard" host="localhost" port="5432" instance="ebusiness" user="ebusiness" passwd="ZWJ1c2luZXNz" />
+	<connector name="localhost (mysql)" database="MySql" driver_class="com.mysql.jdbc.Driver" driver_jar="mysql-connector-java-5.1.43-bin.jar" driver_desc="Standard" host="localhost" port="3306" user="root" />
+	<layout name="erp-identity" id="Layout_3001b7f" confirmed="y" show_relation="columns" >
+		<entity schema="erp_identity" name="user_session_log" color="bfd4f5" x="345" y="75" />
+		<entity schema="erp_identity" name="user_facebook" color="bfd4f5" x="180" y="150" />
+		<entity schema="erp_identity" name="user_google" color="bfd4f5" x="45" y="285" />
+		<entity schema="erp_identity" name="user_identity" color="bfd4f5" x="60" y="90" />
+		<group name="User Authentication" color="c4e0f9" >
+			<entity schema="erp_identity" name="user_facebook" />
+			<entity schema="erp_identity" name="user_google" />
+			<entity schema="erp_identity" name="user_identity" />
+			<entity schema="erp_identity" name="user_session_log" />
+		</group>
+		<browser id="Browse_4ef39e1" name="item_brand" confirm_updates="y" >
+			<browse_table schema="erp_supply" entity="item_brand" x="20" y="20" width="400" height="326" />
+		</browser>
+		<browser id="Browse_3f36e45" name="user_email" confirm_updates="y" >
+			<browse_table schema="erp_identity" entity="user_email" x="20" y="20" width="423" height="326" />
+		</browser>
+		<browser id="Browse_520e756" name="user_google" confirm_updates="y" >
+			<browse_table schema="erp_identity" entity="user_google" x="20" y="20" width="423" height="326" />
+		</browser>
+		<browser id="Browse_1213e3e" name="user_identity" confirm_updates="y" >
+			<browse_table schema="erp_identity" entity="user_identity" x="20" y="20" width="423" height="326" />
+			<browse_table schema="erp_identity" entity="user_google" x="463" y="20" width="423" height="326" />
+			<browse_table schema="erp_identity" entity="user_facebook" x="906" y="20" width="423" height="326" />
+		</browser>
+		<browser id="Browse_5ae7fa3" name="user_session_log" confirm_updates="y" >
+			<browse_table schema="erp_identity" entity="user_session_log" x="20" y="20" width="423" height="326" />
+		</browser>
+		<browser id="Browse_413f0d3" name="user_session_log_001" confirm_updates="y" >
+			<browse_table schema="erp_identity" entity="user_session_log" x="20" y="20" width="423" height="326" />
+		</browser>
+		<browser id="Browse_9039cb" name="user_session_log_003" confirm_updates="y" >
+			<browse_table schema="erp_identity" entity="user_session_log" x="20" y="20" width="423" height="326" />
+		</browser>
+		<browser id="Browse_4d3e076" name="user_session_log_005" confirm_updates="y" >
+			<browse_table schema="erp_identity" entity="user_session_log" x="20" y="20" width="423" height="326" />
+		</browser>
+		<browser id="Browse_3cdef99" name="user_session_savehandler" confirm_updates="y" >
+			<browse_table schema="erp_identity" entity="user_session_savehandler" x="20" y="20" width="866" height="326" />
+		</browser>
+		<browser id="Browse_59c4021" name="usersessionlog" confirm_updates="y" >
+			<browse_table schema="erp_identity" entity="user_session_log" x="20" y="20" width="423" height="326" />
+		</browser>
+	</layout>
+	<layout name="erp-supply" id="Layout_33b1d00" confirmed="y" show_relation="columns" >
+		<entity schema="erp_supply" name="item_structure" color="1f5182" x="90" y="75" />
+		<entity schema="erp_supply" name="item_structure_line" color="1f5182" x="255" y="75" />
+		<entity schema="erp_supply" name="item_class" color="1f5182" x="180" y="465" />
+		<entity schema="erp_supply" name="item_specification" color="1f5182" x="180" y="285" />
+		<entity schema="erp_supply" name="item_brand" color="1f5182" x="45" y="285" />
+		<entity schema="erp_supply" name="item" color="c1d8ee" x="45" y="420" />
+		<entity schema="erp_supply" name="item_specification_property" color="c1d8ee" x="345" y="285" />
+		<entity schema="erp_supply" name="item_property" color="1f5182" x="570" y="465" />
+		<entity schema="erp_supply" name="item_class_property" color="1f5182" x="345" y="465" />
+		<group name="Group_Item" color="c4e0f9" >
+			<entity schema="erp_supply" name="item_brand" />
+			<entity schema="erp_supply" name="item_class" />
+			<entity schema="erp_supply" name="item_property" />
+			<entity schema="erp_supply" name="item_class_property" />
+			<entity schema="erp_supply" name="item_specification" />
+			<entity schema="erp_supply" name="item_structure" />
+			<entity schema="erp_supply" name="item_structure_line" />
+			<entity schema="erp_supply" name="item" />
+		</group>
+		<browser id="Browse_421d96f" name="item_class" confirm_updates="y" >
+			<browse_table schema="erp_supply" entity="item_class" x="741" y="5" width="486" height="388" />
+			<browse_table schema="erp_supply" entity="item_specification" x="1236" y="6" width="624" height="562" />
+			<browse_table schema="erp_supply" entity="item" x="4" y="5" width="730" height="562" />
+		</browser>
+	</layout>
+</project>

@@ -28,7 +28,7 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
     const FACEBOOK_OAUTH_URL       = "https://www.facebook.com/v2.8/dialog/oauth";
     const FACEBOOK_TOKEN_URL       = "https://graph.facebook.com/v2.8/oauth/access_token";
     const FACEBOOK_GRAPH_URL       = "https://graph.facebook.com/me";
-    const FACEBOOK_SCOPE           = "public_profile, email";
+    const FACEBOOK_SCOPE           = "public_profile";
     const FACEBOOK_PROFILE_FIELDS  = "id, first_name, last_name, email";
     const FACEBOOK_PROFILE_ID_NAME = "id";
 
@@ -40,26 +40,40 @@ class FacebookMethod implements UserRegisterMethodAdapter, OAuthAuthenticationIn
     const PROFILE_FIELD_LAST_NAME  = "last_name";
     const PROFILE_FIELD_EMAIL      = "email";
 
-    /** @var  AdapterInterface $dbAdapter */
+    /**
+     * @var  AdapterInterface
+     */
     protected $dbAdapter;
 
-    /** @var  FacebookClient $facebookClient */
+    /**
+     * @var array
+     */
+    protected $config;
+
+    /**
+     * @var  FacebookClient
+     */
     protected $facebookClient;
 
-    /** @var FacebookTable $facebookTable */
+    /**
+     * @var FacebookTable
+     */
     protected $facebookTable;
 
     /**
      * UserFacebookService constructor.
      * @param $dbAdapter
-     * @param $appId
-     * @param $appSecret
-     * @param $appScope
-     * @internal param $redirectUri
+     * @param $config
      */
-    public function __construct($dbAdapter, $appId, $appSecret, $appScope)
+    public function __construct($dbAdapter, array $config)
     {
-        $this->dbAdapter      = $dbAdapter;
+        $this->config    = $config;
+        $this->dbAdapter = $dbAdapter;
+
+        $appId     = $config[self::METHOD_CONFIG_APP_ID];
+        $appSecret = $config[self::METHOD_CONFIG_APP_SECRET];
+        $appScope  = $config[self::METHOD_CONFIG_APP_SCOPE];
+
         $this->facebookTable  = new FacebookTable($this->dbAdapter);
         $this->facebookClient = new FacebookClient($appId, $appSecret, $appScope);
     }

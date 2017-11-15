@@ -67,9 +67,8 @@ class GoogleMethod implements OAuthAuthenticationInterface, UserRegisterMethodAd
      * GoogleMethod constructor.
      * @param Adapter $dbAdapter
      * @param array   $config
-     * @param null    $authConfigFile
      */
-    public function __construct($dbAdapter, array $config, $authConfigFile = null)
+    public function __construct($dbAdapter, array $config)
     {
         $this->dbAdapter = $dbAdapter;
         $this->config    = $config;
