@@ -14,7 +14,6 @@ use CreativeDelta\User\Account\AccountMethod;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
 use CreativeDelta\User\Core\Impl\Row\IdentityRow;
-use CreativeDelta\User\Core\Impl\Service\AccountService;
 use CreativeDelta\User\Core\Impl\Table\UserIdentityTable;
 use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\Result;
@@ -37,7 +36,7 @@ class RegisterTest extends AbstractHttpControllerTestCase
         $dbAdapter = $this->getApplicationServiceLocator()->get(Adapter::class);
 
         /** @var UserIdentityServiceInterface $accountService */
-        $accountService = $this->getApplicationServiceLocator()->get(AccountService::class);
+        $accountService = $this->getApplicationServiceLocator()->get(UserIdentityServiceInterface::class);
         /** @var UserRegisterMethodAdapter $method */
         $method = new AccountMethod($dbAdapter);
 
