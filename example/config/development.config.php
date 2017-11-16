@@ -7,12 +7,16 @@
 
 return [
     // Additional modules to include when in development mode
-    'modules' => [
-    ],
+    'modules'                 => require __DIR__ . '/modules.config.php',
+
     // Configuration overrides during development mode
     'module_listener_options' => [
-        'config_glob_paths' => [realpath(__DIR__) . '/autoload/{,*.}{global,local}-development.php'],
-        'config_cache_enabled' => false,
+        'config_glob_paths'        => [realpath(__DIR__) . '/autoload/{{,*.}global,{,*.}local}.php'],
+        'module_paths'             => [
+            './module',
+            './vendor',
+        ],
+        'config_cache_enabled'     => false,
         'module_map_cache_enabled' => false,
     ],
 ];

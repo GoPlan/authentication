@@ -28,11 +28,13 @@
   "require-dev": {
     "zendframework/zend-mvc": "^3.1.0",
     "zendframework/zend-component-installer": "^1.0 || ^0.7 || ^1.0.0-dev@dev",
+    "zendframework/zend-test": "^3.1.0",
     "zfcampus/zf-development-mode": "^3.0"
   },
   "autoload": {
     "psr-4": {
-      "CreativeDelta\\User\\": "src/"
+      "CreativeDelta\\User\\": "src/",
+      "CreativeDelta\\User\\Test\\": "test/"
     },
     "exclude-from-classmap": [
       "example/module/Application/src/",

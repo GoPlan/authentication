@@ -44,11 +44,11 @@ class Identity extends \ArrayObject
     protected $profile;
     protected $adapterClassName;
 
-    const TABLE_NAME = 'UserIdentity';
-    const ID_NAME = 'id';
-    const COLUMN_USER_NAME = 'account';
+    const TABLE_NAME           = 'UserIdentity';
+    const ID_NAME              = 'id';
+    const COLUMN_USER_NAME     = 'account';
     const COLUMN_USER_PASSWORD = 'password';
-    const COLUMN_STATE = 'state';
+    const COLUMN_STATE         = 'state';
 
     /**
      * @return int
@@ -117,6 +117,22 @@ class Identity extends \ArrayObject
     /**
      * @return mixed
      */
+    public function getProfile()
+    {
+        return $this->profile;
+    }
+
+    /**
+     * @param mixed $profile
+     */
+    public function setProfile($profile)
+    {
+        $this->profile = $profile;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getAdapterClassName()
     {
         return $this->adapterClassName;
@@ -133,7 +149,7 @@ class Identity extends \ArrayObject
     public function exchangeArray($data)
     {
         $hydrator = new ClassMethods(false);
-        $hydrator->hydrate($data,$this);
+        $hydrator->hydrate($data, $this);
     }
 
     /**
@@ -142,26 +158,11 @@ class Identity extends \ArrayObject
     public function getArrayCopy()
     {
         return [
-            self::ID_NAME => $this->getId(),
-            self::COLUMN_STATE => $this->getState(),
-            self::COLUMN_USER_NAME => $this->getAccount(),
+            self::ID_NAME              => $this->getId(),
+            self::COLUMN_STATE         => $this->getState(),
+            self::COLUMN_USER_NAME     => $this->getAccount(),
             self::COLUMN_USER_PASSWORD => $this->getPassword()
         ];
     }
 
-    /**
-     * @return mixed
-     */
-    public function getProfile()
-    {
-        return $this->profile;
-    }
-
-    /**
-     * @param mixed $profile
-     */
-    public function setProfile($profile)
-    {
-        $this->profile = $profile;
-    }
 }
