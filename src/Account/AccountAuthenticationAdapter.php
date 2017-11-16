@@ -17,13 +17,13 @@ use Zend\Crypt\Password\Bcrypt;
 
 class AccountAuthenticationAdapter implements AdapterInterface
 {
-    protected $AccountService;
+    protected $userIdentityService;
     protected $account;
     protected $password;
 
-    public function __construct(UserIdentityServiceInterface $AccountService, $account, $password)
+    public function __construct(UserIdentityServiceInterface $userIdentityService, $account, $password)
     {
-        $this->AccountService = $AccountService;
+        $this->userIdentityService = $userIdentityService;
         $this->account        = $account;
         $this->password       = $password;
     }
@@ -38,7 +38,7 @@ class AccountAuthenticationAdapter implements AdapterInterface
     {
         $bcrypt = new Bcrypt();
         /** @var Identity $account */
-        $account = $this->AccountService->getIdentityByAccount($this->account);
+        $account = $this->userIdentityService->getIdentityByAccount($this->account);
 
 
         if (!$account) {
@@ -57,11 +57,6 @@ class AccountAuthenticationAdapter implements AdapterInterface
             return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, ['Wrong password.']);
         }
 
-        $identity = new Identity();
-        $identity->setAccount($account->getAccount());
-        $identity->setId($account->getId());
-        $identity->setState($account->getState());
-
-        return new Result(Result::SUCCESS, $identity, ['Login Successful.']);
+        return new Result(Result::SUCCESS, $account, ['Login Successful.']);
     }
 }

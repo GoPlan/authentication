@@ -18,10 +18,21 @@ use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
 use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
 use CreativeDelta\User\Core\Impl\Row\IdentityRow;
 use CreativeDelta\User\Core\Impl\Table\UserIdentityTable;
+use Zend\Crypt\Password\Bcrypt;
 use Zend\Hydrator\ClassMethods;
+use Zend\Validator\StringLength;
+use Zend\Validator\ValidatorChain;
 
 class UserIdentityService implements UserIdentityServiceInterface
 {
+
+    const ACCOUNT_RESET_SUCCESS = 1;
+    const ACCOUNT_RESET_CURRENT_PASSWORD_IS_INCORRECT = -1;
+    const ACCOUNT_RESET_PASSWORD_DOES_NOT_MATCH = -2;
+    const ACCOUNT_RESET_CURRENT_PASSWORD_INVALID = -3;
+    const ACCOUNT_RESET_NEW_PASSWORD_INVALID = -4;
+    const ACCOUNT_RESET_FAILED = -5;
+
     /**
      * @var UserIdentityTable
      */
@@ -93,7 +104,12 @@ class UserIdentityService implements UserIdentityServiceInterface
             $identity = new IdentityRow($this->userIdentityTable);
             $identity->setAutoSequence(UserIdentityTable::AUTO_SEQUENCE);
             $identity->setAccount($account);
-            $identity->setPassword($password);
+            if(!empty($password))
+            {
+                $bcrypt = new Bcrypt();
+                $encryptPassword = $bcrypt->create($password);
+                $identity->setPassword($encryptPassword);
+            }
             $identity->setState(Identity::STATE_ACTIVE);
             $identity->save();
 
@@ -128,11 +144,92 @@ class UserIdentityService implements UserIdentityServiceInterface
 
     public function setCurrentIdentityPassword(Identity $identity, $currentPass, $newPass, $confirmNewPass)
     {
-        // TODO: Implement setCurrentPasswordByAccount() method.
+        $dbConnection = $this->userIdentityTable->getTableGateway()->getAdapter()->getDriver()->getConnection();
+        $dbConnection->beginTransaction();
+
+        try
+        {
+            $bcrypt = new Bcrypt();
+
+            $mValidator = new ValidatorChain();
+            $mValidator->attach(new StringLength(['min' => 8, 'max' => 32]));
+
+            if (!$mValidator->isValid($currentPass)) {
+                return self::ACCOUNT_RESET_CURRENT_PASSWORD_INVALID;
+            }
+
+            if (!$mValidator->isValid($newPass)) {
+                return self::ACCOUNT_RESET_NEW_PASSWORD_INVALID;
+            }
+
+            if (!$bcrypt->verify($currentPass, $identity->getPassword())) {
+                return self::ACCOUNT_RESET_CURRENT_PASSWORD_IS_INCORRECT;
+            }
+
+            if ($newPass != $confirmNewPass) {
+                return self::ACCOUNT_RESET_PASSWORD_DOES_NOT_MATCH;
+            }
+
+            //encrypt new pass
+            $identity->setPassword($bcrypt->create($newPass));
+
+            //save new pass
+            if ($this->userIdentityTable->saveAccount($identity)) {
+                $dbConnection->commit();
+                return self::ACCOUNT_RESET_SUCCESS;
+            } else {
+                return self::ACCOUNT_RESET_FAILED;
+            }
+        }
+        catch (\Exception $exception)
+        {
+            $dbConnection->rollback();
+            throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_DATABASE_OPERATION_FAILED, $exception);
+        }
     }
 
     public function setAccountPassword($account, $newPass, $confirmNewPass)
     {
-        // TODO: Implement setRootPassword() method.
+        $dbConnection = $this->userIdentityTable->getTableGateway()->getAdapter()->getDriver()->getConnection();
+        $dbConnection->beginTransaction();
+
+        try {
+            $bcrypt = new Bcrypt();
+
+            $mValidator = new ValidatorChain();
+            $mValidator->attach(new StringLength(['min' => 8, 'max' => 32]));
+
+            if (!$mValidator->isValid($newPass)) {
+                return self::ACCOUNT_RESET_NEW_PASSWORD_INVALID;
+            }
+            if ($newPass != $confirmNewPass) {
+                return self::ACCOUNT_RESET_PASSWORD_DOES_NOT_MATCH;
+            }
+
+            $result = $this->userIdentityTable->getAccountByIdentity($account);
+
+            $rootIdentity = $result ? (new ClassMethods())->hydrate($result->getArrayCopy(), new Identity()) : null;
+
+            if ($rootIdentity == null) {
+                $rootIdentity = new Identity();
+                $rootIdentity->setAccount($account);
+                $rootIdentity->setState(Identity::STATE_ACTIVE);
+            }
+
+            $tmp = $bcrypt->create($newPass);
+            $rootIdentity->setPassword($tmp);
+
+            if ($this->userIdentityTable->saveAccount($rootIdentity)) {
+                $dbConnection->commit();
+                return self::ACCOUNT_RESET_SUCCESS;
+            } else {
+                return self::ACCOUNT_RESET_FAILED;
+            }
+        }
+        catch (\Exception $exception)
+        {
+            $dbConnection->rollback();
+            throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_DATABASE_OPERATION_FAILED, $exception);
+        }
     }
 }

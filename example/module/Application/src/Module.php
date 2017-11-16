@@ -30,7 +30,7 @@ class Module implements ConsoleBannerProviderInterface,
     public function getConsoleUsage(Console $console)
     {
         return [
-            'user resetrootpassword account newPass confirmNewPass' => 'Set new password for root user',
+            'user resetpassword account newPass confirmNewPass' => 'Set new password for account',
 
             ['account', 'User account'],
             ['newPass', 'New pass for root user'],

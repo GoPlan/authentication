@@ -23,8 +23,8 @@ class AccountControllerFactory implements FactoryInterface
         // TODO: Implement __invoke() method.
         $dbAdapter = $container->get(Adapter::class);
         $authService = $container->get(AuthenticationService::class);
-        $AccountServiceInterface = $container->get(UserIdentityServiceInterface::class);
-        $controller  = new AccountController($dbAdapter,$authService,$AccountServiceInterface);
+        $UserIdentityServiceInterface = $container->get(UserIdentityServiceInterface::class);
+        $controller  = new AccountController($dbAdapter,$authService,$UserIdentityServiceInterface);
         return $controller;
     }
 }

@@ -9,7 +9,7 @@
 namespace CreativeDelta\User\Application\Controller;
 
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
-use CreativeDelta\User\Core\Impl\Service\AccountService;
+use CreativeDelta\User\Core\Impl\Service\UserIdentityService;
 use Zend\Console\Request as ConsoleRequest;
 use Zend\Db\Adapter\Adapter;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -18,12 +18,12 @@ use Zend\Mvc\Controller\AbstractActionController;
 class ResetPasswordController extends AbstractActionController
 {
     protected $dbAdapter;
-    protected $AccountService;
+    protected $userIdentityService;
 
-    public function __construct(Adapter $dbAdapter, UserIdentityServiceInterface $AccountService)
+    public function __construct(Adapter $dbAdapter, UserIdentityServiceInterface $userIdentityService)
     {
         $this->dbAdapter      = $dbAdapter;
-        $this->AccountService = $AccountService;
+        $this->userIdentityService = $userIdentityService;
     }
 
     public function indexAction()
@@ -43,8 +43,8 @@ class ResetPasswordController extends AbstractActionController
         $newPass        = $request->getParam('newPass');
         $confirmNewPass = $request->getParam('confirmNewPass');
 
-        switch ($this->AccountService->setAccountPassword($account, $newPass, $confirmNewPass)) {
-            case AccountService::ACCOUNT_RESET_SUCCESS:
+        switch ($this->userIdentityService->setAccountPassword($account, $newPass, $confirmNewPass)) {
+            case UserIdentityService::ACCOUNT_RESET_SUCCESS:
                 return "Success!!!\r\nNew password: $newPass \r\nConfirm new password: $confirmNewPass \r\n";
             default:
                 return "Can not set this value, try again.\r\n";

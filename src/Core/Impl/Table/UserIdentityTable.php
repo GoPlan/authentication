@@ -14,6 +14,7 @@ namespace CreativeDelta\User\Core\Impl\Table;
 
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\TableGateway\TableGateway;
+use CreativeDelta\User\Core\Domain\Entity\Identity;
 
 class UserIdentityTable
 {
@@ -70,6 +71,61 @@ class UserIdentityTable
     public function hasAccount($account)
     {
         return $this->tableGateway->select([self::COLUMN_ACCOUNT => $account])->count() > 0;
+    }
+
+
+    public function hasId($id)
+    {
+        $id     = (int)$id;
+        $rowset = $this->tableGateway->select(
+            [
+                self::ID_NAME => $id,
+            ]
+        );
+
+        return $rowset->count() != 0 ? true : false;
+    }
+
+    public function saveAccount(Identity $identity)
+    {
+        $data = $identity->getArrayCopy();
+
+        $id = $identity->getId();
+        if ($id == 0) {
+            unset($data[self::ID_NAME]);
+            $this->tableGateway->insert($data);
+            return true;
+        } else {
+            if ($this->getAccountById($id)) {
+                $this->tableGateway->update($data, [self::ID_NAME => $id]);
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    public function getAccountByIdentity($account)
+    {
+        $rowset = $this->tableGateway->select(
+            [self::COLUMN_ACCOUNT => $account]
+        );
+        return $rowset->current();
+    }
+
+    public function getAccountById($id)
+    {
+        $id     = (int)$id;
+        $rowset = $this->tableGateway->select([
+                self::ID_NAME => $id
+            ]
+        );
+        return $rowset->current();
+    }
+
+    public function getTableName()
+    {
+        return self::TABLE_NAME;
     }
 }
 

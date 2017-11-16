@@ -14,10 +14,9 @@ use CreativeDelta\User\Application\Form\RegisterForm;
 use CreativeDelta\User\Application\Form\SignInForm;
 use CreativeDelta\User\Core\Domain\Entity\Identity;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
-use CreativeDelta\User\Core\Impl\Service\AccountService;
+use CreativeDelta\User\Core\Impl\Service\UserIdentityService;
 use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\Result;
-use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Adapter\Adapter;
 use Zend\Http\Request;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -32,7 +31,7 @@ abstract class AbstractAccountController extends AbstractActionController
     /**
      * @var UserIdentityServiceInterface
      */
-    protected $AccountService;
+    protected $userIdentityService;
 
     /**
      * @var Adapter
@@ -48,13 +47,13 @@ abstract class AbstractAccountController extends AbstractActionController
      * IndexController constructor.
      * @param Adapter                           $dbAdapter
      * @param AuthenticationService             $authService
-     * @param UserIdentityServiceInterface|null $accountService
+     * @param UserIdentityServiceInterface|null $userIdentityService
      */
-    public function __construct(Adapter $dbAdapter, AuthenticationService $authService = null, UserIdentityServiceInterface $accountService = null)
+    public function __construct(Adapter $dbAdapter, AuthenticationService $authService = null, UserIdentityServiceInterface $userIdentityService = null)
     {
         $this->dbAdapter      = $dbAdapter;
         $this->authService    = $authService;
-        $this->AccountService = $accountService;
+        $this->userIdentityService = $userIdentityService;
     }
 
     public function indexAction()
@@ -82,7 +81,7 @@ abstract class AbstractAccountController extends AbstractActionController
                 $mUsername = $mForm->get('txtUsername')->getValue();
                 $mPassword = $mForm->get('txtPassword')->getValue();
 
-                $mAuthAdapter = new AccountAuthenticationAdapter($this->AccountService, $mUsername, $mPassword);
+                $mAuthAdapter = new AccountAuthenticationAdapter($this->userIdentityService, $mUsername, $mPassword);
                 $mResult      = $mAuthService->authenticate($mAuthAdapter);
                 if ($mResult->getCode() == Result::SUCCESS) {
                     return $this->redirect()->toRoute('application', ['action' => 'index']);
@@ -116,16 +115,13 @@ abstract class AbstractAccountController extends AbstractActionController
                 $mPassword        = $mForm->get('txtPassword')->getValue();
                 $mConfirmPassword = $mForm->get('txtConfirmPassword')->getValue();
 
-                $loadidentity = $this->AccountService->getIdentityByAccount($mUsername);
+                $loadidentity = $this->userIdentityService->getIdentityByAccount($mUsername);
 
                 if ($loadidentity == null) {
                     if (($mPassword == $mConfirmPassword) && !empty($mUsername) && !empty($mPassword)) {
 
-                        $bcrypt      = new Bcrypt();
-                        $encryptPass = $bcrypt->create($mPassword);
-
-                        if ($this->AccountService->register($this->getAccountMethod(), $mUsername, $encryptPass)) {
-                            $mAuthAdapter = new AccountAuthenticationAdapter($this->AccountService, $mUsername, $mPassword);
+                        if ($this->userIdentityService->register($this->getAccountMethod(), $mUsername, $mPassword)) {
+                            $mAuthAdapter = new AccountAuthenticationAdapter($this->userIdentityService, $mUsername, $mPassword);
                             $mResult      = $mAuthService->authenticate($mAuthAdapter);
                             if ($mResult->getCode() == Result::SUCCESS) {
                                 return $this->redirect()->toRoute('application', ['action' => 'index']);
@@ -177,24 +173,24 @@ abstract class AbstractAccountController extends AbstractActionController
                     $mPassword        = $mForm->get('txtPassword')->getValue();
                     $mConfirmPassword = $mForm->get('txtConfirmPassword')->getValue();
 
-                    switch ($this->AccountService->setCurrentIdentityPassword($account, $mCurrentPassword, $mPassword, $mConfirmPassword)) {
+                    switch ($this->userIdentityService->setCurrentIdentityPassword($account, $mCurrentPassword, $mPassword, $mConfirmPassword)) {
 
-                        case AccountService::ACCOUNT_RESET_SUCCESS:
+                        case UserIdentityService::ACCOUNT_RESET_SUCCESS:
                             $mForm->get('ResultMessages')->setValue('Change password success.');
                             break;
-                        case AccountService::ACCOUNT_RESET_NEW_PASSWORD_INVALID:
+                        case UserIdentityService::ACCOUNT_RESET_NEW_PASSWORD_INVALID:
                             $mForm->get('ResultMessages')->setValue('New pass is invalid.');
                             break;
-                        case AccountService::ACCOUNT_RESET_CURRENT_PASSWORD_INVALID:
+                        case UserIdentityService::ACCOUNT_RESET_CURRENT_PASSWORD_INVALID:
                             $mForm->get('ResultMessages')->setValue('Current pass is invalid.');
                             break;
-                        case AccountService::ACCOUNT_RESET_FAILED:
+                        case UserIdentityService::ACCOUNT_RESET_FAILED:
                             $mForm->get('ResultMessages')->setValue('Can not change password.');
                             break;
-                        case AccountService::ACCOUNT_RESET_CURRENT_PASSWORD_IS_INCORRECT:
+                        case UserIdentityService::ACCOUNT_RESET_CURRENT_PASSWORD_IS_INCORRECT:
                             $mForm->get('ResultMessages')->setValue('Current password wrong.');
                             break;
-                        case AccountService::ACCOUNT_RESET_PASSWORD_DOES_NOT_MATCH:
+                        case UserIdentityService::ACCOUNT_RESET_PASSWORD_DOES_NOT_MATCH:
                             $mForm->get('ResultMessages')->setValue('Confirm password not match.');
                             break;
                     }
