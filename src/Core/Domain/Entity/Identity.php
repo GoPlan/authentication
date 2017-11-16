@@ -13,8 +13,10 @@ namespace CreativeDelta\User\Core\Domain\Entity;
 
 
 use Zend\Authentication\Result;
+use Zend\Hydrator\ClassMethods;
 
-class Identity
+
+class Identity extends \ArrayObject
 {
     const STATE_NEW      = 0;
     const STATE_ACTIVE   = 1;
@@ -36,13 +38,20 @@ class Identity
     ];
 
     protected $id;
-    protected $identity;
+    protected $account;
     protected $state;
+    protected $password;
     protected $profile;
     protected $adapterClassName;
 
+    const TABLE_NAME           = 'UserIdentity';
+    const ID_NAME              = 'id';
+    const COLUMN_USER_NAME     = 'account';
+    const COLUMN_USER_PASSWORD = 'password';
+    const COLUMN_STATE         = 'state';
+
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
@@ -50,7 +59,7 @@ class Identity
     }
 
     /**
-     * @param mixed $id
+     * @param int $id
      */
     public function setId($id)
     {
@@ -58,23 +67,23 @@ class Identity
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getIdentity()
+    public function getAccount()
     {
-        return $this->identity;
+        return $this->account;
     }
 
     /**
-     * @param mixed $identity
+     * @param string $account
      */
-    public function setIdentity($identity)
+    public function setAccount($account)
     {
-        $this->identity = $identity;
+        $this->account = $account;
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getState()
     {
@@ -82,11 +91,27 @@ class Identity
     }
 
     /**
-     * @param mixed $state
+     * @param int $state
      */
     public function setState($state)
     {
         $this->state = $state;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param mixed $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
     }
 
     /**
@@ -120,4 +145,24 @@ class Identity
     {
         $this->adapterClassName = $adapterClassName;
     }
+
+    public function exchangeArray($data)
+    {
+        $hydrator = new ClassMethods(false);
+        $hydrator->hydrate($data, $this);
+    }
+
+    /**
+     * @return array
+     */
+    public function getArrayCopy()
+    {
+        return [
+            self::ID_NAME              => $this->getId(),
+            self::COLUMN_STATE         => $this->getState(),
+            self::COLUMN_USER_NAME     => $this->getAccount(),
+            self::COLUMN_USER_PASSWORD => $this->getPassword()
+        ];
+    }
+
 }

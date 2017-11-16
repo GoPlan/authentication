@@ -9,13 +9,13 @@
 namespace CreativeDelta\User\Core\Impl\Factory;
 
 
-use CreativeDelta\User\Core\Impl\Session\DbTableGatewayOptions;
 use Interop\Container\ContainerInterface;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\Session\Container;
 use Zend\Session\SaveHandler\DbTableGateway;
+use Zend\Session\SaveHandler\DbTableGatewayOptions;
 use Zend\Session\SessionManager;
 
 class SessionManagerFactory implements FactoryInterface
@@ -27,8 +27,7 @@ class SessionManagerFactory implements FactoryInterface
         $adapter      = $container->get(Adapter::class);
         $tableGateway = new TableGateway(self::SESSION_SAVE_HANDLER_TABLE, $adapter);
         $saveHandler  = new DbTableGateway($tableGateway, new DbTableGatewayOptions());
-        $manager      = new SessionManager();
-        $manager->setSaveHandler($saveHandler);
+        $manager      = new SessionManager(null, null, $saveHandler);
 
         Container::setDefaultManager($manager);
 

@@ -55,4 +55,6 @@ class UserSessionLogTable
     {
         return $this->tableGateway->select(['hash' => $hash])->current();
     }
+
+
 }

@@ -7,8 +7,8 @@
 
 namespace CreativeDelta\User\Application\Controller;
 
-use CreativeDelta\User\Core\Impl\Service\AuthenticationService;
 use CreativeDelta\User\Core\Impl\Service\UserSessionService;
+use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -54,5 +54,10 @@ class IndexController extends AbstractActionController
     {
         $this->authService->clearIdentity();
         return $this->redirect()->toRoute(self::ROUTE_HOME_NAME);
+    }
+
+    public function phpinfoAction()
+    {
+        return [];
     }
 }

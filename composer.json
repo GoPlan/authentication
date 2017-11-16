@@ -15,18 +15,26 @@
     "zendframework/zend-authentication": "^2.5.3",
     "zendframework/zend-crypt": "^3.2.1",
     "zendframework/zend-db": "^2.8.2",
-    "zendframework/zend-filter": "^2.7.1",
+    "zendframework/zend-filter": "^2.7",
     "zendframework/zend-hydrator": "^2.2.2",
-    "zendframework/zend-session": "^2.7"
+    "zendframework/zend-session": "^2.7",
+    "zendframework/zend-json": "^3.0",
+    "zendframework/zend-form": "^2.10",
+    "zendframework/zend-i18n": "^2.7",
+    "zendframework/zend-validator": "^2.10",
+    "zendframework/zend-console": "^2.6",
+    "zendframework/zend-mvc-console": "^1.1"
   },
   "require-dev": {
     "zendframework/zend-mvc": "^3.1.0",
     "zendframework/zend-component-installer": "^1.0 || ^0.7 || ^1.0.0-dev@dev",
+    "zendframework/zend-test": "^3.1.0",
     "zfcampus/zf-development-mode": "^3.0"
   },
   "autoload": {
     "psr-4": {
-      "CreativeDelta\\User\\": "src/"
+      "CreativeDelta\\User\\": "src/",
+      "CreativeDelta\\User\\Test\\": "test/"
     },
     "exclude-from-classmap": [
       "example/module/Application/src/",

@@ -19,7 +19,9 @@ use Zend\Mvc\MvcEvent;
 
 abstract class AbstractSecuredActionController extends AbstractActionController
 {
-    /** @var  AuthenticationServiceInterface $authenticationService */
+    /**
+     * @var  AuthenticationServiceInterface
+     */
     protected $authenticationService;
 
     /**
@@ -44,7 +46,8 @@ abstract class AbstractSecuredActionController extends AbstractActionController
 
     public function onDispatch(MvcEvent $e)
     {
-        return $this->getAuthenticationService()->hasIdentity() ? parent::onDispatch($e) : $this->noIdentityDispatch($e);
+        $response = $this->getAuthenticationService()->hasIdentity() ? parent::onDispatch($e) : $this->noIdentityDispatch($e);
+        return $response;
     }
 
     abstract function noIdentityDispatch(MvcEvent $e);

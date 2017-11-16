@@ -3,6 +3,10 @@
 
 use CreativeDelta\User\Application\Controller\IndexController;
 use CreativeDelta\User\Application\Controller\UserController;
+use CreativeDelta\User\Core\Domain\Entity\Identity;
+
+/** @var Identity $identity */
+$identity = $this->identity();
 
 $userLink     = $this->url(UserController::ROUTE_NAME);
 $registerLink = $this->url(IndexController::ROUTE_APPLICATION_NAME, ['action' => 'register']);
@@ -11,7 +15,7 @@ $signOutLink  = $this->url(IndexController::ROUTE_APPLICATION_NAME, ['action' =>
 ?>
 <div class="jumbotron">
     <?php if ($this->identity()) : ?>
-        <h3>Identity: <?= $this->identity() ? $this->identity()->getIdentity() : null ?></h3>
+        <h3>Identity: <?= $identity ? $identity->getAccount() : null ?></h3>
         <a href="<?= $signOutLink ?>">Sign-out</a>
     <?php else: ?>
         <a class="btn btn-primary" href="<?= $registerLink ?>">Register</a>

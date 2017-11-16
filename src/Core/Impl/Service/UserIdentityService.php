@@ -13,87 +13,56 @@ namespace CreativeDelta\User\Core\Impl\Service;
 
 
 use CreativeDelta\User\Core\Domain\Entity\Identity;
-use CreativeDelta\User\Core\Domain\Entity\SessionLog;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
 use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
-use CreativeDelta\User\Core\Domain\UserSessionServiceInterface;
 use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
 use CreativeDelta\User\Core\Impl\Row\IdentityRow;
 use CreativeDelta\User\Core\Impl\Table\UserIdentityTable;
-use CreativeDelta\User\Core\Impl\Table\UserSessionLogTable;
-use Zend\Crypt\Password\Bcrypt;
-use Zend\Db\Adapter\Adapter;
 use Zend\Hydrator\ClassMethods;
 
-class UserIdentityService implements UserIdentityServiceInterface, UserSessionServiceInterface
+class UserIdentityService implements UserIdentityServiceInterface
 {
-    const AUTHENTICATION_SERVICE_NAME = 'Zend\Authentication\AuthenticationService';
-
-    protected $bcrypt;
-    protected $dbAdapter;
+    /**
+     * @var UserIdentityTable
+     */
     protected $userIdentityTable;
-    protected $userSignInLogTable;
-    protected $userSessionService;
 
-    function __construct(Adapter $dbAdapter)
+
+    function __construct(UserIdentityTable $identityTable)
     {
-        $this->dbAdapter          = $dbAdapter;
-        $this->bcrypt             = new Bcrypt();
-        $this->userIdentityTable  = new UserIdentityTable($dbAdapter);
-        $this->userSignInLogTable = new UserSessionLogTable($dbAdapter);
-        $this->userSessionService = new UserSessionService($this->dbAdapter);
+        $this->userIdentityTable = $identityTable;
     }
 
     /**
-     * @param $previousHash
-     * @param $returnUrl
-     * @param $data
-     * @return string
-     */
-    public function createSessionLog($previousHash = null, $returnUrl = null, $data = null)
-    {
-        return $this->userSessionService->createSessionLog($previousHash, $returnUrl, $data);
-    }
-
-    /**
-     * @param $hash
-     * @return SessionLog|null
-     */
-    public function getSessionLog($hash)
-    {
-        return $this->userSessionService->getSessionLog($hash);
-    }
-
-    /**
-     * @param Identity|string $identity
+     * @param string $account
      * @return bool
      */
-    public function hasIdentity($identity)
+    public function hasAccount($account)
     {
-        return $this->userIdentityTable->hasIdentity($identity);
+        return $this->userIdentityTable->hasAccount($account);
     }
 
     /**
-     * @param string $identity
-     * @return null|Identity
-     */
-    public function getIdentityByIdentity($identity)
-    {
-        $result = $this->userIdentityTable->getByIdentity($identity);
-
-        /** @var Identity $identity */
-        $identity = $result ? (new ClassMethods())->hydrate($result->getArrayCopy(), new Identity()) : null;
-
-        return $identity;
-    }
-
-    /**
-     * @param $identityId
+     * @param string $account
      * @return Identity|null
      */
-    public function getIdentityById($identityId)
+    public function getIdentityByAccount($account)
     {
-        $result = $this->userIdentityTable->get($identityId);
+        $result = $this->userIdentityTable->getByAccount($account);
+
+        /** @var Identity $account */
+        $account = $result ? (new ClassMethods())->hydrate($result->getArrayCopy(), new Identity()) : null;
+
+        return $account;
+    }
+
+    /**
+     * @param $id
+     * @return Identity|null
+     */
+    public function getIdentityById($id)
+    {
+        $result = $this->userIdentityTable->get($id);
 
         /** @var Identity $identity */
         $identity = $result ? (new ClassMethods())->hydrate($result->getArrayCopy(), new Identity()) : null;
@@ -104,24 +73,27 @@ class UserIdentityService implements UserIdentityServiceInterface, UserSessionSe
     /**
      * @param UserRegisterMethodAdapter $adapter
      * @param string                    $account
-     * @param int                       $userId
-     * @param null                      $data
-     * @return mixed
+     * @param string|null               $password
+     * @param string|null               $userId
+     * @param string|null               $data
+     * @return int Newly created IdentityId
      * @throws UserIdentityException
      */
-    public function register(UserRegisterMethodAdapter $adapter, $account, $userId, $data = null)
+    public function register(UserRegisterMethodAdapter $adapter, $account, $password = null, $userId = null, $data = null)
     {
-        if ($this->hasIdentity($account) || $adapter->has($userId))
+        if ($this->hasAccount($account))
             throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_ACCOUNT_ALREADY_EXIST);
 
-        $dbConnection = $this->dbAdapter->getDriver()->getConnection();
+        $dbAdapter    = $this->userIdentityTable->getTableGateway()->getAdapter();
+        $dbConnection = $dbAdapter->getDriver()->getConnection();
         $dbConnection->beginTransaction();
 
         try {
 
             $identity = new IdentityRow($this->userIdentityTable);
             $identity->setAutoSequence(UserIdentityTable::AUTO_SEQUENCE);
-            $identity->setIdentity($account);
+            $identity->setAccount($account);
+            $identity->setPassword($password);
             $identity->setState(Identity::STATE_ACTIVE);
             $identity->save();
 
@@ -135,5 +107,32 @@ class UserIdentityService implements UserIdentityServiceInterface, UserSessionSe
             $dbConnection->rollback();
             throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_DATABASE_OPERATION_FAILED, $exception);
         }
+    }
+
+    public function attach(UserRegisterMethodAdapter $adapter, $identityId, $userId, $data)
+    {
+        $dbConnection = $this->userIdentityTable->getTableGateway()->getAdapter()->getDriver()->getConnection();
+        $dbConnection->beginTransaction();
+
+        try {
+
+            $adapter->register($identityId, $userId, $data);
+            $dbConnection->commit();
+            return $identityId;
+
+        } catch (\Exception $exception) {
+            $dbConnection->rollback();
+            throw new UserIdentityException(UserIdentityException::CODE_ERROR_INSERT_DATABASE_OPERATION_FAILED, $exception);
+        }
+    }
+
+    public function setCurrentIdentityPassword(Identity $identity, $currentPass, $newPass, $confirmNewPass)
+    {
+        // TODO: Implement setCurrentPasswordByAccount() method.
+    }
+
+    public function setAccountPassword($account, $newPass, $confirmNewPass)
+    {
+        // TODO: Implement setRootPassword() method.
     }
 }

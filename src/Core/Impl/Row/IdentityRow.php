@@ -52,8 +52,8 @@ class IdentityRow implements RowGatewayInterface
     public function exchangeArray(array $data)
     {
         $this->setId($data[UserIdentityTable::ID_NAME]);
-        $this->setIdentity($data[UserIdentityTable::COLUMN_IDENTITY]);
-        $this->setSecret($data[UserIdentityTable::COLUMN_SECRET]);
+        $this->setAccount($data[UserIdentityTable::COLUMN_ACCOUNT]);
+        $this->setPassword($data[UserIdentityTable::COLUMN_PASSWORD]);
         $this->setState($data[UserIdentityTable::COLUMN_STATE]);
     }
 
@@ -89,24 +89,24 @@ class IdentityRow implements RowGatewayInterface
         $this->data[UserIdentityTable::ID_NAME] = $id;
     }
 
-    public function getIdentity()
+    public function getAccount()
     {
-        return $this->data[UserIdentityTable::COLUMN_IDENTITY];
+        return $this->data[UserIdentityTable::COLUMN_ACCOUNT];
     }
 
-    public function setIdentity($identity)
+    public function setAccount($account)
     {
-        $this->data[UserIdentityTable::COLUMN_IDENTITY] = $identity;
+        $this->data[UserIdentityTable::COLUMN_ACCOUNT] = $account;
     }
 
-    public function setSecret($secret)
+    public function setPassword($password)
     {
-        return $this->data[UserIdentityTable::COLUMN_SECRET] = $secret;
+        return $this->data[UserIdentityTable::COLUMN_PASSWORD] = $password;
     }
 
-    public function getSecret()
+    public function getPassword()
     {
-        $this->data[UserIdentityTable::COLUMN_SECRET];
+        $this->data[UserIdentityTable::COLUMN_PASSWORD];
     }
 
     public function getState()
@@ -123,9 +123,7 @@ class IdentityRow implements RowGatewayInterface
     {
         if ($this->rowExistInDatabase) {
 
-            $this->identityTable->getTableGateway()->update($this->data, [
-                UserIdentityTable::ID_NAME => $this->getId()
-            ]);
+            $this->identityTable->getTableGateway()->update($this->data, [UserIdentityTable::ID_NAME => $this->getId()]);
 
         } else {
 
@@ -135,6 +133,8 @@ class IdentityRow implements RowGatewayInterface
 
                 $driver = $this->identityTable->getTableGateway()->getAdapter()->getDriver();
                 $newId  = $driver instanceof Pdo ? $driver->getLastGeneratedValue($this->getAutoSequence()) : $driver->getLastGeneratedValue();
+
+                $this->rowExistInDatabase = true;
                 $this->setId($newId);
             }
         }

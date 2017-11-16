@@ -7,9 +7,12 @@
  */
 
 use CreativeDelta\User\Application\Controller\IndexController;
+use CreativeDelta\User\Core\Domain\Entity\Identity;
 
+/** @var Identity $identity */
+$identity = $this->identity();
 $homeLink = $this->url(IndexController::ROUTE_HOME_NAME);
 ?>
 <h1>Secured Page</h1>
-<h3>Identity: <?= $this->identity()->getIdentity() ?></h3>
+<h3>Identity: <?= $identity->getAccount() ?></h3>
 <a class="btn btn-default" href="<?= $homeLink ?>">Back to home</a>

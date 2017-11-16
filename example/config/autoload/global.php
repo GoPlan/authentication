@@ -15,37 +15,42 @@ return [
 
     'service_manager' => [
         'factories' => [
-            \Zend\Db\Adapter\Adapter::class                                    => \Zend\Db\Adapter\AdapterServiceFactory::class,
-            \Zend\Session\SessionManager::class                                => \CreativeDelta\User\Core\Impl\Factory\SessionManagerFactory::class,
-            \CreativeDelta\User\Core\Impl\Service\AuthenticationService::class => \CreativeDelta\User\Core\Impl\Factory\AuthenticationServiceFactory::class
+            \Zend\Db\Adapter\Adapter::class                                  => \Zend\Db\Adapter\AdapterServiceFactory::class,
+            \Zend\Session\SessionManager::class                              => \CreativeDelta\User\Core\Impl\Factory\SessionManagerFactory::class,
+            \Zend\Authentication\AuthenticationService::class                => \Zend\ServiceManager\Factory\InvokableFactory::class,
+            \CreativeDelta\User\Google\GoogleMethod::class                   => \CreativeDelta\User\Core\Impl\Factory\GoogleMethodFactory::class,
+            \CreativeDelta\User\Facebook\FacebookMethod::class               => \CreativeDelta\User\Core\Impl\Factory\FacebookMethodFactory::class,
+            \CreativeDelta\User\Core\Impl\Service\UserIdentityService::class => \CreativeDelta\User\Core\Impl\Factory\UserIdentityServiceFactory::class,
+            \CreativeDelta\User\Core\Impl\Service\AccountService::class      => \CreativeDelta\User\Core\Impl\Factory\AccountServiceFactory::class
         ],
         'aliases'   => [
-            \Zend\Authentication\AuthenticationService::class => \CreativeDelta\User\Core\Impl\Service\AuthenticationService::class
+            \Zend\Authentication\AuthenticationServiceInterface::class          => \Zend\Authentication\AuthenticationService::class,
+            \CreativeDelta\User\Core\Domain\UserIdentityServiceInterface::class => \CreativeDelta\User\Core\Impl\Service\UserIdentityService::class
         ]
     ],
 
 
     // User should define below configurations in local.php for security purpose.
 
-    //    'authConfig' => [
-    //        'facebook' => [
-    //            'appId'     => "",
-    //            "appSecret" => "",
-    //            "appScope"  => ""
-    //        ],
-    //        'google'   => [
-    //            "clientId"     => "",
-    //            "clientSecret" => "",
-    //            "clientScope"  => "",
-    //            "apiKey"       => "",
-    //        ]
-    //    ],
-    //
-    //    'db' => [
-    //        'driver'   => '',
-    //        'hostname' => '',
-    //        'database' => '',
-    //        'username' => '',
-    //        'password' => ''
-    //    ],
+    'authConfig' => [
+        'facebook' => [
+            'appId'     => "",
+            "appSecret" => "",
+            "appScope"  => ""
+        ],
+        'google'   => [
+            "clientId"     => "",
+            "clientSecret" => "",
+            "clientScope"  => "",
+            "apiKey"       => "",
+        ]
+    ],
+
+    'db' => [
+        'driver'   => "",
+        'hostname' => "",
+        'database' => "",
+        'username' => "",
+        'password' => ""
+    ],
 ];

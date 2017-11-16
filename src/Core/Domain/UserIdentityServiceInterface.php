@@ -13,50 +13,41 @@ namespace CreativeDelta\User\Core\Domain;
 
 
 use CreativeDelta\User\Core\Domain\Entity\Identity;
-use CreativeDelta\User\Core\Domain\Entity\SessionLog;
 
 interface UserIdentityServiceInterface
 {
-
     /**
-     * @param string $identity
+     * @param $account
      * @return bool
      */
-    public function hasIdentity($identity);
+    public function hasAccount($account);
 
     /**
-     * @param string $identity
+     * @param $account
      * @return Identity
      */
-    public function getIdentityByIdentity($identity);
+    public function getIdentityByAccount($account);
 
     /**
-     * @param $identityId
+     * @param $id
      * @return Identity
      */
-    public function getIdentityById($identityId);
+    public function getIdentityById($id);
 
     /**
      * @param UserRegisterMethodAdapter $adapter
-     * @param                           $identity
-     * @param                           $userId // This field is a primary key of user record stored in (authentication) method tables - email, facebook, g+. It is usually either email, user_id depending on your authentication method record
+     * @param string                    $account
+     * @param string|null               $password
+     * @param mixed                     $userId
      * @param mixed                     $data // This field is for additional data such as profile data, password, or configuration. Array type is recommended
      * @return int Primary key of the newly created UserIdentity record
-     * @internal param string $identity
      */
-    public function register(UserRegisterMethodAdapter $adapter, $identity, $userId, $data = null);
+    public function register(UserRegisterMethodAdapter $adapter, $account, $password = null, $userId = null, $data = null);
 
-    /**
-     * @param $previousHash
-     * @param $returnUrl
-     * @param $data
-     * @return string
-     */
-    public function createSessionLog($previousHash = null, $returnUrl = null, $data = null);
+    public function attach(UserRegisterMethodAdapter $adapter, $identityId, $userId, $data);
 
-    /**
-     * @param $hash
-     * @return SessionLog|null
-     */
-    public function getSessionLog($hash);
+    public function setCurrentIdentityPassword(Identity $identity, $currentPass, $newPass, $confirmNewPass);
+
+    public function setAccountPassword($account, $newPass, $confirmNewPass);
+
 }

@@ -8,17 +8,20 @@
 namespace CreativeDelta\User\Application;
 
 use CreativeDelta\User\Application\Controller\FacebookController;
+use CreativeDelta\User\Application\Controller\Factory\AccountControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\FacebookControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\GoogleControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\IndexControllerFactory;
+use CreativeDelta\User\Application\Controller\Factory\ResetPasswordControllerFactory;
 use CreativeDelta\User\Application\Controller\Factory\UserControllerFactory;
 use CreativeDelta\User\Application\Controller\GoogleController;
+use CreativeDelta\User\Application\Controller\ResetPasswordController;
 use CreativeDelta\User\Application\Controller\UserController;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 
 return [
-    'router'       => [
+    'router'          => [
         'routes' => [
             'home'        => [
                 'type'    => Literal::class,
@@ -26,6 +29,26 @@ return [
                     'route'    => '/',
                     'defaults' => [
                         'controller' => Controller\IndexController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
+            'phpinfo'     => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/phpinfo',
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action'     => 'phpinfo',
+                    ],
+                ],
+            ],
+            'account'     => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/account[/:action]',
+                    'defaults' => [
+                        'controller' => Controller\AccountController::class,
                         'action'     => 'index',
                     ],
                 ],
@@ -55,7 +78,27 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [
-                                    'register'        => [
+                                    'attach'                => [
+                                        'type'    => Literal::class,
+                                        'options' => [
+                                            'route'    => '/attach',
+                                            'defaults' => [
+                                                'controller' => FacebookController::class,
+                                                'action'     => 'attach-account'
+                                            ]
+                                        ]
+                                    ],
+                                    'attach-account-return' => [
+                                        'type'    => Literal::class,
+                                        'options' => [
+                                            'route'    => '/attach-account-return',
+                                            'defaults' => [
+                                                'controller' => FacebookController::class,
+                                                'action'     => 'attach-account-return'
+                                            ]
+                                        ]
+                                    ],
+                                    'register'              => [
                                         'type'    => Literal::class,
                                         'options' => [
                                             'route'    => '/register',
@@ -65,7 +108,7 @@ return [
                                             ]
                                         ]
                                     ],
-                                    'register-return' => [
+                                    'register-return'       => [
                                         'type'    => Literal::class,
                                         'options' => [
                                             'route'    => '/register-return',
@@ -84,7 +127,27 @@ return [
                                 ],
                                 'may_terminate' => false,
                                 'child_routes'  => [
-                                    'register'        => [
+                                    'attach'                => [
+                                        'type'    => Literal::class,
+                                        'options' => [
+                                            'route'    => '/attach',
+                                            'defaults' => [
+                                                'controller' => GoogleController::class,
+                                                'action'     => 'attach-account'
+                                            ]
+                                        ]
+                                    ],
+                                    'attach-account-return' => [
+                                        'type'    => Literal::class,
+                                        'options' => [
+                                            'route'    => '/attach-account-return',
+                                            'defaults' => [
+                                                'controller' => GoogleController::class,
+                                                'action'     => 'attach-account-return'
+                                            ]
+                                        ]
+                                    ],
+                                    'register'              => [
                                         'type'    => Literal::class,
                                         'options' => [
                                             'route'    => '/register',
@@ -94,7 +157,7 @@ return [
                                             ]
                                         ]
                                     ],
-                                    'register-return' => [
+                                    'register-return'       => [
                                         'type'    => Literal::class,
                                         'options' => [
                                             'route'    => '/register-return',
@@ -189,15 +252,22 @@ return [
             ]
         ],
     ],
-    'controllers'  => [
+    'controllers'     => [
         'factories' => [
-            Controller\UserController::class     => UserControllerFactory::class,
-            Controller\IndexController::class    => IndexControllerFactory::class,
-            Controller\FacebookController::class => FacebookControllerFactory::class,
-            Controller\GoogleController::class   => GoogleControllerFactory::class,
+            Controller\UserController::class          => UserControllerFactory::class,
+            Controller\IndexController::class         => IndexControllerFactory::class,
+            Controller\FacebookController::class      => FacebookControllerFactory::class,
+            Controller\GoogleController::class        => GoogleControllerFactory::class,
+            Controller\AccountController::class       => AccountControllerFactory::class,
+            Controller\ResetPasswordController::class => ResetPasswordControllerFactory::class,
         ],
     ],
-    'view_manager' => [
+    'service_manager' => [
+        'factories' => [
+//            UserIdentityServiceInterface::class => UserIdentityServiceInterfaceFactory::class,
+        ],
+    ],
+    'view_manager'    => [
         'display_not_found_reason' => true,
         'display_exceptions'       => true,
         'doctype'                  => 'HTML5',
@@ -211,6 +281,21 @@ return [
         ],
         'template_path_stack'      => [
             __DIR__ . '/../view',
+        ],
+    ],
+    'console'         => [
+        'router' => [
+            'routes' => [
+                'user-reset-password' => [
+                    'options' => [
+                        'route'    => 'user resetpassword <account> <newPass> <confirmNewPass>',
+                        'defaults' => [
+                            'controller' => ResetPasswordController::class,
+                            'action'     => 'resetpassword',
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 ];
