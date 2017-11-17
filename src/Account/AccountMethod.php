@@ -10,8 +10,6 @@ namespace CreativeDelta\User\Account;
 
 
 use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
-use CreativeDelta\User\Core\Impl\Table\UserIdentityTable;
-use Zend\Db\Adapter\Adapter;
 
 class AccountMethod implements UserRegisterMethodAdapter
 {
@@ -19,11 +17,11 @@ class AccountMethod implements UserRegisterMethodAdapter
     protected $dbAdapter;
     protected $UserIdentityTable;
 
-    public function __construct(Adapter $dbAdapter)
-    {
-        $this->dbAdapter    = $dbAdapter;
-        $this->UserIdentityTable = new UserIdentityTable($dbAdapter);
-    }
+//    public function __construct(Adapter $dbAdapter)
+//    {
+//        $this->dbAdapter    = $dbAdapter;
+//        $this->UserIdentityTable = new UserIdentityTable($dbAdapter);
+//    }
 
     public function getName()
     {
@@ -32,12 +30,12 @@ class AccountMethod implements UserRegisterMethodAdapter
 
     public function getTableName()
     {
-        return $this->UserIdentityTable->getTableName();
+//        return $this->UserIdentityTable->getTableName();
     }
 
     public function has($userId)
     {
-        return $this->UserIdentityTable->hasId($userId);
+//        return $this->UserIdentityTable->hasId($userId);
     }
 
     public function register($identityId, $userId, $dataJson)

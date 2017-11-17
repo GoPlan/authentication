@@ -6,7 +6,7 @@
  * Time: 14:27
  */
 
-namespace CreativeDelta\User\Application\Form;
+namespace CreativeDelta\User\Account\Form;
 
 
 use Zend\Form\Form;
