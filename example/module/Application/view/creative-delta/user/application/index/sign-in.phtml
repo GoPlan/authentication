@@ -6,14 +6,17 @@
  * Time: 11:46 AM
  */
 
+use CreativeDelta\User\Application\Controller\AccountController;
 use CreativeDelta\User\Application\Controller\FacebookController;
 use CreativeDelta\User\Application\Controller\GoogleController;
 use CreativeDelta\User\Application\Controller\IndexController;
 
 $returnLink         = $this->return ? $this->return : $this->url(IndexController::ROUTE_HOME_NAME);
+$accountSignInLink  = $this->url(AccountController::ROUTE_NAME, [], ['query' => ['return' => $returnLink]]);
 $facebookSignInLink = $this->url(FacebookController::ROUTE_SIGN_IN_NAME, [], ['query' => ['return' => $returnLink]]);
 $googleSignInLink   = $this->url(GoogleController::ROUTE_SIGN_IN_NAME, [], ['query' => ['return' => $returnLink]]);
 ?>
 <h1>SIGN-IN PAGE</h1>
+<a class="btn btn-primary" href="<?= $accountSignInLink ?>">Account</a>
 <a class="btn btn-primary" href="<?= $facebookSignInLink ?>">Facebook</a>
 <a class="btn btn-primary" href="<?= $googleSignInLink ?>">Google</a>

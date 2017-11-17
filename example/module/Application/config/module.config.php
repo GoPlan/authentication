@@ -49,7 +49,7 @@ return [
                     'route'    => '/account[/:action]',
                     'defaults' => [
                         'controller' => Controller\AccountController::class,
-                        'action'     => 'index',
+                        'action'     => 'signin',
                     ],
                 ],
             ],
