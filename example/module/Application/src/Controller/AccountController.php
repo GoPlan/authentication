@@ -12,5 +12,20 @@ use CreativeDelta\User\Account\AbstractAccountController;
 
 class AccountController extends AbstractAccountController
 {
+    function returnResponseLoginSuccess()
+    {
+        return $this->redirect()->toRoute('application', ['action' => 'index']);
+    }
+
+    function returnResponseRegisterSuccess()
+    {
+        return $this->redirect()->toRoute('application', ['action' => 'index']);
+    }
+
+    function returnResponseAccessDeniedProfileAction()
+    {
+        return $this->redirect()->toRoute('account', ['action' => 'signin']);
+    }
+
 
 }

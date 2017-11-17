@@ -2,16 +2,15 @@
 /**
  * Created by PhpStorm.
  * User: work
- * Date: 13/11/2017
+ * Date: 10/11/2017
  * Time: 12:03
  */
 
-namespace CreativeDelta\User\Application\Form;
-
+namespace CreativeDelta\User\Account\Form;
 
 use Zend\Form\Form;
 
-class ProfileForm extends Form
+class SignInForm extends Form
 {
     public function __construct($name = null)
     {
@@ -19,38 +18,21 @@ class ProfileForm extends Form
 
         $this->add(
             [
-                'name' => 'Identity',
-                'type' => 'Hidden',
+               'name' => 'txtUsername',
+               'type' => 'Text',
+               'options' => [
+                   'label' => 'User name:'
+               ]
             ]);
-
-        $this->add(
-            [
-                'name' => 'txtCurrentPassword',
-                'type' => 'Password',
-                'options' => [
-                    'label' => 'Current password:'
-                ]
-            ]);
-
 
         $this->add(
             [
                 'name' => 'txtPassword',
                 'type' => 'Password',
                 'options' => [
-                    'label' => 'New password:'
+                    'label' => 'Password:'
                 ]
             ]);
-
-        $this->add(
-            [
-                'name' => 'txtConfirmPassword',
-                'type' => 'Password',
-                'options' => [
-                    'label' => 'Confirm password:'
-                ]
-            ]);
-
 
         $this->add(
             [
@@ -63,12 +45,10 @@ class ProfileForm extends Form
                 'name' => 'submit',
                 'type' => 'submit',
                 'options' => [
-                    'value' => 'Update',
+                    'value' => 'Sign In',
                     'id' => 'btnsubmit',
                 ]
             ]
         );
-
     }
-
 }

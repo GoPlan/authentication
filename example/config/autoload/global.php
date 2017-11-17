@@ -21,7 +21,6 @@ return [
             \CreativeDelta\User\Google\GoogleMethod::class                   => \CreativeDelta\User\Core\Impl\Factory\GoogleMethodFactory::class,
             \CreativeDelta\User\Facebook\FacebookMethod::class               => \CreativeDelta\User\Core\Impl\Factory\FacebookMethodFactory::class,
             \CreativeDelta\User\Core\Impl\Service\UserIdentityService::class => \CreativeDelta\User\Core\Impl\Factory\UserIdentityServiceFactory::class,
-            \CreativeDelta\User\Core\Impl\Service\AccountService::class      => \CreativeDelta\User\Core\Impl\Factory\AccountServiceFactory::class
         ],
         'aliases'   => [
             \Zend\Authentication\AuthenticationServiceInterface::class          => \Zend\Authentication\AuthenticationService::class,
