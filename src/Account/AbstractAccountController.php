@@ -199,7 +199,6 @@ abstract class AbstractAccountController extends AbstractActionController
                             break;
                     }
                 }
-
             }
 
         } else {
