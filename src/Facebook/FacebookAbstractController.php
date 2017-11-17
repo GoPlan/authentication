@@ -11,7 +11,9 @@ namespace CreativeDelta\User\Facebook;
 
 use CreativeDelta\User\Core\Domain\Entity\Identity;
 use CreativeDelta\User\Core\Domain\OAuthAuthenticationAdapter;
+use CreativeDelta\User\Core\Domain\OAuthAuthenticationInterface;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
+use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
 use CreativeDelta\User\Core\Impl\Exception\AuthenticationException;
 use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
 use CreativeDelta\User\Core\Impl\Service\UserSessionService;
@@ -38,9 +40,14 @@ abstract class FacebookAbstractController extends AbstractActionController
     protected $userIdentityService;
 
     /**
-     * @var FacebookMethod
+     * @var OAuthAuthenticationInterface
      */
-    protected $facebookMethod;
+    protected $oauthService;
+
+    /**
+     * @var UserRegisterMethodAdapter
+     */
+    protected $registerMethod;
 
     /**
      * @var Container
@@ -52,16 +59,19 @@ abstract class FacebookAbstractController extends AbstractActionController
      * FacebookAbstractController constructor.
      * @param AuthenticationService        $authenticationService
      * @param UserIdentityServiceInterface $userIdentityService
-     * @param FacebookMethod               $facebookMethod
+     * @param OAuthAuthenticationInterface $oauthService
+     * @param UserRegisterMethodAdapter    $registerMethod
      */
     public function __construct(
         AuthenticationService $authenticationService,
         UserIdentityServiceInterface $userIdentityService,
-        FacebookMethod $facebookMethod)
+        OAuthAuthenticationInterface $oauthService,
+        UserRegisterMethodAdapter $registerMethod)
     {
         $this->authenticationService = $authenticationService;
-        $this->facebookMethod        = $facebookMethod;
         $this->userIdentityService   = $userIdentityService;
+        $this->registerMethod        = $registerMethod;
+        $this->oauthService          = $oauthService;
     }
 
     /**
@@ -73,11 +83,19 @@ abstract class FacebookAbstractController extends AbstractActionController
     }
 
     /**
-     * @return FacebookMethod
+     * @return OAuthAuthenticationInterface
      */
-    public function getFacebookMethod()
+    public function getOAuthService()
     {
-        return $this->facebookMethod;
+        return $this->oauthService;
+    }
+
+    /**
+     * @return UserRegisterMethodAdapter
+     */
+    public function getRegisterMethod()
+    {
+        return $this->registerMethod;
     }
 
     /**
@@ -108,6 +126,9 @@ abstract class FacebookAbstractController extends AbstractActionController
      */
     abstract function getAuthenticationReturnPath();
 
+    /**
+     * @return mixed
+     */
     abstract function getAttachReturnPath();
 
     /**
@@ -208,7 +229,7 @@ abstract class FacebookAbstractController extends AbstractActionController
 
         $this->getContainer()[self::RETURN_URL] = $returnUrl;
 
-        $oauthUrl = $this->getFacebookMethod()->makeAuthenticationUrl($this->getAttachReturnUrl(), null);
+        $oauthUrl = $this->getOAuthService()->makeAuthenticationUrl($this->getAttachReturnUrl(), null);
 
         return $this->redirect()->toUrl($oauthUrl);
     }
@@ -222,11 +243,11 @@ abstract class FacebookAbstractController extends AbstractActionController
 
         try {
 
-            $this->getFacebookMethod()->initAccessToken($this->getAttachReturnUrl(), $code);
-            $facebookData = $this->getFacebookMethod()->getOAuthProfile();
+            $this->getOAuthService()->initAccessToken($this->getAttachReturnUrl(), $code);
+            $facebookData = $this->getOAuthService()->getOAuthProfile();
             $facebookId   = $facebookData[FacebookMethod::PROFILE_FIELD_ID];
 
-            $registerAdapter = $this->getFacebookMethod();
+            $registerAdapter = $this->getRegisterMethod();
 
             if ($this->authenticationService->hasIdentity()) {
                 /** @var Identity $getIdentity */
@@ -262,7 +283,7 @@ abstract class FacebookAbstractController extends AbstractActionController
 
         $this->getContainer()[self::RETURN_URL] = $returnUrl;
 
-        $oauthUrl = $this->getFacebookMethod()->makeAuthenticationUrl($this->getRegisterReturnUrl(), null);
+        $oauthUrl = $this->getOAuthService()->makeAuthenticationUrl($this->getRegisterReturnUrl(), null);
 
         return $this->redirect()->toUrl($oauthUrl);
     }
@@ -276,11 +297,11 @@ abstract class FacebookAbstractController extends AbstractActionController
 
         try {
 
-            $this->getFacebookMethod()->initAccessToken($this->getRegisterReturnUrl(), $code);
-            $facebookData = $this->getFacebookMethod()->getOAuthProfile();
+            $this->getOAuthService()->initAccessToken($this->getRegisterReturnUrl(), $code);
+            $facebookData = $this->getOAuthService()->getOAuthProfile();
             $facebookId   = $facebookData[FacebookMethod::PROFILE_FIELD_ID];
 
-            $registerAdapter = $this->getFacebookMethod();
+            $registerAdapter = $this->getRegisterMethod();
             $newAccountName  = $this->newAccountName($facebookId, $facebookData);
             $newIdentityId   = $this->getUserIdentityService()->register($registerAdapter, $newAccountName, null, $facebookId, $facebookData);
 
@@ -311,7 +332,7 @@ abstract class FacebookAbstractController extends AbstractActionController
 
         $this->getContainer()[self::RETURN_URL] = $returnUrl;
 
-        $facebookAuthUrl = $this->getFacebookMethod()->makeAuthenticationUrl($this->getAuthenticationReturnUrl(), null);
+        $facebookAuthUrl = $this->getOAuthService()->makeAuthenticationUrl($this->getAuthenticationReturnUrl(), null);
 
         return $this->redirect()->toUrl($facebookAuthUrl);
     }
@@ -325,14 +346,14 @@ abstract class FacebookAbstractController extends AbstractActionController
 
         try {
 
-            $this->getFacebookMethod()->initAccessToken($this->getAuthenticationReturnUrl(), $code);
+            $this->getOAuthService()->initAccessToken($this->getAuthenticationReturnUrl(), $code);
 
             $returnUrl   = $this->getContainer()[self::RETURN_URL];
             $authService = $this->getAuthenticationService();
 
             if ($this->authenticationService instanceof AuthenticationService) {
 
-                $adapter = new OAuthAuthenticationAdapter($this->getUserIdentityService(), $this->getFacebookMethod());
+                $adapter = new OAuthAuthenticationAdapter($this->getUserIdentityService(), $this->getOAuthService());
                 $result  = $authService->authenticate($adapter);
 
             } else {

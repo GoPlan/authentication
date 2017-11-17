@@ -24,7 +24,9 @@ class FacebookControllerFactory implements FactoryInterface
         $authService     = $container->get(AuthenticationService::class);
         $identityService = $container->get(UserIdentityServiceInterface::class);
         $facebookMethod  = $container->get(FacebookMethod::class);
-        $controller      = new FacebookController($authService, $identityService, $facebookMethod);
+
+        $controller = new FacebookController($authService, $identityService, $facebookMethod, $facebookMethod);
+
         return $controller;
     }
 }

@@ -38,7 +38,7 @@ class RegisterTest extends AbstractHttpControllerTestCase
         /** @var UserIdentityServiceInterface $accountService */
         $accountService = $this->getApplicationServiceLocator()->get(UserIdentityServiceInterface::class);
         /** @var UserRegisterMethodAdapter $method */
-        $method = new AccountMethod($dbAdapter);
+        $method = new AccountMethod();
 
         if ($accountService->hasAccount(self::USER_ACCOUNT)) {
             $identity    = $accountService->getIdentityByAccount(self::USER_ACCOUNT);
