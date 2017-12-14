@@ -131,9 +131,11 @@ class UserIdentityService implements UserIdentityServiceInterface
         $dbConnection->beginTransaction();
 
         try {
-
-            $adapter->register($identityId, $userId, $data);
-            $dbConnection->commit();
+            if(!$adapter->has($userId))
+            {
+                $adapter->register($identityId, $userId, $data);
+                $dbConnection->commit();
+            }
             return $identityId;
 
         } catch (\Exception $exception) {

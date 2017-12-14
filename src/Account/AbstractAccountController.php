@@ -57,6 +57,8 @@ abstract class AbstractAccountController extends AbstractActionController
      */
     abstract function returnResponseAccessDeniedProfileAction();
 
+
+
     /**
      * IndexController constructor.
      * @param AuthenticationService $authService
