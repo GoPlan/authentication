@@ -12,6 +12,8 @@ use CreativeDelta\User\Account\AbstractAccountController;
 
 class AccountController extends AbstractAccountController
 {
+    const ROUTE_NAME = "account";
+
     function returnResponseLoginSuccess()
     {
         return $this->redirect()->toRoute('application', ['action' => 'index']);

@@ -34,13 +34,10 @@ abstract class AbstractAccountController extends AbstractActionController
      */
     protected $userIdentityService;
 
-
-    protected $registerMethodAdapter;
-
     /**
-     * @var AccountMethod
+     * @var UserRegisterMethodAdapter
      */
-    protected $AccountMethod;
+    protected $registerMethodAdapter;
 
     /**
      * @return Response
@@ -61,48 +58,44 @@ abstract class AbstractAccountController extends AbstractActionController
 
     /**
      * IndexController constructor.
-     * @param AuthenticationService $authService
+     * @param AuthenticationService             $authService
      * @param UserIdentityServiceInterface|null $userIdentityService
-     * @param UserRegisterMethodAdapter $registerMethodAdapter
+     * @param UserRegisterMethodAdapter         $registerMethodAdapter
      */
-    public function __construct(AuthenticationService $authService = null, UserIdentityServiceInterface $userIdentityService = null, UserRegisterMethodAdapter $registerMethodAdapter)
+    public function __construct(AuthenticationService $authService = null,
+        UserIdentityServiceInterface $userIdentityService = null,
+        UserRegisterMethodAdapter $registerMethodAdapter)
     {
-        $this->authService = $authService;
-        $this->userIdentityService = $userIdentityService;
+        $this->authService           = $authService;
+        $this->userIdentityService   = $userIdentityService;
         $this->registerMethodAdapter = $registerMethodAdapter;
-    }
-
-    public function indexAction()
-    {
-        return [];
     }
 
     public function signinAction()
     {
-        /** @var Request $request */
-        $request = $this->getRequest();
+        /** @var Request $req */
+        $req   = $this->getRequest();
         $mForm = new SignInForm();
-        $mForm->get('submit')->setValue('Sign In');
 
-        $mAuthService = new AuthenticationService();
+        $mAuthService = $this->authService;
 
-        if ($request->isPost()) {
+        if ($req->isPost()) {
 
             if ($mAuthService->hasIdentity())
                 $mAuthService->clearIdentity();
 
-            $mForm->setData($request->getPost());
+            $mForm->setData($req->getPost());
 
             if ($mForm->isValid()) {
-                $mUsername = $mForm->get('txtUsername')->getValue();
-                $mPassword = $mForm->get('txtPassword')->getValue();
+                $mUsername = $mForm->get(SignInForm::ELEMENT_TXT_USERNAME)->getValue();
+                $mPassword = $mForm->get(SignInForm::ELEMENT_TXT_PASSWORD)->getValue();
 
                 $mAuthAdapter = new AccountAuthenticationAdapter($this->userIdentityService, $mUsername, $mPassword);
-                $mResult = $mAuthService->authenticate($mAuthAdapter);
+                $mResult      = $mAuthService->authenticate($mAuthAdapter);
                 if ($mResult->getCode() == Result::SUCCESS) {
                     return $this->returnResponseLoginSuccess();
                 } else {
-                    $mForm->get('ResultMessages')->setValue($mResult->getMessages()[0]);
+                    $mForm->get(SignInForm::ELEMENT_RESULT_MESSAGES)->setValue($mResult->getMessages()[0]);
                 }
             }
         }
@@ -112,44 +105,45 @@ abstract class AbstractAccountController extends AbstractActionController
 
     public function registerAction()
     {
-        /** @var Request $request */
-        $request = $this->getRequest();
+        /** @var Request $req */
+        $req   = $this->getRequest();
         $mForm = new RegisterForm();
-        $mForm->get('submit')->setValue('Sign In');
 
-        $mAuthService = new AuthenticationService();
+        $mAuthService = $this->authService;
 
-        if ($request->isPost()) {
+        if ($req->isPost()) {
             if ($mAuthService->hasIdentity())
                 $mAuthService->clearIdentity();
 
-            $mForm->setData($request->getPost());
+            $mForm->setData($req->getPost());
 
             if ($mForm->isValid()) {
 
-                $mUsername = $mForm->get('txtUsername')->getValue();
-                $mPassword = $mForm->get('txtPassword')->getValue();
-                $mConfirmPassword = $mForm->get('txtConfirmPassword')->getValue();
+                $data = $mForm->getData();
+
+                $mUsername        = $data[RegisterForm::ELEMENT_TXT_USERNAME];
+                $mPassword        = $data[RegisterForm::ELEMENT_TXT_PASSWORD];
+                $mConfirmPassword = $data[RegisterForm::ELEMENT_TXT_CONFIRM_PASSWORD];
 
                 $loadidentity = $this->userIdentityService->getIdentityByAccount($mUsername);
 
                 if ($loadidentity == null) {
                     if (($mPassword == $mConfirmPassword) && !empty($mUsername) && !empty($mPassword)) {
 
-                        if ($this->userIdentityService->register($this->getAccountMethod(), $mUsername, $mPassword)) {
+                        if ($this->userIdentityService->register($this->registerMethodAdapter, $mUsername, $mPassword)) {
                             $mAuthAdapter = new AccountAuthenticationAdapter($this->userIdentityService, $mUsername, $mPassword);
-                            $mResult = $mAuthService->authenticate($mAuthAdapter);
+                            $mResult      = $mAuthService->authenticate($mAuthAdapter);
                             if ($mResult->getCode() == Result::SUCCESS) {
                                 return $this->returnResponseRegisterSuccess();
                             } else {
-                                $mForm->get('ResultMessages')->setValue($mResult->getMessages()[0]);
+                                $mForm->get(RegisterForm::ELEMENT_RESULT_MESSAGES)->setValue($mResult->getMessages()[0]);
                             }
                         } else {
-                            $mForm->get('ResultMessages')->setValue('Register failed.');
+                            $mForm->get(RegisterForm::ELEMENT_RESULT_MESSAGES)->setValue('Register failed.');
                         }
                     }
                 } else {
-                    $mForm->get('ResultMessages')->setValue('Account already exists.');
+                    $mForm->get(RegisterForm::ELEMENT_TXT_CONFIRM_PASSWORD)->setValue('Account already exists.');
                 }
             }
         }
@@ -157,16 +151,11 @@ abstract class AbstractAccountController extends AbstractActionController
         return ['form' => $mForm];
     }
 
-    public function getAccountMethod()
-    {
-        return $this->AccountMethod;
-    }
-
     public function profileAction()
     {
         /** @var Request $request */
         $request = $this->getRequest();
-        $mForm = new ProfileForm();
+        $mForm   = new ProfileForm();
         $mForm->get('submit')->setValue('Update');
 
         $mAuthService = new AuthenticationService();
@@ -182,7 +171,7 @@ abstract class AbstractAccountController extends AbstractActionController
 
                 if ($mForm->isValid()) {
                     $mCurrentPassword = $mForm->get('txtCurrentPassword')->getValue();
-                    $mPassword = $mForm->get('txtPassword')->getValue();
+                    $mPassword        = $mForm->get('txtPassword')->getValue();
                     $mConfirmPassword = $mForm->get('txtConfirmPassword')->getValue();
 
                     switch ($this->userIdentityService->setCurrentIdentityPassword($account, $mCurrentPassword, $mPassword, $mConfirmPassword)) {
@@ -207,7 +196,6 @@ abstract class AbstractAccountController extends AbstractActionController
                             break;
                     }
                 }
-
             }
 
         } else {

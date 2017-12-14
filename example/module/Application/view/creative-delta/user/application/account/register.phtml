@@ -6,24 +6,24 @@
  * Time: 14:49
  */
 
-/** @var \Zend\Form\Form  $form */
+use CreativeDelta\User\Account\Form\RegisterForm;
 
-$mUsername = $form->get('txtUsername');
+/** @var RegisterForm $form */
+
+$mUsername = $form->get(RegisterForm::ELEMENT_TXT_USERNAME);
 $mUsername->setAttribute('class', 'form-control');
 $mUsername->setAttribute('Placeholder', 'User name');
 
-$mPassword = $form->get('txtPassword');
+$mPassword = $form->get(RegisterForm::ELEMENT_TXT_PASSWORD);
 $mPassword->setAttribute('class', 'form-control');
 $mPassword->setAttribute('Placeholder', 'Password');
 
-$mConfirmPassword = $form->get('txtConfirmPassword');
+$mConfirmPassword = $form->get(RegisterForm::ELEMENT_TXT_CONFIRM_PASSWORD);
 $mConfirmPassword->setAttribute('class', 'form-control');
 $mConfirmPassword->setAttribute('Placeholder', 'Password');
 
-$mResultMessages = $form->get('ResultMessages');
+$mResultMessages = $form->get(RegisterForm::ELEMENT_RESULT_MESSAGES);
 $mResultMessages->setAttribute('class', 'label-warning');
-
-$submit = $form->get('submit');
 
 echo $this->form()->openTag($form);
 ?>
@@ -44,10 +44,12 @@ echo $this->form()->openTag($form);
         <?= $this->formElementErrors()->render($mConfirmPassword, ['class' => 'help-block']) ?>
     </div>
     <div class="form-group">
-        <label class="label label-warning"><?= $form->get('ResultMessages')->getValue() ?></label>
+        <label class="label label-warning"><?= $form->get(RegisterForm::ELEMENT_RESULT_MESSAGES)->getValue() ?></label>
+    </div>
+    <div class="form-group">
+        <button class="btn btn-primary" type="submit">Submit</button>
     </div>
 
 <?php
-echo $this->formSubmit($submit);
 echo $this->form()->closeTag();
 ?>

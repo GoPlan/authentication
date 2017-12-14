@@ -9,9 +9,11 @@
 namespace CreativeDelta\User\Google;
 
 
-use CreativeDelta\User\Core\Domain\OAuthAuthenticationAdapter;
 use CreativeDelta\User\Core\Domain\Entity\Identity;
+use CreativeDelta\User\Core\Domain\OAuthAuthenticationAdapter;
+use CreativeDelta\User\Core\Domain\OAuthAuthenticationInterface;
 use CreativeDelta\User\Core\Domain\UserIdentityServiceInterface;
+use CreativeDelta\User\Core\Domain\UserRegisterMethodAdapter;
 use CreativeDelta\User\Core\Impl\Exception\AuthenticationException;
 use CreativeDelta\User\Core\Impl\Exception\UserIdentityException;
 use CreativeDelta\User\Core\Impl\Service\UserSessionService;
@@ -25,12 +27,18 @@ use Zend\Session\Container;
 
 abstract class GoogleAbstractController extends AbstractActionController
 {
+
     const RETURN_URL = 'returnUrl';
 
     /**
-     * @var GoogleMethod
+     * @var OAuthAuthenticationInterface
      */
-    protected $googleMethod;
+    protected $oauthService;
+
+    /**
+     * @var UserRegisterMethodAdapter
+     */
+    protected $registerMethod;
 
     /**
      * @var UserIdentityServiceInterface
@@ -51,24 +59,35 @@ abstract class GoogleAbstractController extends AbstractActionController
      * GoogleAbstractController constructor.
      * @param AuthenticationService        $authenticationService
      * @param UserIdentityServiceInterface $userIdentityService
-     * @param GoogleMethod                 $googleMethod
+     * @param OAuthAuthenticationInterface $oauthService
+     * @param UserRegisterMethodAdapter    $registerMethod
      */
     public function __construct(
         AuthenticationService $authenticationService,
         UserIdentityServiceInterface $userIdentityService,
-        GoogleMethod $googleMethod)
+        OAuthAuthenticationInterface $oauthService,
+        UserRegisterMethodAdapter $registerMethod)
     {
         $this->authenticationService = $authenticationService;
-        $this->googleMethod          = $googleMethod;
         $this->userIdentityService   = $userIdentityService;
+        $this->oauthService          = $oauthService;
+        $this->registerMethod        = $registerMethod;
     }
 
     /**
-     * @return GoogleMethod
+     * @return UserRegisterMethodAdapter
      */
-    public function getGoogleMethod()
+    public function getRegisterMethod()
     {
-        return $this->googleMethod;
+        return $this->registerMethod;
+    }
+
+    /**
+     * @return OAuthAuthenticationInterface
+     */
+    public function getOauthService()
+    {
+        return $this->oauthService;
     }
 
     /**
@@ -107,6 +126,9 @@ abstract class GoogleAbstractController extends AbstractActionController
      */
     abstract function getAuthenticationReturnPath();
 
+    /**
+     * @return string
+     */
     abstract function getAttachAccountReturnPath();
 
     /**
@@ -156,6 +178,7 @@ abstract class GoogleAbstractController extends AbstractActionController
      */
     abstract function newAccountName($googleId, $googleData);
 
+
     public function attachAccountAction()
     {
         /** @var Request $request */
@@ -166,8 +189,7 @@ abstract class GoogleAbstractController extends AbstractActionController
             throw AuthenticationException::ReturnUrlIsNotProvided();
 
         $this->getContainer()[self::RETURN_URL] = $returnUrl;
-
-        $oauthUrl = $this->getGoogleMethod()->makeAuthenticationUrl($this->getAttachAccountReturnPath(), null);
+        $oauthUrl                               = $this->getOauthService()->makeAuthenticationUrl($this->getAttachAccountReturnPath(), null);
 
         return $this->redirect()->toUrl($oauthUrl);
 
@@ -180,24 +202,18 @@ abstract class GoogleAbstractController extends AbstractActionController
 
         try {
 
-            $this->getGoogleMethod()->initAccessToken($this->getAttachAccountReturnPath(), $code);
-            $oauthData = $this->getGoogleMethod()->getOAuthProfile();
+            $this->getOauthService()->initAccessToken($this->getAttachAccountReturnPath(), $code);
+            $oauthData = $this->getOauthService()->getOAuthProfile();
             $oauthId   = $oauthData[GoogleMethod::PROFILE_FIELD_ID];
 
-            $registerAdapter = $this->getGoogleMethod();
+            $registerAdapter = $this->getRegisterMethod();
 
-            if($this->authenticationService->hasIdentity())
-            {
+            if ($this->authenticationService->hasIdentity()) {
                 /** @var Identity $getIdentity */
                 $getIdentity = $this->authenticationService->getIdentity();
-
                 $this->getUserIdentityService()->attach($registerAdapter, $getIdentity->getId(), $oauthId, $oauthData);
-
                 $this->createUserInLocalDatabase($getIdentity->getId(), $oauthData);
             }
-
-
-
 
             return $this->getReturnResponseForNewUserCreated();
 
@@ -224,7 +240,7 @@ abstract class GoogleAbstractController extends AbstractActionController
 
         $this->getContainer()[self::RETURN_URL] = $returnUrl;
 
-        $oauthUrl = $this->getGoogleMethod()->makeAuthenticationUrl($this->getRegisterReturnPath(), null);
+        $oauthUrl = $this->getOauthService()->makeAuthenticationUrl($this->getRegisterReturnPath(), null);
 
         return $this->redirect()->toUrl($oauthUrl);
     }
@@ -236,11 +252,11 @@ abstract class GoogleAbstractController extends AbstractActionController
 
         try {
 
-            $this->getGoogleMethod()->initAccessToken($this->getRegisterReturnPath(), $code);
-            $oauthData = $this->getGoogleMethod()->getOAuthProfile();
+            $this->getOauthService()->initAccessToken($this->getRegisterReturnPath(), $code);
+            $oauthData = $this->getOauthService()->getOAuthProfile();
             $oauthId   = $oauthData[GoogleMethod::PROFILE_FIELD_ID];
 
-            $registerAdapter = $this->getGoogleMethod();
+            $registerAdapter = $this->getRegisterMethod();
             $newAccountName  = $this->newAccountName($oauthId, $oauthData);
             $newIdentityId   = $this->getUserIdentityService()->register($registerAdapter, $newAccountName, null, $oauthId, $oauthData);
 
@@ -271,7 +287,7 @@ abstract class GoogleAbstractController extends AbstractActionController
 
         $this->getContainer()[self::RETURN_URL] = $returnUrl;
 
-        $oauthUrl = $this->getGoogleMethod()->makeAuthenticationUrl($this->getAuthenticationReturnPath(), null);
+        $oauthUrl = $this->getOauthService()->makeAuthenticationUrl($this->getAuthenticationReturnPath(), null);
 
         return $this->redirect()->toUrl($oauthUrl);
     }
@@ -285,14 +301,14 @@ abstract class GoogleAbstractController extends AbstractActionController
 
         try {
 
-            $this->getGoogleMethod()->initAccessToken($this->getAuthenticationReturnPath(), $code);
+            $this->getOauthService()->initAccessToken($this->getAuthenticationReturnPath(), $code);
 
             $returnUrl   = $this->getContainer()[self::RETURN_URL];
             $authService = $this->getAuthenticationService();
 
             if ($authService instanceof AuthenticationService) {
 
-                $adapter = new OAuthAuthenticationAdapter($this->getUserIdentityService(), $this->getGoogleMethod());
+                $adapter = new OAuthAuthenticationAdapter($this->getUserIdentityService(), $this->getOauthService());
                 $result  = $authService->authenticate($adapter);
 
             } else {

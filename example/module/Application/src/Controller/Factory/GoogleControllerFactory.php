@@ -24,7 +24,7 @@ class GoogleControllerFactory implements FactoryInterface
         $authService     = $container->get(AuthenticationService::class);
         $identityService = $container->get(UserIdentityServiceInterface::class);
         $googleMethod    = $container->get(GoogleMethod::class);
-        $controller      = new GoogleController($authService, $identityService, $googleMethod);
+        $controller      = new GoogleController($authService, $identityService, $googleMethod, $googleMethod);
         return $controller;
     }
 }
